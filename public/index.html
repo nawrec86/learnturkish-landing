@@ -1,0 +1,304 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>LearnTurkish AI — Learn Turkish by Talking with AI</title>
+<meta name="description" content="Master Turkish through real AI conversations. 25+ scenarios, 3 AI coaches, TÖMER prep. Download for iOS and Android.">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🇹🇷</text></svg>">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:#0A0A0B;color:#FFF;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;overflow-x:hidden}
+a{text-decoration:none;color:inherit}
+.r{color:#E30A17}.g{color:#00C853}.gold{color:#F5C518}.blue{color:#3B82F6}.purple{color:#8B5CF6}
+
+/* Nav */
+nav{position:fixed;top:0;width:100%;background:rgba(10,10,11,0.9);backdrop-filter:blur(20px);border-bottom:1px solid rgba(255,255,255,0.06);padding:12px 20px;display:flex;align-items:center;justify-content:space-between;z-index:100}
+nav .logo{font-size:18px;font-weight:800}
+nav .lang-sel{position:relative;cursor:pointer}
+nav .lang-btn{display:flex;align-items:center;gap:6px;background:#131315;border:1px solid rgba(255,255,255,0.1);border-radius:8px;padding:6px 12px;font-size:13px;color:#FFF;cursor:pointer}
+nav .lang-drop{display:none;position:absolute;right:0;top:40px;background:#131315;border:1px solid rgba(255,255,255,0.1);border-radius:12px;width:180px;max-height:400px;overflow-y:auto;box-shadow:0 8px 32px rgba(0,0,0,0.5)}
+nav .lang-sel:hover .lang-drop{display:block}
+nav .lang-drop a{display:flex;align-items:center;gap:8px;padding:10px 14px;font-size:13px;border-bottom:1px solid rgba(255,255,255,0.04);transition:background 0.2s}
+nav .lang-drop a:hover{background:rgba(227,10,23,0.1)}
+.nav-links{display:flex;gap:20px;align-items:center}
+.nav-links a{font-size:14px;color:#888;transition:color 0.2s}
+.nav-links a:hover{color:#FFF}
+
+/* Hero */
+.hero{min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:100px 20px 60px;position:relative}
+.hero::before{content:'';position:absolute;top:0;left:50%;transform:translateX(-50%);width:600px;height:600px;background:radial-gradient(circle,rgba(227,10,23,0.12) 0%,transparent 70%);pointer-events:none}
+.hero .flag{font-size:80px;margin-bottom:20px;animation:float 3s ease-in-out infinite}
+@keyframes float{0%,100%{transform:translateY(0)}50%{transform:translateY(-10px)}}
+.hero h1{font-size:clamp(36px,6vw,60px);font-weight:900;line-height:1.1;margin-bottom:16px;letter-spacing:-1px}
+.hero p{font-size:clamp(16px,2.5vw,20px);color:#888;max-width:520px;margin-bottom:32px;line-height:1.6}
+.btn{padding:16px 32px;border-radius:14px;font-size:16px;font-weight:700;cursor:pointer;border:none;transition:all 0.2s;display:inline-flex;align-items:center;gap:8px}
+.btn:hover{transform:scale(1.05)}
+.btn-r{background:#E30A17;color:#FFF}
+.btn-o{background:transparent;color:#FFF;border:2px solid rgba(255,255,255,0.12)}
+.hero .cta{display:flex;gap:12px;flex-wrap:wrap;justify-content:center;margin-bottom:40px}
+
+/* Store Buttons */
+.stores{display:flex;gap:16px;flex-wrap:wrap;justify-content:center;align-items:center;margin-bottom:32px}
+.store-btn{display:flex;align-items:center;gap:10px;background:#131315;border:1px solid rgba(255,255,255,0.1);border-radius:12px;padding:10px 20px;cursor:pointer;transition:border-color 0.3s}
+.store-btn:hover{border-color:rgba(227,10,23,0.4)}
+.store-btn .icon{font-size:28px}
+.store-btn .text{text-align:left}
+.store-btn .text .small{font-size:10px;color:#888}
+.store-btn .text .big{font-size:15px;font-weight:700}
+
+.qr-section{display:flex;gap:24px;justify-content:center;margin-top:24px;flex-wrap:wrap}
+.qr-box{background:#FFF;border-radius:12px;padding:12px;text-align:center;width:120px}
+.qr-box .qr{width:96px;height:96px;background:#EEE;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:11px;color:#333;margin-bottom:6px}
+.qr-box .label{font-size:11px;color:#333;font-weight:600}
+
+.stats{display:flex;gap:32px;justify-content:center}
+.stat{text-align:center}
+.stat .num{font-size:28px;font-weight:900}
+.stat .label{font-size:12px;color:#888;margin-top:4px}
+
+/* Section */
+section{padding:80px 20px}
+.section-dark{background:#0D0D0F}
+h2{font-size:clamp(28px,4vw,36px);font-weight:800;text-align:center;margin-bottom:16px}
+.sub{text-align:center;color:#888;margin-bottom:48px;font-size:16px}
+
+/* Features */
+.feature-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:16px;max-width:1000px;margin:0 auto}
+.f-card{background:#131315;border:1px solid rgba(255,255,255,0.06);border-radius:20px;padding:28px;transition:border-color 0.3s}
+.f-card:hover{border-color:rgba(227,10,23,0.3)}
+.f-card .e{font-size:32px;margin-bottom:12px}
+.f-card h3{font-size:17px;font-weight:700;margin-bottom:6px}
+.f-card p{color:#888;font-size:14px;line-height:1.6}
+
+/* Scenarios */
+.sc-grid{display:flex;flex-wrap:wrap;gap:10px;justify-content:center;max-width:800px;margin:0 auto}
+.sc-pill{background:#131315;border:1px solid rgba(255,255,255,0.06);border-radius:50px;padding:10px 18px;font-size:14px;display:flex;align-items:center;gap:6px;transition:all 0.3s}
+.sc-pill:hover{border-color:rgba(227,10,23,0.3);transform:scale(1.05)}
+.sc-pill.locked{opacity:0.4}
+
+/* Demo */
+.demo-box{max-width:500px;margin:0 auto}
+.chat{background:#131315;border:1px solid rgba(255,255,255,0.06);border-radius:20px;padding:20px;margin-bottom:24px}
+.msg{margin-bottom:12px;max-width:85%}
+.msg.ai{background:#1A1D27;border-radius:18px;padding:12px 16px}
+.msg.ai .nm{font-size:11px;font-weight:700;margin-bottom:4px}
+.msg.user{background:#E30A17;border-radius:18px;padding:12px 16px;margin-left:auto}
+.msg p{font-size:15px;line-height:1.5}
+
+/* Coaches */
+.coach-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:16px;max-width:800px;margin:0 auto}
+.c-card{background:#131315;border:1px solid rgba(255,255,255,0.06);border-radius:20px;padding:28px;text-align:center;transition:border-color 0.3s}
+.c-card:hover{border-color:rgba(227,10,23,0.2)}
+.c-card .av{font-size:48px;margin-bottom:12px}
+.c-card h3{font-size:18px;font-weight:700}
+.c-card p{color:#888;font-size:13px;margin-top:8px}
+
+/* Pricing */
+.price-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:20px;max-width:720px;margin:0 auto}
+.p-card{background:#131315;border:1px solid rgba(255,255,255,0.06);border-radius:24px;padding:32px;position:relative}
+.p-card.pop{border-color:rgba(227,10,23,0.4)}
+.p-card.pop::before{content:'MOST POPULAR';position:absolute;top:-12px;left:50%;transform:translateX(-50%);background:#E30A17;color:#FFF;font-size:11px;font-weight:700;padding:4px 16px;border-radius:20px;letter-spacing:1px}
+.p-card h3{font-size:20px;font-weight:700;margin-bottom:4px}
+.p-card .price{font-size:40px;font-weight:900;margin:16px 0}
+.p-card .price span{font-size:16px;color:#888;font-weight:400}
+.p-card ul{list-style:none;margin:20px 0}
+.p-card li{padding:6px 0;font-size:14px;color:#CCC}
+.p-card li::before{content:'✓ ';color:#00C853;font-weight:700}
+.p-card li.no{color:#555}
+.p-card li.no::before{content:'✗ ';color:#555}
+.p-card .btn{width:100%;justify-content:center;margin-top:8px}
+.p-card .note{color:#888;font-size:12px;text-align:center;margin-top:12px}
+
+/* CTA bottom */
+.cta-bottom{padding:80px 20px;text-align:center;background:linear-gradient(180deg,#0A0A0B 0%,#1A0A0B 100%)}
+.cta-bottom h2{margin-bottom:16px}
+.cta-bottom p{color:#888;margin-bottom:32px}
+
+/* Footer */
+footer{padding:40px 20px;text-align:center;border-top:1px solid rgba(255,255,255,0.06)}
+footer p{color:#555;font-size:13px;margin-bottom:4px}
+footer a{color:#E30A17}
+
+@media(max-width:600px){
+  .stats{gap:16px}.stat .num{font-size:22px}
+  .nav-links{display:none}
+  .stores{flex-direction:column;align-items:center}
+}
+</style>
+</head>
+<body>
+
+<!-- Nav -->
+<nav>
+  <a href="#" class="logo">🇹🇷 Learn<span class="r">Turkish</span> AI</a>
+  <div class="nav-links">
+    <a href="#features">Features</a>
+    <a href="#scenarios">Scenarios</a>
+    <a href="#pricing">Pricing</a>
+    <a href="#download" class="btn btn-r" style="padding:8px 20px;font-size:14px">Download</a>
+  </div>
+  <div class="lang-sel">
+    <div class="lang-btn">🇬🇧 EN ▼</div>
+    <div class="lang-drop">
+      <a href="#">🇬🇧 English</a><a href="#">🇸🇦 العربية</a><a href="#">🇩🇪 Deutsch</a>
+      <a href="#">🇫🇷 Français</a><a href="#">🇪🇸 Español</a><a href="#">🇷🇺 Русский</a>
+      <a href="#">🇮🇷 فارسی</a><a href="#">🇯🇵 日本語</a><a href="#">🇺🇿 O'zbekcha</a>
+      <a href="#">🇰🇬 Кыргызча</a><a href="#">🇰🇿 Қазақша</a><a href="#">🇵🇰 اردو</a>
+      <a href="#">🇮🇳 हिन्दी</a><a href="#">🇹🇷 Türkçe</a>
+    </div>
+  </div>
+</nav>
+
+<!-- Hero -->
+<section class="hero">
+  <div class="flag">🇹🇷</div>
+  <h1>Learn <span class="r">Turkish</span> by<br>Talking with AI</h1>
+  <p>Practice real conversations with AI coaches. Master Turkish through real-life scenarios — restaurant, taxi, market. From "Merhaba" to fluency.</p>
+  <div class="cta">
+    <a href="#download" class="btn btn-r">Download Free →</a>
+    <a href="#demo" class="btn btn-o">Try Demo</a>
+  </div>
+  <div class="stores" id="download">
+    <a href="#" class="store-btn"><div class="icon">🍎</div><div class="text"><div class="small">Download on the</div><div class="big">App Store</div></div></a>
+    <a href="#" class="store-btn"><div class="icon">▶️</div><div class="text"><div class="small">Get it on</div><div class="big">Google Play</div></div></a>
+  </div>
+  <div class="qr-section">
+    <div class="qr-box"><div class="qr">📱 iOS QR<br>(Coming Soon)</div><div class="label">App Store</div></div>
+    <div class="qr-box"><div class="qr">📱 Android QR<br>(Coming Soon)</div><div class="label">Google Play</div></div>
+  </div>
+  <div class="stats" style="margin-top:40px">
+    <div class="stat"><div class="num">25+</div><div class="label">Scenarios</div></div>
+    <div class="stat"><div class="num">3</div><div class="label">AI Coaches</div></div>
+    <div class="stat"><div class="num">400+</div><div class="label">Words</div></div>
+    <div class="stat"><div class="num">14</div><div class="label">Languages</div></div>
+  </div>
+</section>
+
+<!-- Features -->
+<section id="features">
+  <h2>Why LearnTurkish AI?</h2>
+  <p class="sub">Everything you need to speak Turkish confidently</p>
+  <div class="feature-grid">
+    <div class="f-card"><div class="e">🤖</div><h3>AI Conversations</h3><p>Chat with 3 unique AI coaches. Get instant corrections, suggestions, and encouragement in your native language.</p></div>
+    <div class="f-card"><div class="e">🎭</div><h3>Real-Life Scenarios</h3><p>25+ scenarios with real Istanbul locations, real prices, real culture. Mandabatmaz coffee, Mısır Çarşısı, Taksim taxis.</p></div>
+    <div class="f-card"><div class="e">🔊</div><h3>Listen & Speak</h3><p>AI speaks Turkish to you with natural pronunciation. Listen, repeat, and build confidence before you travel.</p></div>
+    <div class="f-card"><div class="e">🎓</div><h3>TÖMER Preparation</h3><p>A1 to C1 quiz questions with star ratings. Prepare for the official Turkish proficiency exam with AI explanations.</p></div>
+    <div class="f-card"><div class="e">📖</div><h3>AI Dictionary</h3><p>Search any word — get meaning, examples, conjugation, synonyms, pronunciation. Powered by AI, not a static database.</p></div>
+    <div class="f-card"><div class="e">🖼️</div><h3>Visual Flashcards</h3><p>400+ words in 20 categories with emoji visuals and audio. Fruits, animals, verbs, greetings — learn by seeing and hearing.</p></div>
+    <div class="f-card"><div class="e">🏆</div><h3>Certificates</h3><p>Earn verified certificates with QR code validation. Share on LinkedIn. Minimum 3 months active learning required.</p></div>
+    <div class="f-card"><div class="e">🔥</div><h3>Daily Challenges</h3><p>Streak rewards, XP points, daily tasks. Stay motivated with gamification that keeps you coming back every day.</p></div>
+    <div class="f-card"><div class="e">🌍</div><h3>14 Languages</h3><p>Interface available in English, Arabic, German, French, Spanish, Russian, Persian, Japanese, Uzbek, Kyrgyz, Kazakh, Urdu, Hindi, and Turkish.</p></div>
+  </div>
+</section>
+
+<!-- Scenarios -->
+<section class="section-dark" id="scenarios">
+  <h2>25+ Real-Life Scenarios</h2>
+  <p class="sub">Practice in situations you'll actually face in Turkey</p>
+  <div class="sc-grid">
+    <div class="sc-pill">🍽 Restaurant</div><div class="sc-pill">☕ Coffee Shop</div>
+    <div class="sc-pill">🚕 Taxi</div><div class="sc-pill">🛒 Market</div>
+    <div class="sc-pill">🗺 Directions</div><div class="sc-pill">🏨 Hotel</div>
+    <div class="sc-pill">✈️ Airport</div><div class="sc-pill">💇 Barber</div>
+    <div class="sc-pill locked">🏠 Apartment 🔒</div><div class="sc-pill locked">🏦 Bank 🔒</div>
+    <div class="sc-pill locked">💊 Pharmacy 🔒</div><div class="sc-pill locked">🏥 Doctor 🔒</div>
+    <div class="sc-pill locked">💼 Job Interview 🔒</div><div class="sc-pill locked">🎉 Party 🔒</div>
+    <div class="sc-pill locked">🏛 Government 🔒</div><div class="sc-pill locked">💒 Wedding 🔒</div>
+  </div>
+  <p style="text-align:center;color:#888;margin-top:24px;font-size:14px">🔒 = Premium only. <a href="#pricing" class="r">Upgrade to unlock all →</a></p>
+</section>
+
+<!-- Demo -->
+<section id="demo">
+  <h2>See It In Action</h2>
+  <p class="sub">A real conversation with AI coach Ayşe at a restaurant</p>
+  <div class="demo-box">
+    <div class="chat">
+      <div class="msg ai"><div class="nm r">Ayşe 🧑‍🏫</div><p>Hoş geldiniz! Taksim'deki Tarihi Çorbacı'ya hoş geldiniz. Bugün Adana kebabımız harika! 🍽</p></div>
+      <div class="msg user"><p>Merhaba! Menüye bakabilir miyim?</p></div>
+      <div class="msg ai"><div class="nm r">Ayşe 🧑‍🏫</div><p>Tabii efendim! Adana kebap 120 TL, mercimek çorbası 45 TL, pide 85 TL, ayran 20 TL. Ne istersiniz? 😊</p></div>
+      <div class="msg user"><p>Bir çorba ve ayran lütfen</p></div>
+      <div class="msg ai"><div class="nm r">Ayşe 🧑‍🏫</div><p>Harika seçim! 🎉 Mercimek çorbası ve ayran — 65 TL. Afiyet olsun! 🍲<br><br>💡 <em>"Afiyet olsun" = Bon appétit in Turkish!</em></p></div>
+    </div>
+    <p style="text-align:center;color:#888;font-size:14px">AI responds in 1-2 seconds. Conversations feel natural and fun.</p>
+  </div>
+</section>
+
+<!-- Coaches -->
+<section class="section-dark">
+  <h2>3 Unique AI Coaches</h2>
+  <p class="sub">Choose who you want to practice with</p>
+  <div class="coach-grid">
+    <div class="c-card"><div class="av">🧑‍🏫</div><h3>Ayşe</h3><div class="r" style="font-size:14px;font-weight:600">Friendly Teacher</div><p>Patient and warm. Perfect for beginners. Uses "Harika! Çok güzel!" to encourage you. Explains in your language.</p></div>
+    <div class="c-card"><div class="av">🗣</div><h3>Emre</h3><div class="blue" style="font-size:14px;font-weight:600">Conversation Partner</div><p>25-year-old Turkish guy. Casual and fun. Uses slang: "Abi, hadi ya!" Talks like a real friend.</p></div>
+    <div class="c-card"><div class="av">📚</div><h3>Prof. Demir</h3><div class="purple" style="font-size:14px;font-weight:600">Grammar Coach</div><p>Detail-oriented professor. Explains every grammar rule. Uses formal "siz". Quotes Turkish proverbs.</p></div>
+  </div>
+</section>
+
+<!-- Pricing -->
+<section id="pricing">
+  <h2>Simple, Honest Pricing</h2>
+  <p class="sub">Start free. Upgrade when you're ready.</p>
+  <div class="price-grid">
+    <div class="p-card">
+      <h3>Free</h3>
+      <div class="price">$0<span>/forever</span></div>
+      <ul>
+        <li>10 AI messages per day</li>
+        <li>8 free scenarios</li>
+        <li>Basic TÖMER quiz</li>
+        <li>Dictionary (10 searches/day)</li>
+        <li>3 flashcard categories</li>
+        <li class="no">Unlimited conversations</li>
+        <li class="no">All 25+ scenarios</li>
+        <li class="no">Certificate</li>
+        <li class="no">All flashcards</li>
+        <li class="no">AI speaking feedback</li>
+      </ul>
+      <a href="#download" class="btn btn-o" style="width:100%;justify-content:center">Start Free</a>
+    </div>
+    <div class="p-card pop">
+      <h3>Premium</h3>
+      <div class="price">$5<span>/month</span></div>
+      <ul>
+        <li><strong>Unlimited</strong> AI conversations</li>
+        <li><strong>All 25+</strong> scenarios</li>
+        <li>Full TÖMER preparation (A1-C1)</li>
+        <li>Unlimited AI Dictionary</li>
+        <li>All flashcard categories (400+ words)</li>
+        <li>AI speaking feedback</li>
+        <li>3 AI coaches (Ayşe, Emre, Prof. Demir)</li>
+        <li>Verified certificates with QR</li>
+        <li>Priority AI responses</li>
+        <li>Ad-free experience</li>
+      </ul>
+      <a href="#download" class="btn btn-r" style="width:100%;justify-content:center">Go Premium →</a>
+      <p class="note">or <strong>$50/year</strong> (save 17%) · Cancel anytime</p>
+    </div>
+  </div>
+</section>
+
+<!-- Bottom CTA -->
+<section class="cta-bottom">
+  <h2>Ready to speak Turkish? 🇹🇷</h2>
+  <p>Join thousands learning Turkish with AI. Start speaking from day one.</p>
+  <div class="stores" style="margin-bottom:24px">
+    <a href="#" class="store-btn"><div class="icon">🍎</div><div class="text"><div class="small">Download on the</div><div class="big">App Store</div></div></a>
+    <a href="#" class="store-btn"><div class="icon">▶️</div><div class="text"><div class="small">Get it on</div><div class="big">Google Play</div></div></a>
+  </div>
+  <a href="#demo" class="btn btn-o">Try Demo First</a>
+</section>
+
+<!-- Footer -->
+<footer>
+  <p style="font-size:20px;margin-bottom:8px">🇹🇷</p>
+  <p style="color:#FFF;font-weight:700;font-size:15px">LearnTurkish AI</p>
+  <p>Learn Turkish by talking with AI</p>
+  <p style="margin-top:16px"><a href="#">Privacy Policy</a> · <a href="#">Terms of Service</a> · <a href="mailto:kilinc.metin@hotmail.com">Contact</a></p>
+  <p style="margin-top:12px">© 2026 LearnTurkish AI. All rights reserved.</p>
+  <p style="margin-top:8px;font-size:11px">Made with ❤️ for Turkish language learners worldwide</p>
+</footer>
+
+</body>
+</html>
