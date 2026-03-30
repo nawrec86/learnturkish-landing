@@ -240,6 +240,13 @@ footer a{color:#E30A17}
 <section id="pricing">
   <h2>Simple, Honest Pricing</h2>
   <p class="sub">Start free. Upgrade when you're ready.</p>
+  <div style="display:flex;align-items:center;justify-content:center;gap:12px;margin-bottom:32px">
+    <span id="lbl-monthly" style="font-size:15px;font-weight:700;color:#FFF">Monthly</span>
+    <div onclick="togglePricing()" style="width:52px;height:28px;background:#E30A17;border-radius:14px;cursor:pointer;position:relative;transition:background 0.3s" id="price-toggle">
+      <div id="toggle-dot" style="width:22px;height:22px;background:#FFF;border-radius:50%;position:absolute;top:3px;left:3px;transition:transform 0.3s"></div>
+    </div>
+    <span id="lbl-yearly" style="font-size:15px;font-weight:700;color:#888">Yearly <span style="background:#00C853;color:#FFF;font-size:11px;padding:2px 8px;border-radius:10px;margin-left:4px">Save 17%</span></span>
+  </div>
   <div class="price-grid">
     <div class="p-card">
       <h3>Free</h3>
@@ -260,7 +267,7 @@ footer a{color:#E30A17}
     </div>
     <div class="p-card pop">
       <h3>Premium</h3>
-      <div class="price">$4.99<span>/month</span></div>
+      <div class="price" id="premium-price">$4.99<span id="premium-period">/month</span></div>
       <ul>
         <li><strong>Unlimited</strong> AI conversations</li>
         <li><strong>All 25+</strong> scenarios</li>
@@ -274,7 +281,7 @@ footer a{color:#E30A17}
         <li>Ad-free experience</li>
       </ul>
       <a href="#download" class="btn btn-r" style="width:100%;justify-content:center">Go Premium →</a>
-      <p class="note">or <strong>$49.99/year</strong> (save 17%) · Cancel anytime</p>
+
     </div>
     <div class="p-card" style="border-color:rgba(245,197,24,0.3)">
       <div style="position:absolute;top:-12px;left:50%;transform:translateX(-50%);background:#F5C518;color:#000;font-size:11px;font-weight:800;padding:4px 14px;border-radius:20px;letter-spacing:1px">BEST DEAL</div>
@@ -313,5 +320,29 @@ footer a{color:#E30A17}
   <p style="margin-top:8px;font-size:11px">Made with ❤️ for Turkish language learners worldwide</p>
 </footer>
 
+<script>
+var isYearly = false;
+function togglePricing() {
+  isYearly = !isYearly;
+  var dot = document.getElementById('toggle-dot');
+  var price = document.getElementById('premium-price');
+  var period = document.getElementById('premium-period');
+  var lblM = document.getElementById('lbl-monthly');
+  var lblY = document.getElementById('lbl-yearly');
+  if (isYearly) {
+    dot.style.transform = 'translateX(24px)';
+    price.childNodes[0].nodeValue = '$49.99';
+    period.textContent = '/year';
+    lblM.style.color = '#888';
+    lblY.style.color = '#FFF';
+  } else {
+    dot.style.transform = 'translateX(0)';
+    price.childNodes[0].nodeValue = '$4.99';
+    period.textContent = '/month';
+    lblM.style.color = '#FFF';
+    lblY.style.color = '#888';
+  }
+}
+</script>
 </body>
 </html>
