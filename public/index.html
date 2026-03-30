@@ -1,317 +1,971 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
 <title>LearnTurkish AI — Learn Turkish by Talking with AI</title>
-<meta name="description" content="Master Turkish through real AI conversations. 25+ scenarios, 3 AI coaches, TÖMER prep. Download for iOS and Android.">
-<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🇹🇷</text></svg>">
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,500;0,9..40,600;1,9..40,400&display=swap" rel="stylesheet"/>
 <style>
-*{margin:0;padding:0;box-sizing:border-box}
-body{background:#0A0A0B;color:#FFF;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;overflow-x:hidden}
-a{text-decoration:none;color:inherit}
-.r{color:#E30A17}.g{color:#00C853}.gold{color:#F5C518}.blue{color:#3B82F6}.purple{color:#8B5CF6}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#0A0A0B;--cd:#111113;--r:#E30A17;--gold:#F5C518;
+  --green:#00C853;--purple:#8B5CF6;--blue:#3B82F6;--teal:#00B4C8;
+  --t1:#F5F5F7;--t2:rgba(245,245,247,.62);--t3:rgba(245,245,247,.32);
+  --glass:rgba(255,255,255,.04);--gb:rgba(255,255,255,.08);
+  --hh:'Syne',sans-serif;--hb:'DM Sans',sans-serif;
+}
+html{scroll-behavior:smooth}
+body{background:var(--bg);color:var(--t1);font-family:var(--hb);overflow-x:hidden;line-height:1.6}
 
-/* Nav */
-nav{position:fixed;top:0;width:100%;background:rgba(10,10,11,0.9);backdrop-filter:blur(20px);border-bottom:1px solid rgba(255,255,255,0.06);padding:12px 20px;display:flex;align-items:center;justify-content:space-between;z-index:100}
-nav .logo{font-size:18px;font-weight:800}
-nav .lang-sel{position:relative;cursor:pointer}
-nav .lang-btn{display:flex;align-items:center;gap:6px;background:#131315;border:1px solid rgba(255,255,255,0.1);border-radius:8px;padding:6px 12px;font-size:13px;color:#FFF;cursor:pointer}
-nav .lang-drop{display:none;position:absolute;right:0;top:40px;background:#131315;border:1px solid rgba(255,255,255,0.1);border-radius:12px;width:180px;max-height:400px;overflow-y:auto;box-shadow:0 8px 32px rgba(0,0,0,0.5)}
-nav .lang-sel:hover .lang-drop{display:block}
-nav .lang-drop a{display:flex;align-items:center;gap:8px;padding:10px 14px;font-size:13px;border-bottom:1px solid rgba(255,255,255,0.04);transition:background 0.2s}
-nav .lang-drop a:hover{background:rgba(227,10,23,0.1)}
-.nav-links{display:flex;gap:20px;align-items:center}
-.nav-links a{font-size:14px;color:#888;transition:color 0.2s}
-.nav-links a:hover{color:#FFF}
+/* ── NAV ── */
+nav{position:fixed;top:0;left:0;right:0;z-index:200;height:64px;display:flex;align-items:center;justify-content:space-between;padding:0 clamp(16px,5vw,80px);background:rgba(10,10,11,.88);backdrop-filter:blur(24px);border-bottom:1px solid rgba(255,255,255,.06);transition:background .3s}
+.nav-logo{display:flex;align-items:center;gap:10px;text-decoration:none;color:var(--t1);font-family:var(--hh);font-weight:700;font-size:17px}
+.logo-icon{width:32px;height:32px;background:var(--r);border-radius:9px;display:flex;align-items:center;justify-content:center;font-size:16px;box-shadow:0 4px 12px rgba(227,10,23,.4)}
+.nav-links{display:flex;gap:32px;list-style:none}
+.nav-links a{color:var(--t2);text-decoration:none;font-size:14px;font-weight:500;transition:color .2s}
+.nav-links a:hover{color:var(--t1)}
+.nav-right{display:flex;align-items:center;gap:12px}
+.lang-btn{background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.1);border-radius:8px;padding:6px 12px;color:var(--t2);font-size:13px;cursor:pointer;font-family:var(--hb)}
+.cta-btn{background:var(--r);color:#fff;border:none;border-radius:10px;padding:9px 22px;font-size:14px;font-weight:600;cursor:pointer;font-family:var(--hb);box-shadow:0 4px 16px rgba(227,10,23,.35);transition:transform .15s,box-shadow .15s}
+.cta-btn:hover{transform:translateY(-1px);box-shadow:0 6px 24px rgba(227,10,23,.5)}
 
-/* Hero */
-.hero{min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:100px 20px 60px;position:relative}
-.hero::before{content:'';position:absolute;top:0;left:50%;transform:translateX(-50%);width:600px;height:600px;background:radial-gradient(circle,rgba(227,10,23,0.12) 0%,transparent 70%);pointer-events:none}
-.hero .flag{font-size:80px;margin-bottom:20px;animation:float 3s ease-in-out infinite}
-@keyframes float{0%,100%{transform:translateY(0)}50%{transform:translateY(-10px)}}
-.hero h1{font-size:clamp(36px,6vw,60px);font-weight:900;line-height:1.1;margin-bottom:16px;letter-spacing:-1px}
-.hero p{font-size:clamp(16px,2.5vw,20px);color:#888;max-width:520px;margin-bottom:32px;line-height:1.6}
-.btn{padding:16px 32px;border-radius:14px;font-size:16px;font-weight:700;cursor:pointer;border:none;transition:all 0.2s;display:inline-flex;align-items:center;gap:8px}
-.btn:hover{transform:scale(1.05)}
-.btn-r{background:#E30A17;color:#FFF}
-.btn-o{background:transparent;color:#FFF;border:2px solid rgba(255,255,255,0.12)}
-.hero .cta{display:flex;gap:12px;flex-wrap:wrap;justify-content:center;margin-bottom:40px}
+/* ── HERO ── */
+.hero{min-height:100vh;display:grid;grid-template-columns:1fr 1fr;gap:40px;align-items:center;padding:100px clamp(16px,5vw,80px) 60px;position:relative;overflow:hidden;max-width:1280px;margin:0 auto}
+.hero-glow-a{position:absolute;width:700px;height:500px;border-radius:50%;background:radial-gradient(ellipse,rgba(0,180,200,.16) 0%,transparent 65%);top:-150px;left:-100px;pointer-events:none;animation:gA 7s ease-in-out infinite}
+.hero-glow-b{position:absolute;width:500px;height:400px;border-radius:50%;background:radial-gradient(ellipse,rgba(139,92,246,.12) 0%,transparent 65%);bottom:-100px;right:10%;pointer-events:none;animation:gB 9s ease-in-out infinite}
+@keyframes gA{0%,100%{opacity:.7;transform:scale(1)}50%{opacity:1;transform:scale(1.06)}}
+@keyframes gB{0%,100%{opacity:.5;transform:scale(1)}50%{opacity:.85;transform:scale(1.08)}}
 
-/* Store Buttons */
-.stores{display:flex;gap:16px;flex-wrap:wrap;justify-content:center;align-items:center;margin-bottom:32px}
-.store-btn{display:flex;align-items:center;gap:10px;background:#131315;border:1px solid rgba(255,255,255,0.1);border-radius:12px;padding:10px 20px;cursor:pointer;transition:border-color 0.3s}
-.store-btn:hover{border-color:rgba(227,10,23,0.4)}
-.store-btn .icon{font-size:28px}
-.store-btn .text{text-align:left}
-.store-btn .text .small{font-size:10px;color:#888}
-.store-btn .text .big{font-size:15px;font-weight:700}
+.hero-badge{display:inline-flex;align-items:center;gap:6px;background:rgba(227,10,23,.12);border:1px solid rgba(227,10,23,.28);border-radius:20px;padding:5px 14px;font-size:12px;font-weight:600;color:rgba(227,10,23,.95);letter-spacing:.5px;margin-bottom:24px;animation:fadeUp .6s ease both}
+.badge-dot{width:6px;height:6px;border-radius:50%;background:var(--r);animation:blink 1.4s ease-in-out infinite}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:.3}}
 
-.qr-section{display:flex;gap:24px;justify-content:center;margin-top:24px;flex-wrap:wrap}
-.qr-box{background:#FFF;border-radius:12px;padding:12px;text-align:center;width:120px}
-.qr-box .qr{width:96px;height:96px;background:#EEE;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:11px;color:#333;margin-bottom:6px}
-.qr-box .label{font-size:11px;color:#333;font-weight:600}
+.hero-title{font-family:var(--hh);font-size:clamp(38px,5.5vw,72px);font-weight:800;line-height:1.06;letter-spacing:-2px;margin-bottom:22px;animation:fadeUp .6s .1s ease both}
+.hero-title span{color:var(--r)}
+.hero-title em{font-style:normal;background:linear-gradient(135deg,var(--teal),var(--purple));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.hero-sub{font-size:clamp(15px,1.5vw,18px);color:var(--t2);line-height:1.7;max-width:480px;margin-bottom:36px;animation:fadeUp .6s .18s ease both}
+.hero-actions{display:flex;gap:12px;flex-wrap:wrap;margin-bottom:44px;animation:fadeUp .6s .26s ease both}
+.btn-primary{background:var(--r);color:#fff;border:none;border-radius:14px;padding:15px 28px;font-size:15px;font-weight:600;cursor:pointer;font-family:var(--hb);box-shadow:0 6px 24px rgba(227,10,23,.4);transition:transform .15s,box-shadow .15s}
+.btn-primary:hover{transform:translateY(-2px);box-shadow:0 10px 32px rgba(227,10,23,.55)}
+.btn-ghost{background:rgba(255,255,255,.07);color:var(--t1);border:1px solid rgba(255,255,255,.12);border-radius:14px;padding:14px 24px;font-size:15px;font-weight:500;cursor:pointer;font-family:var(--hb);transition:background .2s;display:flex;align-items:center;gap:8px}
+.btn-ghost:hover{background:rgba(255,255,255,.12)}
+.play-icon{width:28px;height:28px;border-radius:50%;background:rgba(255,255,255,.15);display:flex;align-items:center;justify-content:center}
+.play-icon svg{margin-left:2px}
 
-.stats{display:flex;gap:32px;justify-content:center}
-.stat{text-align:center}
-.stat .num{font-size:28px;font-weight:900}
-.stat .label{font-size:12px;color:#888;margin-top:4px}
+.hero-stores{display:flex;gap:10px;flex-wrap:wrap;animation:fadeUp .6s .34s ease both}
+.store-btn{display:flex;align-items:center;gap:10px;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.1);border-radius:12px;padding:10px 18px;cursor:pointer;transition:background .2s,border-color .2s}
+.store-btn:hover{background:rgba(255,255,255,.1);border-color:rgba(255,255,255,.18)}
+.store-btn-sub{font-size:10px;color:var(--t3);line-height:1}
+.store-btn-name{font-size:14px;font-weight:600;color:var(--t1);line-height:1;margin-top:2px}
 
-/* Section */
-section{padding:80px 20px}
-.section-dark{background:#0D0D0F}
-h2{font-size:clamp(28px,4vw,36px);font-weight:800;text-align:center;margin-bottom:16px}
-.sub{text-align:center;color:#888;margin-bottom:48px;font-size:16px}
+@keyframes fadeUp{from{opacity:0;transform:translateY(22px)}to{opacity:1;transform:translateY(0)}}
 
-/* Features */
-.feature-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:16px;max-width:1000px;margin:0 auto}
-.f-card{background:#131315;border:1px solid rgba(255,255,255,0.06);border-radius:20px;padding:28px;transition:border-color 0.3s}
-.f-card:hover{border-color:rgba(227,10,23,0.3)}
-.f-card .e{font-size:32px;margin-bottom:12px}
-.f-card h3{font-size:17px;font-weight:700;margin-bottom:6px}
-.f-card p{color:#888;font-size:14px;line-height:1.6}
+/* ── IPHONE MOCKUP ── */
+.hero-visual{display:flex;justify-content:center;align-items:center;position:relative;animation:fadeUp .6s .2s ease both}
+.phone-wrap{position:relative;width:280px}
+.phone-frame{width:100%;background:#111113;border-radius:44px;border:2px solid rgba(255,255,255,.15);overflow:hidden;box-shadow:0 40px 100px rgba(0,0,0,.7),0 0 0 1px rgba(255,255,255,.05),inset 0 0 0 1px rgba(255,255,255,.04);position:relative}
+.phone-notch{position:absolute;top:0;left:50%;transform:translateX(-50%);width:90px;height:28px;background:#0A0A0B;border-radius:0 0 18px 18px;z-index:10}
+.phone-screen{background:var(--bg);padding:28px 0 0}
+.phone-glow{position:absolute;width:200px;height:200px;border-radius:50%;background:radial-gradient(ellipse,rgba(227,10,23,.25),transparent 70%);bottom:-40px;left:50%;transform:translateX(-50%);pointer-events:none}
 
-/* Scenarios */
-.sc-grid{display:flex;flex-wrap:wrap;gap:10px;justify-content:center;max-width:800px;margin:0 auto}
-.sc-pill{background:#131315;border:1px solid rgba(255,255,255,0.06);border-radius:50px;padding:10px 18px;font-size:14px;display:flex;align-items:center;gap:6px;transition:all 0.3s}
-.sc-pill:hover{border-color:rgba(227,10,23,0.3);transform:scale(1.05)}
-.sc-pill.locked{opacity:0.4}
+/* phone screen content */
+.ps-status{display:flex;justify-content:space-between;padding:8px 16px 6px;font-size:10px;color:rgba(255,255,255,.4);font-weight:600}
+.ps-hero-card{margin:10px 12px;background:rgba(245,197,24,.1);border:1px solid rgba(245,197,24,.2);border-radius:18px;padding:16px}
+.ps-hero-label{font-size:9px;font-weight:700;letter-spacing:1px;color:var(--gold);text-transform:uppercase;margin-bottom:6px}
+.ps-hero-phrase{font-size:17px;font-weight:800;color:var(--t1);font-family:var(--hh);letter-spacing:-.3px}
+.ps-hero-mean{font-size:10px;color:var(--t2);margin-top:3px;line-height:1.4}
+.ps-mini-grid{display:grid;grid-template-columns:1fr 1fr;gap:7px;padding:0 12px;margin-top:8px}
+.ps-mini-card{background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.07);border-radius:14px;padding:12px 10px}
+.ps-mini-val{font-size:18px;font-weight:800;font-family:var(--hh);line-height:1}
+.ps-mini-lbl{font-size:9px;color:var(--t3);margin-top:3px;text-transform:uppercase;letter-spacing:.5px}
+.ps-coaches{display:flex;gap:6px;padding:8px 12px;margin-top:4px}
+.ps-coach{flex:1;border-radius:14px;padding:10px 6px;text-align:center;border:1px solid transparent}
+.ps-coach-av{width:34px;height:34px;border-radius:50%;margin:0 auto 5px;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:800}
+.ps-coach-name{font-size:9px;font-weight:700;line-height:1}
+.ps-coach-role{font-size:8px;color:var(--t3);margin-top:2px}
+.ps-tabbar{display:flex;padding:8px 8px 12px;border-top:1px solid rgba(255,255,255,.05);margin-top:8px;gap:2px}
+.ps-tab{flex:1;display:flex;flex-direction:column;align-items:center;gap:3px}
+.ps-tab-dot{width:4px;height:4px;border-radius:50%;background:transparent}
+.ps-tab.act .ps-tab-dot{background:var(--r)}
+.ps-tab-icon{font-size:16px;line-height:1}
+.ps-tab-lbl{font-size:8px;color:var(--t3)}
+.ps-tab.act .ps-tab-lbl{color:var(--r)}
 
-/* Demo */
-.demo-box{max-width:500px;margin:0 auto}
-.chat{background:#131315;border:1px solid rgba(255,255,255,0.06);border-radius:20px;padding:20px;margin-bottom:24px}
-.msg{margin-bottom:12px;max-width:85%}
-.msg.ai{background:#1A1D27;border-radius:18px;padding:12px 16px}
-.msg.ai .nm{font-size:11px;font-weight:700;margin-bottom:4px}
-.msg.user{background:#E30A17;border-radius:18px;padding:12px 16px;margin-left:auto}
-.msg p{font-size:15px;line-height:1.5}
+/* play overlay */
+.play-overlay{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;background:rgba(0,0,0,.25);cursor:pointer;border-radius:42px;transition:background .2s;z-index:5}
+.play-overlay:hover{background:rgba(0,0,0,.15)}
+.play-btn-big{width:64px;height:64px;border-radius:50%;background:rgba(255,255,255,.18);backdrop-filter:blur(12px);border:2px solid rgba(255,255,255,.35);display:flex;align-items:center;justify-content:center;box-shadow:0 8px 32px rgba(0,0,0,.4);transition:transform .2s,background .2s}
+.play-overlay:hover .play-btn-big{transform:scale(1.08);background:rgba(255,255,255,.26)}
 
-/* Coaches */
-.coach-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:16px;max-width:800px;margin:0 auto}
-.c-card{background:#131315;border:1px solid rgba(255,255,255,0.06);border-radius:20px;padding:28px;text-align:center;transition:border-color 0.3s}
-.c-card:hover{border-color:rgba(227,10,23,0.2)}
-.c-card .av{font-size:48px;margin-bottom:12px}
-.c-card h3{font-size:18px;font-weight:700}
-.c-card p{color:#888;font-size:13px;margin-top:8px}
+/* floating badges */
+.float-badge{position:absolute;background:rgba(17,17,19,.92);border:1px solid rgba(255,255,255,.1);backdrop-filter:blur(16px);border-radius:14px;padding:10px 14px;display:flex;align-items:center;gap:9px;font-size:12px;font-weight:600;color:var(--t1);box-shadow:0 8px 24px rgba(0,0,0,.4);animation:floatBob 4s ease-in-out infinite}
+.float-badge-icon{width:28px;height:28px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:14px}
+.float-badge.pos1{left:-80px;top:80px;animation-delay:0s}
+.float-badge.pos2{right:-70px;bottom:120px;animation-delay:1.5s}
+.float-badge.pos3{right:-60px;top:60px;animation-delay:.8s}
+@keyframes floatBob{0%,100%{transform:translateY(0)}50%{transform:translateY(-8px)}}
 
-/* Pricing */
-.price-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:20px;max-width:900px;margin:0 auto}
-.p-card{background:#131315;border:1px solid rgba(255,255,255,0.06);border-radius:24px;padding:32px;position:relative}
-.p-card.pop{border-color:rgba(227,10,23,0.4)}
-.p-card.pop::before{content:'MOST POPULAR';position:absolute;top:-12px;left:50%;transform:translateX(-50%);background:#E30A17;color:#FFF;font-size:11px;font-weight:700;padding:4px 16px;border-radius:20px;letter-spacing:1px}
-.p-card h3{font-size:20px;font-weight:700;margin-bottom:4px}
-.p-card .price{font-size:40px;font-weight:900;margin:16px 0}
-.p-card .price span{font-size:16px;color:#888;font-weight:400}
-.p-card ul{list-style:none;margin:20px 0}
-.p-card li{padding:6px 0;font-size:14px;color:#CCC}
-.p-card li::before{content:'✓ ';color:#00C853;font-weight:700}
-.p-card li.no{color:#555}
-.p-card li.no::before{content:'✗ ';color:#555}
-.p-card .btn{width:100%;justify-content:center;margin-top:8px}
-.p-card .note{color:#888;font-size:12px;text-align:center;margin-top:12px}
+/* ── VIDEO MODAL ── */
+.modal-overlay{position:fixed;inset:0;z-index:500;background:rgba(0,0,0,.85);backdrop-filter:blur(16px);display:none;align-items:center;justify-content:center;padding:20px}
+.modal-overlay.open{display:flex}
+.modal-box{background:#111113;border:1px solid rgba(255,255,255,.1);border-radius:24px;width:100%;max-width:860px;overflow:hidden;position:relative;box-shadow:0 40px 120px rgba(0,0,0,.8);animation:modalIn .3s cubic-bezier(.34,1.56,.64,1)}
+@keyframes modalIn{from{opacity:0;transform:scale(.9)}to{opacity:1;transform:scale(1)}}
+.modal-header{display:flex;justify-content:space-between;align-items:center;padding:20px 24px;border-bottom:1px solid rgba(255,255,255,.07)}
+.modal-title{font-family:var(--hh);font-size:18px;font-weight:700;color:var(--t1)}
+.modal-close{width:36px;height:36px;border-radius:10px;background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.1);color:var(--t1);font-size:18px;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:background .2s}
+.modal-close:hover{background:rgba(255,255,255,.14)}
+.modal-video{background:#000;aspect-ratio:16/9;display:flex;align-items:center;justify-content:center;position:relative;overflow:hidden}
+.video-placeholder{width:100%;height:100%;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:16px;background:linear-gradient(135deg,#0d1f2d 0%,#0A0A0B 100%)}
+.video-ph-icon{width:80px;height:80px;border-radius:50%;background:rgba(227,10,23,.2);border:2px solid rgba(227,10,23,.4);display:flex;align-items:center;justify-content:center;font-size:32px}
+.video-ph-txt{font-size:15px;color:var(--t2);text-align:center}
+.video-ph-sub{font-size:12px;color:var(--t3);margin-top:4px;text-align:center}
 
-/* CTA bottom */
-.cta-bottom{padding:80px 20px;text-align:center;background:linear-gradient(180deg,#0A0A0B 0%,#1A0A0B 100%)}
-.cta-bottom h2{margin-bottom:16px}
-.cta-bottom p{color:#888;margin-bottom:32px}
+/* ── SECTION SHARED ── */
+.section-wrap{padding:80px clamp(16px,5vw,80px);max-width:1280px;margin:0 auto}
+.section-header{margin-bottom:52px}
+.sec-label{font-size:11px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--r);margin-bottom:10px}
+.sec-title{font-family:var(--hh);font-size:clamp(28px,4vw,52px);font-weight:800;letter-spacing:-1.5px;color:var(--t1);line-height:1.1;margin-bottom:14px}
+.sec-sub{font-size:17px;color:var(--t2);line-height:1.65;max-width:520px}
 
-/* Footer */
-footer{padding:40px 20px;text-align:center;border-top:1px solid rgba(255,255,255,0.06)}
-footer p{color:#555;font-size:13px;margin-bottom:4px}
-footer a{color:#E30A17}
+/* ── MOCKUP GALLERY ── */
+.gallery-scroll{display:flex;gap:20px;overflow-x:auto;padding:0 clamp(16px,5vw,80px) 24px;scrollbar-width:none;scroll-snap-type:x mandatory}
+.gallery-scroll::-webkit-scrollbar{display:none}
+.gallery-item{flex-shrink:0;scroll-snap-align:center}
+.gallery-phone{width:220px;background:#111113;border-radius:36px;border:2px solid rgba(255,255,255,.12);overflow:hidden;box-shadow:0 24px 64px rgba(0,0,0,.6),0 0 0 1px rgba(255,255,255,.04)}
+.gallery-notch{height:24px;background:#0A0A0B;border-radius:0 0 14px 14px;width:70px;margin:0 auto}
+.gallery-label{margin-top:14px;text-align:center;font-size:13px;font-weight:600;color:var(--t2)}
+.gallery-sub{text-align:center;font-size:11px;color:var(--t3);margin-top:3px}
 
-@media(max-width:600px){
-  .stats{gap:16px}.stat .num{font-size:22px}
+/* screen contents */
+.gscr{padding:12px;min-height:360px}
+.gscr-chat{display:flex;flex-direction:column;gap:8px}
+.msg-row{display:flex;gap:6px;align-items:flex-end}
+.msg-row.u{flex-direction:row-reverse}
+.msg-av{width:22px;height:22px;border-radius:50%;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:9px;font-weight:800}
+.bubble{padding:8px 11px;border-radius:16px;font-size:10px;line-height:1.5;color:var(--t1);max-width:78%}
+.bubble.ai{background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.1);border-bottom-left-radius:4px}
+.bubble.usr{background:var(--r);border-bottom-right-radius:4px;box-shadow:0 3px 10px rgba(227,10,23,.3)}
+.msg-action{font-style:italic;font-size:9px;color:rgba(139,92,246,.9);margin-bottom:3px;display:flex;align-items:center;gap:3px}
+
+.gscr-tomer{padding:6px}
+.tomer-title{font-family:var(--hh);font-size:13px;font-weight:800;color:var(--t1);margin-bottom:10px}
+.tomer-q{font-size:10px;color:var(--t2);line-height:1.5;margin-bottom:10px}
+.tomer-opt{padding:7px 10px;border-radius:10px;font-size:10px;margin-bottom:5px;border:1px solid rgba(255,255,255,.08);background:rgba(255,255,255,.04);color:var(--t2);cursor:pointer}
+.tomer-opt.correct{background:rgba(0,200,83,.15);border-color:rgba(0,200,83,.35);color:#4ade80}
+.tomer-opt.wrong{background:rgba(227,10,23,.1);border-color:rgba(227,10,23,.25);color:rgba(255,120,120,.9)}
+.idiom-card{background:rgba(245,197,24,.1);border:1px solid rgba(245,197,24,.2);border-radius:14px;padding:12px;margin-top:8px}
+.idiom-lbl{font-size:9px;font-weight:700;letter-spacing:1px;color:var(--gold);text-transform:uppercase;margin-bottom:4px}
+.idiom-phrase{font-size:15px;font-weight:800;font-family:var(--hh);color:var(--t1)}
+.idiom-mean{font-size:10px;color:var(--t2);margin-top:3px;line-height:1.4}
+
+.gscr-cert{display:flex;flex-direction:column;align-items:center;padding:16px 10px;text-align:center;position:relative}
+.cert-bg{position:absolute;inset:0;background:linear-gradient(135deg,rgba(245,197,24,.06),rgba(245,197,24,.02));pointer-events:none}
+.cert-logo-big{font-size:28px;margin-bottom:6px;position:relative}
+.cert-border-title{font-size:9px;letter-spacing:2px;text-transform:uppercase;color:var(--gold);font-weight:700;margin-bottom:8px;position:relative}
+.cert-divider{height:1px;background:linear-gradient(90deg,transparent,rgba(245,197,24,.4),transparent);margin:6px 0;width:100%;position:relative}
+.cert-holder{font-family:var(--hh);font-size:18px;font-weight:800;color:var(--t1);position:relative}
+.cert-desc{font-size:10px;color:var(--t2);line-height:1.4;margin:5px 0;position:relative}
+.cert-level-badge{background:var(--r);color:#fff;border-radius:20px;font-size:11px;font-weight:700;padding:5px 16px;position:relative}
+.cert-qr{width:52px;height:52px;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.1);border-radius:8px;margin-top:10px;display:flex;align-items:center;justify-content:center;font-size:22px;position:relative}
+.cert-qr-label{font-size:9px;color:var(--t3);margin-top:4px;position:relative}
+
+.gscr-lb{padding:6px}
+.lb-title{font-family:var(--hh);font-size:13px;font-weight:800;color:var(--t1);margin-bottom:10px}
+.lb-row-item{display:flex;align-items:center;gap:8px;padding:8px 0;border-bottom:1px solid rgba(255,255,255,.05)}
+.lb-rank-num{font-size:11px;font-weight:800;font-family:var(--hh);width:16px;text-align:center}
+.lb-av-sm{width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700}
+.lb-name-txt{flex:1;font-size:11px;font-weight:500;color:var(--t1)}
+.lb-pts-txt{font-size:11px;font-weight:700;color:var(--gold)}
+
+.gscr-guide{padding:8px}
+.guide-header{font-family:var(--hh);font-size:13px;font-weight:800;color:var(--t1);margin-bottom:10px}
+.guide-card{border-radius:12px;overflow:hidden;margin-bottom:7px;border:1px solid rgba(255,255,255,.07);background:rgba(255,255,255,.03)}
+.guide-card-top{padding:12px;display:flex;align-items:center;gap:8px}
+.guide-card-icon{width:36px;height:36px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:18px}
+.guide-card-title{font-size:12px;font-weight:700;color:var(--t1)}
+.guide-card-sub{font-size:10px;color:var(--t2)}
+
+/* ── BENTO GRID ── */
+.bento-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}
+.bc{background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);border-radius:24px;padding:28px;position:relative;overflow:hidden;transition:border-color .25s,transform .25s}
+.bc:hover{border-color:rgba(255,255,255,.16);transform:translateY(-4px)}
+.bc.span2{grid-column:span 2}
+.bc.accent-gold{background:rgba(245,197,24,.08);border-color:rgba(245,197,24,.18)}
+.bc.accent-teal{background:rgba(0,180,200,.07);border-color:rgba(0,180,200,.18)}
+.bc.accent-purple{background:rgba(139,92,246,.08);border-color:rgba(139,92,246,.18)}
+.bc.accent-red{background:rgba(227,10,23,.08);border-color:rgba(227,10,23,.18)}
+.bc-deco{position:absolute;right:-14px;bottom:-14px;font-size:90px;opacity:.07;filter:blur(3px);pointer-events:none}
+.bc-icon{width:48px;height:48px;border-radius:16px;display:flex;align-items:center;justify-content:center;font-size:22px;margin-bottom:18px}
+.bc-num{font-family:var(--hh);font-size:48px;font-weight:800;line-height:1;margin-bottom:8px}
+.bc-title{font-family:var(--hh);font-size:20px;font-weight:700;color:var(--t1);margin-bottom:8px}
+.bc-body{font-size:14px;color:var(--t2);line-height:1.6}
+.bc-tag{display:inline-block;padding:4px 10px;border-radius:8px;font-size:11px;font-weight:600;margin-top:12px}
+
+/* ── COACHES ── */
+.coaches-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
+.coach-card{border-radius:24px;padding:32px 24px;border:1px solid transparent;cursor:pointer;position:relative;overflow:hidden;transition:transform .2s,box-shadow .2s;text-align:center}
+.coach-card::before{content:'';position:absolute;inset:0;border-radius:24px;opacity:0;transition:opacity .3s;pointer-events:none}
+.coach-card:hover{transform:translateY(-6px)}
+.coach-card.ayse{background:rgba(245,197,24,.07);border-color:rgba(245,197,24,.18)}
+.coach-card.ayse:hover{box-shadow:0 20px 60px rgba(245,197,24,.2);border-color:rgba(245,197,24,.35)}
+.coach-card.emre{background:rgba(59,130,246,.08);border-color:rgba(59,130,246,.2)}
+.coach-card.emre:hover{box-shadow:0 20px 60px rgba(59,130,246,.22);border-color:rgba(59,130,246,.4)}
+.coach-card.demir{background:rgba(180,120,60,.08);border-color:rgba(180,120,60,.18)}
+.coach-card.demir:hover{box-shadow:0 20px 60px rgba(180,120,60,.2);border-color:rgba(180,120,60,.35)}
+.coach-aura{position:absolute;width:140px;height:140px;border-radius:50%;top:-30px;right:-20px;opacity:.14;filter:blur(30px);pointer-events:none}
+.ayse .coach-aura{background:var(--gold)}
+.emre .coach-aura{background:var(--blue)}
+.demir .coach-aura{background:rgb(180,120,60)}
+.coach-av-big{width:80px;height:80px;border-radius:50%;margin:0 auto 20px;display:flex;align-items:center;justify-content:center;font-size:32px;font-weight:800;font-family:var(--hh)}
+.ayse .coach-av-big{background:rgba(245,197,24,.2);color:var(--gold);box-shadow:0 0 30px rgba(245,197,24,.25)}
+.emre .coach-av-big{background:rgba(59,130,246,.2);color:var(--blue);box-shadow:0 0 30px rgba(59,130,246,.25)}
+.demir .coach-av-big{background:rgba(180,120,60,.2);color:rgb(200,140,70);box-shadow:0 0 30px rgba(180,120,60,.25)}
+.coach-name{font-family:var(--hh);font-size:22px;font-weight:800;margin-bottom:6px}
+.ayse .coach-name{color:var(--gold)}
+.emre .coach-name{color:var(--blue)}
+.demir .coach-name{color:rgb(200,140,70)}
+.coach-role{font-size:13px;color:var(--t3);font-weight:500;margin-bottom:16px}
+.coach-bio{font-size:14px;color:var(--t2);line-height:1.6;margin-bottom:20px}
+.coach-tag{display:inline-block;border-radius:20px;padding:5px 14px;font-size:12px;font-weight:600;border:1px solid}
+.ayse .coach-tag{background:rgba(245,197,24,.12);border-color:rgba(245,197,24,.25);color:var(--gold)}
+.emre .coach-tag{background:rgba(59,130,246,.12);border-color:rgba(59,130,246,.25);color:var(--blue)}
+.demir .coach-tag{background:rgba(180,120,60,.12);border-color:rgba(180,120,60,.25);color:rgb(200,140,70)}
+
+/* ── DEMO CHAT ── */
+.demo-wrap{display:grid;grid-template-columns:1fr 1fr;gap:40px;align-items:center}
+.demo-phone-big{width:280px;margin:0 auto}
+.demo-chat-phone{background:#111113;border-radius:40px;border:2px solid rgba(255,255,255,.12);overflow:hidden;box-shadow:0 40px 100px rgba(0,0,0,.6)}
+.demo-chat-content{padding:0 14px 14px}
+.demo-chat-header{display:flex;align-items:center;gap:10px;padding:14px 0 10px;border-bottom:1px solid rgba(255,255,255,.06)}
+.demo-info{flex:1}
+.demo-name{font-size:14px;font-weight:700;color:var(--t1)}
+.demo-status{font-size:11px;color:var(--green);display:flex;align-items:center;gap:4px;margin-top:1px}
+.demo-dot{width:6px;height:6px;border-radius:50%;background:var(--green);animation:blink 1.4s infinite}
+.demo-msgs{padding:14px 0;display:flex;flex-direction:column;gap:10px}
+.demo-bubble{padding:10px 14px;border-radius:18px;font-size:13px;line-height:1.5;max-width:82%;color:var(--t1)}
+.demo-bubble.ai{background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.1);border-bottom-left-radius:4px}
+.demo-bubble.usr{background:var(--r);border-bottom-right-radius:4px;margin-left:auto;box-shadow:0 4px 14px rgba(227,10,23,.3)}
+.demo-action{font-size:11px;color:rgba(139,92,246,.9);font-style:italic;display:flex;align-items:center;gap:5px;margin-bottom:3px}
+.demo-input-row{display:flex;gap:8px;align-items:center;margin-top:8px;padding-top:8px;border-top:1px solid rgba(255,255,255,.06)}
+.demo-field{flex:1;background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.1);border-radius:20px;padding:9px 14px;color:var(--t1);font-size:12px;outline:none;font-family:var(--hb)}
+.demo-send{width:34px;height:34px;border-radius:50%;background:var(--r);border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;box-shadow:0 3px 10px rgba(227,10,23,.4)}
+
+.demo-right h3{font-family:var(--hh);font-size:clamp(24px,3vw,38px);font-weight:800;letter-spacing:-1px;color:var(--t1);margin-bottom:16px;line-height:1.15}
+.demo-right p{font-size:16px;color:var(--t2);line-height:1.7;margin-bottom:24px}
+.demo-feature{display:flex;align-items:center;gap:12px;margin-bottom:14px;font-size:15px;color:var(--t2)}
+.demo-feature-dot{width:8px;height:8px;border-radius:50%;background:var(--green);flex-shrink:0}
+
+/* ── PRICING ── */
+.pricing-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
+.price-card{background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);border-radius:24px;padding:32px 28px;position:relative;overflow:hidden;transition:transform .2s}
+.price-card:hover{transform:translateY(-4px)}
+.price-card.featured{background:rgba(227,10,23,.08);border-color:rgba(227,10,23,.3);box-shadow:0 0 0 1px rgba(227,10,23,.15)}
+.price-badge{position:absolute;top:16px;right:16px;background:var(--r);color:#fff;border-radius:20px;padding:4px 12px;font-size:11px;font-weight:700;letter-spacing:.3px}
+.price-plan{font-size:12px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:var(--t3);margin-bottom:12px}
+.price-amount{font-family:var(--hh);font-size:44px;font-weight:800;color:var(--t1);letter-spacing:-2px;line-height:1}
+.price-per{font-size:14px;color:var(--t3);margin-left:4px}
+.price-desc{font-size:14px;color:var(--t2);margin:14px 0 24px;line-height:1.5}
+.price-divider{height:1px;background:rgba(255,255,255,.07);margin-bottom:20px}
+.price-feature{display:flex;align-items:flex-start;gap:9px;font-size:14px;color:var(--t2);margin-bottom:10px}
+.pf-check{color:var(--green);font-size:15px;flex-shrink:0;margin-top:1px}
+.price-btn{width:100%;border-radius:12px;padding:13px;font-size:14px;font-weight:600;cursor:pointer;font-family:var(--hb);margin-top:20px;transition:transform .15s,box-shadow .15s}
+.price-btn.main{background:var(--r);color:#fff;border:none;box-shadow:0 4px 16px rgba(227,10,23,.35)}
+.price-btn.main:hover{transform:translateY(-1px);box-shadow:0 8px 24px rgba(227,10,23,.5)}
+.price-btn.outline{background:transparent;color:var(--t1);border:1px solid rgba(255,255,255,.15)}
+.price-btn.outline:hover{background:rgba(255,255,255,.07)}
+.price-save{display:inline-block;background:rgba(0,200,83,.15);border:1px solid rgba(0,200,83,.25);color:var(--green);border-radius:8px;font-size:11px;font-weight:600;padding:2px 8px;margin-top:6px}
+
+/* ── CTA BANNER ── */
+.cta-banner{margin:0 clamp(16px,5vw,80px) 80px;background:linear-gradient(135deg,rgba(227,10,23,.15) 0%,rgba(139,92,246,.12) 50%,rgba(0,180,200,.1) 100%);border:1px solid rgba(255,255,255,.1);border-radius:32px;padding:64px 48px;text-align:center;position:relative;overflow:hidden}
+.cta-banner-glow{position:absolute;width:400px;height:300px;border-radius:50%;background:radial-gradient(ellipse,rgba(227,10,23,.2),transparent 70%);top:50%;left:50%;transform:translate(-50%,-50%);pointer-events:none}
+.cta-banner h2{font-family:var(--hh);font-size:clamp(28px,4vw,52px);font-weight:800;letter-spacing:-1.5px;color:var(--t1);margin-bottom:16px;position:relative}
+.cta-banner p{font-size:18px;color:var(--t2);max-width:500px;margin:0 auto 36px;line-height:1.65;position:relative}
+.cta-store-row{display:flex;gap:12px;justify-content:center;flex-wrap:wrap;position:relative}
+.store-lg{display:flex;align-items:center;gap:12px;background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.12);border-radius:14px;padding:12px 24px;cursor:pointer;transition:background .2s,border-color .2s}
+.store-lg:hover{background:rgba(255,255,255,.12);border-color:rgba(255,255,255,.22)}
+.store-lg-sub{font-size:11px;color:var(--t3);line-height:1}
+.store-lg-name{font-size:16px;font-weight:700;color:var(--t1);line-height:1;margin-top:3px;font-family:var(--hh)}
+
+/* ── FOOTER ── */
+footer{border-top:1px solid rgba(255,255,255,.07);padding:36px clamp(16px,5vw,80px);display:flex;justify-content:space-between;align-items:center;flex-wrap:gap;gap:16px}
+.footer-logo{display:flex;align-items:center;gap:8px;font-family:var(--hh);font-size:15px;font-weight:700;color:var(--t1)}
+.footer-logo-icon{width:28px;height:28px;background:var(--r);border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:13px}
+.footer-links{display:flex;gap:20px}
+.footer-links a{font-size:13px;color:var(--t3);text-decoration:none;transition:color .2s}
+.footer-links a:hover{color:var(--t2)}
+.footer-copy{font-size:13px;color:var(--t3)}
+
+/* ── SCROLL REVEAL ── */
+.reveal{opacity:0;transform:translateY(28px);transition:opacity .65s ease,transform .65s ease}
+.reveal.visible{opacity:1;transform:translateY(0)}
+.reveal-delay-1{transition-delay:.1s}
+.reveal-delay-2{transition-delay:.2s}
+.reveal-delay-3{transition-delay:.3s}
+
+/* ── GALLERY DOTS ── */
+.gallery-dots{display:flex;justify-content:center;gap:6px;margin-top:20px}
+.gdot{width:6px;height:6px;border-radius:50%;background:rgba(255,255,255,.2);cursor:pointer;transition:all .2s}
+.gdot.active{width:18px;border-radius:3px;background:var(--r)}
+
+/* responsive */
+@media(max-width:900px){
+  .hero{grid-template-columns:1fr;text-align:center;gap:48px}
+  .hero-sub,.hero-actions,.hero-stores{justify-content:center}
+  .hero-visual{display:none}
+  .bento-grid{grid-template-columns:1fr 1fr}
+  .bc.span2{grid-column:span 1}
+  .coaches-grid{grid-template-columns:1fr}
+  .pricing-grid{grid-template-columns:1fr}
+  .demo-wrap{grid-template-columns:1fr}
+  .demo-phone-big{display:none}
   .nav-links{display:none}
-  .stores{flex-direction:column;align-items:center}
 }
 </style>
 </head>
 <body>
 
-<!-- Nav -->
+<!-- NAV -->
 <nav>
-  <a href="#" class="logo">🇹🇷 Learn<span class="r">Turkish</span> AI</a>
-  <div class="nav-links">
-    <a href="#features">Features</a>
-    <a href="#scenarios">Scenarios</a>
-    <a href="#pricing">Pricing</a>
-    <a href="#download" class="btn btn-r" style="padding:8px 20px;font-size:14px">Download</a>
-  </div>
-  <div class="lang-sel">
-    <div class="lang-btn">🇬🇧 EN ▼</div>
-    <div class="lang-drop">
-      <a href="#">🇬🇧 English</a><a href="#">🇸🇦 العربية</a><a href="#">🇩🇪 Deutsch</a>
-      <a href="#">🇫🇷 Français</a><a href="#">🇪🇸 Español</a><a href="#">🇷🇺 Русский</a>
-      <a href="#">🇮🇷 فارسی</a><a href="#">🇯🇵 日本語</a><a href="#">🇺🇿 O'zbekcha</a>
-      <a href="#">🇰🇬 Кыргызча</a><a href="#">🇰🇿 Қазақша</a><a href="#">🇵🇰 اردو</a>
-      <a href="#">🇮🇳 हिन्दी</a><a href="#">🇹🇷 Türkçe</a>
-    </div>
+  <a class="nav-logo" href="#">
+    <div class="logo-icon">🇹🇷</div>
+    LearnTurkish AI
+  </a>
+  <ul class="nav-links">
+    <li><a href="#features">Özellikler</a></li>
+    <li><a href="#coaches">Koçlar</a></li>
+    <li><a href="#scenarios">Senaryolar</a></li>
+    <li><a href="#pricing">Fiyatlar</a></li>
+  </ul>
+  <div class="nav-right">
+    <button class="lang-btn">🌐 EN</button>
+    <button class="cta-btn" onclick="document.getElementById('pricing').scrollIntoView({behavior:'smooth'})">Ücretsiz Başla</button>
   </div>
 </nav>
 
-<!-- Hero -->
-<section class="hero">
-  <div class="flag">🇹🇷</div>
-  <h1>Learn <span class="r">Turkish</span> by<br>Talking with AI</h1>
-  <p>Practice real conversations with AI coaches. Master Turkish through real-life scenarios — restaurant, taxi, market. From "Merhaba" to fluency.</p>
-  <div class="cta">
-    <a href="#download" class="btn btn-r">Download Free →</a>
-    <a href="#demo" class="btn btn-o">Try Demo</a>
-  </div>
-  <div class="stores" id="download">
-    <a href="#" class="store-btn"><div class="icon">🍎</div><div class="text"><div class="small">Download on the</div><div class="big">App Store</div></div></a>
-    <a href="#" class="store-btn"><div class="icon">▶️</div><div class="text"><div class="small">Get it on</div><div class="big">Google Play</div></div></a>
-  </div>
-  <div class="qr-section">
-    <div class="qr-box"><div class="qr">📱 iOS QR<br>(Coming Soon)</div><div class="label">App Store</div></div>
-    <div class="qr-box"><div class="qr">📱 Android QR<br>(Coming Soon)</div><div class="label">Google Play</div></div>
-  </div>
-  <div class="stats" style="margin-top:40px">
-    <div class="stat"><div class="num">25+</div><div class="label">Scenarios</div></div>
-    <div class="stat"><div class="num">3</div><div class="label">AI Coaches</div></div>
-    <div class="stat"><div class="num">400+</div><div class="label">Words</div></div>
-    <div class="stat"><div class="num">14</div><div class="label">Languages</div></div>
-  </div>
-</section>
-
-<!-- Features -->
-<section id="features">
-  <h2>Why LearnTurkish AI?</h2>
-  <p class="sub">Everything you need to speak Turkish confidently</p>
-  <div class="feature-grid">
-    <div class="f-card"><div class="e">🤖</div><h3>AI Conversations</h3><p>Chat with 3 unique AI coaches. Get instant corrections, suggestions, and encouragement in your native language.</p></div>
-    <div class="f-card"><div class="e">🎭</div><h3>Real-Life Scenarios</h3><p>25+ scenarios with real Istanbul locations, real prices, real culture. Mandabatmaz coffee, Mısır Çarşısı, Taksim taxis.</p></div>
-    <div class="f-card"><div class="e">🔊</div><h3>Listen & Speak</h3><p>AI speaks Turkish to you with natural pronunciation. Listen, repeat, and build confidence before you travel.</p></div>
-    <div class="f-card"><div class="e">🎓</div><h3>TÖMER Preparation</h3><p>A1 to C1 quiz questions with star ratings. Prepare for the official Turkish proficiency exam with AI explanations.</p></div>
-    <div class="f-card"><div class="e">📖</div><h3>AI Dictionary</h3><p>Search any word — get meaning, examples, conjugation, synonyms, pronunciation. Powered by AI, not a static database.</p></div>
-    <div class="f-card"><div class="e">🖼️</div><h3>Visual Flashcards</h3><p>400+ words in 20 categories with emoji visuals and audio. Fruits, animals, verbs, greetings — learn by seeing and hearing.</p></div>
-    <div class="f-card"><div class="e">🏆</div><h3>Certificates</h3><p>Earn verified certificates with QR code validation. Share on LinkedIn. Minimum 3 months active learning required.</p></div>
-    <div class="f-card"><div class="e">🔥</div><h3>Daily Challenges</h3><p>Streak rewards, XP points, daily tasks. Stay motivated with gamification that keeps you coming back every day.</p></div>
-    <div class="f-card"><div class="e">🌍</div><h3>14 Languages</h3><p>Interface available in English, Arabic, German, French, Spanish, Russian, Persian, Japanese, Uzbek, Kyrgyz, Kazakh, Urdu, Hindi, and Turkish.</p></div>
-  </div>
-</section>
-
-<!-- Scenarios -->
-<section class="section-dark" id="scenarios">
-  <h2>25+ Real-Life Scenarios</h2>
-  <p class="sub">Practice in situations you'll actually face in Turkey</p>
-  <div class="sc-grid">
-    <div class="sc-pill">🍽 Restaurant</div><div class="sc-pill">☕ Coffee Shop</div>
-    <div class="sc-pill">🚕 Taxi</div><div class="sc-pill">🛒 Market</div>
-    <div class="sc-pill">🗺 Directions</div><div class="sc-pill">🏨 Hotel</div>
-    <div class="sc-pill">✈️ Airport</div><div class="sc-pill">💇 Barber</div>
-    <div class="sc-pill locked">🏠 Apartment 🔒</div><div class="sc-pill locked">🏦 Bank 🔒</div>
-    <div class="sc-pill locked">💊 Pharmacy 🔒</div><div class="sc-pill locked">🏥 Doctor 🔒</div>
-    <div class="sc-pill locked">💼 Job Interview 🔒</div><div class="sc-pill locked">🎉 Party 🔒</div>
-    <div class="sc-pill locked">🏛 Government 🔒</div><div class="sc-pill locked">💒 Wedding 🔒</div>
-  </div>
-  <p style="text-align:center;color:#888;margin-top:24px;font-size:14px">🔒 = Premium only. <a href="#pricing" class="r">Upgrade to unlock all →</a></p>
-</section>
-
-<!-- Demo -->
-<section id="demo">
-  <h2>See It In Action</h2>
-  <p class="sub">A real conversation with AI coach Ayşe at a restaurant</p>
-  <div class="demo-box">
-    <div class="chat">
-      <div class="msg ai"><div class="nm r">Ayşe 🧑‍🏫</div><p>Hoş geldiniz! Taksim'deki Tarihi Çorbacı'ya hoş geldiniz. Bugün Adana kebabımız harika! 🍽</p></div>
-      <div class="msg user"><p>Merhaba! Menüye bakabilir miyim?</p></div>
-      <div class="msg ai"><div class="nm r">Ayşe 🧑‍🏫</div><p>Tabii efendim! Adana kebap 120 TL, mercimek çorbası 45 TL, pide 85 TL, ayran 20 TL. Ne istersiniz? 😊</p></div>
-      <div class="msg user"><p>Bir çorba ve ayran lütfen</p></div>
-      <div class="msg ai"><div class="nm r">Ayşe 🧑‍🏫</div><p>Harika seçim! 🎉 Mercimek çorbası ve ayran — 65 TL. Afiyet olsun! 🍲<br><br>💡 <em>"Afiyet olsun" = Bon appétit in Turkish!</em></p></div>
+<!-- VIDEO MODAL -->
+<div class="modal-overlay" id="videoModal">
+  <div class="modal-box">
+    <div class="modal-header">
+      <span class="modal-title">LearnTurkish AI — Tanıtım Videosu</span>
+      <button class="modal-close" onclick="closeModal()">✕</button>
     </div>
-    <p style="text-align:center;color:#888;font-size:14px">AI responds in 1-2 seconds. Conversations feel natural and fun.</p>
-  </div>
-</section>
-
-<!-- Coaches -->
-<section class="section-dark">
-  <h2>3 Unique AI Coaches</h2>
-  <p class="sub">Choose who you want to practice with</p>
-  <div class="coach-grid">
-    <div class="c-card"><div class="av">🧑‍🏫</div><h3>Ayşe</h3><div class="r" style="font-size:14px;font-weight:600">Friendly Teacher</div><p>Patient and warm. Perfect for beginners. Uses "Harika! Çok güzel!" to encourage you. Explains in your language.</p></div>
-    <div class="c-card"><div class="av">🗣</div><h3>Emre</h3><div class="blue" style="font-size:14px;font-weight:600">Conversation Partner</div><p>25-year-old Turkish guy. Casual and fun. Uses slang: "Abi, hadi ya!" Talks like a real friend.</p></div>
-    <div class="c-card"><div class="av">📚</div><h3>Prof. Demir</h3><div class="purple" style="font-size:14px;font-weight:600">Grammar Coach</div><p>Detail-oriented professor. Explains every grammar rule. Uses formal "siz". Quotes Turkish proverbs.</p></div>
-  </div>
-</section>
-
-<!-- Pricing -->
-<section id="pricing">
-  <h2>Simple, Honest Pricing</h2>
-  <p class="sub">Start free. Upgrade when you're ready.</p>
-  <div class="price-grid">
-    <div class="p-card">
-      <h3>Free</h3>
-      <div class="price">$0<span>/forever</span></div>
-      <ul>
-        <li>10 AI messages per day</li>
-        <li>8 free scenarios</li>
-        <li>Basic TÖMER quiz</li>
-        <li>Dictionary (10 searches/day)</li>
-        <li>3 flashcard categories</li>
-        <li class="no">Unlimited conversations</li>
-        <li class="no">All 25+ scenarios</li>
-        <li class="no">Certificate</li>
-        <li class="no">All flashcards</li>
-        <li class="no">AI speaking feedback</li>
-      </ul>
-      <a href="#download" class="btn btn-o" style="width:100%;justify-content:center">Start Free</a>
-    </div>
-    <div class="p-card pop">
-      <h3>Premium</h3>
-      <div class="price">$4.99<span>/month</span></div>
-      <ul>
-        <li><strong>Unlimited</strong> AI conversations</li>
-        <li><strong>All 25+</strong> scenarios</li>
-        <li>Full TÖMER preparation (A1-C1)</li>
-        <li>Unlimited AI Dictionary</li>
-        <li>All flashcard categories (400+ words)</li>
-        <li>AI speaking feedback</li>
-        <li>3 AI coaches (Ayşe, Emre, Prof. Demir)</li>
-        <li>Verified certificates with QR</li>
-        <li>Priority AI responses</li>
-        <li>Ad-free experience</li>
-      </ul>
-      <a href="#download" class="btn btn-r" style="width:100%;justify-content:center">Go Premium →</a>
-
-    </div>
-    <div class="p-card" style="border-color:rgba(0,200,83,0.3)">
-      <h3>Yearly</h3>
-      <div class="price">$49.99<span>/year</span></div>
-      <div style="background:rgba(0,200,83,0.1);border:1px solid rgba(0,200,83,0.3);border-radius:10px;padding:6px 12px;display:inline-block;margin-bottom:16px">
-        <span style="color:#00C853;font-size:13px;font-weight:700">Save 17% vs monthly</span>
+    <div class="modal-video">
+      <div class="video-placeholder">
+        <div class="video-ph-icon">▶</div>
+        <div class="video-ph-txt">Tanıtım videosu yakında</div>
+        <div class="video-ph-sub">Buraya YouTube/Vimeo embed kodu eklenecek</div>
       </div>
-      <ul>
-        <li><strong>Everything</strong> in Premium</li>
-        <li>12 months for price of 10</li>
-        <li>Cancel anytime</li>
-      </ul>
-      <a href="#download" class="btn btn-r" style="width:100%;justify-content:center;background:#00C853;border:none">Get Yearly →</a>
+    </div>
+  </div>
+</div>
+
+<!-- HERO -->
+<div style="max-width:1280px;margin:0 auto">
+<section class="hero">
+  <div class="hero-glow-a"></div>
+  <div class="hero-glow-b"></div>
+
+  <div class="hero-left">
+    <div class="hero-badge">
+      <span class="badge-dot"></span>
+      Yapay Zeka Destekli Türkçe Öğrenme
+    </div>
+    <h1 class="hero-title">
+      <span>"Merhaba"</span>dan<br>
+      <em>Akıcılığa</em>
+    </h1>
+    <p class="hero-sub">3 AI koçla gerçek konuşmalar yap. 25+ senaryo ile restoran, market, hastane gibi gerçek hayat durumlarını pratik et. 1-2 saniyede yanıt.</p>
+    <div class="hero-actions">
+      <button class="btn-primary" onclick="document.getElementById('pricing').scrollIntoView({behavior:'smooth'})">🚀 Ücretsiz Başla</button>
+      <button class="btn-ghost" onclick="openModal()">
+        <div class="play-icon">
+          <svg width="10" height="12" viewBox="0 0 10 12" fill="white"><path d="M0 0l10 6-10 6V0z"/></svg>
+        </div>
+        Videoyu İzle
+      </button>
+    </div>
+    <div class="hero-stores">
+      <button class="store-btn">
+        <span style="font-size:22px">🍎</span>
+        <div>
+          <div class="store-btn-sub">Download on the</div>
+          <div class="store-btn-name">App Store</div>
+        </div>
+      </button>
+      <button class="store-btn">
+        <span style="font-size:22px">▶️</span>
+        <div>
+          <div class="store-btn-sub">Get it on</div>
+          <div class="store-btn-name">Google Play</div>
+        </div>
+      </button>
+    </div>
+  </div>
+
+  <!-- iPhone mockup -->
+  <div class="hero-visual">
+    <div class="phone-wrap">
+      <div class="phone-frame">
+        <div class="phone-notch"></div>
+        <div class="phone-screen">
+          <div class="ps-status"><span style="font-weight:700">9:41</span><span>••• ▲ ▮▮▮</span></div>
+          <div style="padding:0 12px 4px;font-size:17px;font-weight:800;font-family:var(--hh);color:var(--t1)">Merhaba, Metin 👋</div>
+          <div style="padding:0 12px 10px;font-size:11px;color:var(--t2)">Bugün 3. gün — devam et!</div>
+          <!-- stats -->
+          <div style="display:flex;gap:6px;padding:0 12px;margin-bottom:8px">
+            <div style="flex:1;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.08);border-radius:12px;padding:8px 6px;text-align:center">
+              <div style="font-size:16px;font-weight:800;color:var(--gold);font-family:var(--hh)">1,240</div>
+              <div style="font-size:8px;color:var(--t3);text-transform:uppercase;letter-spacing:.5px">XP</div>
+            </div>
+            <div style="flex:1;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.08);border-radius:12px;padding:8px 6px;text-align:center">
+              <div style="font-size:16px;font-weight:800;color:var(--r);font-family:var(--hh)">🔥3</div>
+              <div style="font-size:8px;color:var(--t3);text-transform:uppercase;letter-spacing:.5px">Seri</div>
+            </div>
+            <div style="flex:1;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.08);border-radius:12px;padding:8px 6px;text-align:center">
+              <div style="font-size:16px;font-weight:800;color:var(--green);font-family:var(--hh)">B1</div>
+              <div style="font-size:8px;color:var(--t3);text-transform:uppercase;letter-spacing:.5px">Seviye</div>
+            </div>
+          </div>
+          <div class="ps-hero-card">
+            <div class="ps-hero-label">✦ Günün Deyimi</div>
+            <div class="ps-hero-phrase">Canına Minnet</div>
+            <div class="ps-hero-mean">Çok değerli, ona minnettar olunur anlamında kullanılır.</div>
+          </div>
+          <div class="ps-coaches">
+            <div class="ps-coach" style="background:rgba(245,197,24,.1);border-color:rgba(245,197,24,.2)">
+              <div class="ps-coach-av" style="background:rgba(245,197,24,.2);color:var(--gold)">A</div>
+              <div class="ps-coach-name" style="color:var(--gold)">Ayşe</div>
+              <div class="ps-coach-role">Sıcak</div>
+            </div>
+            <div class="ps-coach" style="background:rgba(59,130,246,.1);border-color:rgba(59,130,246,.2)">
+              <div class="ps-coach-av" style="background:rgba(59,130,246,.2);color:var(--blue)">E</div>
+              <div class="ps-coach-name" style="color:var(--blue)">Emre</div>
+              <div class="ps-coach-role">Enerjik</div>
+            </div>
+            <div class="ps-coach" style="background:rgba(180,120,60,.1);border-color:rgba(180,120,60,.2)">
+              <div class="ps-coach-av" style="background:rgba(180,120,60,.2);color:rgb(200,140,70)">P</div>
+              <div class="ps-coach-name" style="color:rgb(200,140,70)">Prof.</div>
+              <div class="ps-coach-role">Akademik</div>
+            </div>
+          </div>
+          <div class="ps-tabbar">
+            <div class="ps-tab act"><div class="ps-tab-icon">🏠</div><div class="ps-tab-dot"></div><div class="ps-tab-lbl" style="color:var(--r)">Ana</div></div>
+            <div class="ps-tab"><div class="ps-tab-icon">🎭</div><div class="ps-tab-dot"></div><div class="ps-tab-lbl">Senar.</div></div>
+            <div class="ps-tab"><div class="ps-tab-icon">🎮</div><div class="ps-tab-dot"></div><div class="ps-tab-lbl">Oyun</div></div>
+            <div class="ps-tab"><div class="ps-tab-icon">👥</div><div class="ps-tab-dot"></div><div class="ps-tab-lbl">Partner</div></div>
+            <div class="ps-tab"><div class="ps-tab-icon">👤</div><div class="ps-tab-dot"></div><div class="ps-tab-lbl">Profil</div></div>
+          </div>
+        </div>
+      </div>
+      <div class="phone-glow"></div>
+      <div class="play-overlay" onclick="openModal()">
+        <div class="play-btn-big">
+          <svg width="18" height="22" viewBox="0 0 18 22" fill="white"><path d="M0 0l18 11L0 22V0z"/></svg>
+        </div>
+      </div>
+
+      <!-- floating badges -->
+      <div class="float-badge pos1" style="left:-90px;top:70px">
+        <div class="float-badge-icon" style="background:rgba(0,200,83,.2)">⚡</div>
+        <div><div style="font-size:13px;font-weight:800;font-family:var(--hh)">1-2 sn</div><div style="font-size:11px;color:var(--t3)">AI yanıt süresi</div></div>
+      </div>
+      <div class="float-badge pos2" style="right:-95px;bottom:110px">
+        <div class="float-badge-icon" style="background:rgba(245,197,24,.2)">🏆</div>
+        <div><div style="font-size:13px;font-weight:800;font-family:var(--hh)">25+</div><div style="font-size:11px;color:var(--t3)">Senaryo</div></div>
+      </div>
+      <div class="float-badge pos3" style="right:-85px;top:55px">
+        <div class="float-badge-icon" style="background:rgba(139,92,246,.2)">🌍</div>
+        <div><div style="font-size:13px;font-weight:800;font-family:var(--hh)">14 Dil</div><div style="font-size:11px;color:var(--t3)">Arayüz dili</div></div>
+      </div>
     </div>
   </div>
 </section>
+</div>
 
-<!-- Bottom CTA -->
-<section class="cta-bottom">
-  <h2>Ready to speak Turkish? 🇹🇷</h2>
-  <p>Join thousands learning Turkish with AI. Start speaking from day one.</p>
-  <div class="stores" style="margin-bottom:24px">
-    <a href="#" class="store-btn"><div class="icon">🍎</div><div class="text"><div class="small">Download on the</div><div class="big">App Store</div></div></a>
-    <a href="#" class="store-btn"><div class="icon">▶️</div><div class="text"><div class="small">Get it on</div><div class="big">Google Play</div></div></a>
+<!-- MOCKUP GALLERY -->
+<div style="padding:0 0 80px;overflow:hidden" id="scenarios">
+  <div class="section-wrap" style="padding-bottom:24px">
+    <div class="section-header reveal">
+      <div class="sec-label">Ekran Galerisi</div>
+      <h2 class="sec-title">Her özelliği canlı gör</h2>
+      <p class="sec-sub">Uygulamanın farklı ekranlarını keşfet — sohbetten sertifikaya kadar.</p>
+    </div>
   </div>
-  <a href="#demo" class="btn btn-o">Try Demo First</a>
-</section>
+  <div class="gallery-scroll" id="galleryScroll">
 
-<!-- Footer -->
+    <!-- 1: Chat -->
+    <div class="gallery-item">
+      <div class="gallery-phone">
+        <div style="background:#0A0A0B;padding-top:8px"><div class="gallery-notch"></div></div>
+        <div class="gscr">
+          <!-- chat header -->
+          <div style="display:flex;align-items:center;gap:8px;padding:10px 0 8px;border-bottom:1px solid rgba(255,255,255,.06);margin-bottom:10px">
+            <div style="width:32px;height:32px;border-radius:50%;background:rgba(245,197,24,.2);color:var(--gold);display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:800">A</div>
+            <div><div style="font-size:12px;font-weight:700;color:var(--t1)">Ayşe</div><div style="font-size:10px;color:var(--green);display:flex;align-items:center;gap:3px"><span style="width:5px;height:5px;border-radius:50%;background:var(--green);display:inline-block"></span>Çevrimiçi</div></div>
+          </div>
+          <div class="gscr-chat">
+            <div class="msg-row">
+              <div class="msg-av" style="background:rgba(245,197,24,.2);color:var(--gold)">A</div>
+              <div>
+                <div class="msg-action">✨ <em>Ayşe berber koltuğuna oturuyor...</em></div>
+                <div class="bubble ai">Merhaba! Bugün nasıl bir saç istiyorsunuz?</div>
+              </div>
+            </div>
+            <div class="msg-row u">
+              <div class="bubble usr">Biraz kısa kestirmek istiyorum.</div>
+            </div>
+            <div class="msg-row">
+              <div class="msg-av" style="background:rgba(245,197,24,.2);color:var(--gold)">A</div>
+              <div>
+                <div class="bubble ai">Tabii! Yanları ve arkası ne kadar kısa olsun? <span style="color:var(--green);font-size:9px">✓ Harika cümle!</span></div>
+              </div>
+            </div>
+            <div class="msg-row u">
+              <div class="bubble usr">İki santim yeterli.</div>
+            </div>
+            <div class="msg-row">
+              <div class="msg-av" style="background:rgba(245,197,24,.2);color:var(--gold)">A</div>
+              <div>
+                <div class="msg-action">💡 <em>Ayşe ipucu paylaşıyor...</em></div>
+                <div class="bubble ai">Anladım! <br><span style="font-size:9px;color:rgba(245,197,24,.8)">"İki santim" = 2 cm — ölçü birimlerini çok güzel kullandınız!</span></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="gallery-label">💬 Berber Senaryosu</div>
+      <div class="gallery-sub">Gerçek zamanlı AI koç geri bildirimi</div>
+    </div>
+
+    <!-- 2: TÖMER -->
+    <div class="gallery-item">
+      <div class="gallery-phone">
+        <div style="background:#0A0A0B;padding-top:8px"><div class="gallery-notch"></div></div>
+        <div class="gscr gscr-tomer">
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px">
+            <div class="tomer-title">TÖMER Hazırlık</div>
+            <div style="font-size:10px;background:rgba(245,197,24,.15);border:1px solid rgba(245,197,24,.2);color:var(--gold);padding:3px 8px;border-radius:6px;font-weight:700">B1</div>
+          </div>
+          <div style="display:flex;gap:4px;margin-bottom:12px">
+            <div style="flex:1;height:3px;border-radius:3px;background:var(--green)"></div>
+            <div style="flex:1;height:3px;border-radius:3px;background:var(--green)"></div>
+            <div style="flex:1;height:3px;border-radius:3px;background:var(--r)"></div>
+            <div style="flex:1;height:3px;border-radius:3px;background:rgba(255,255,255,.1)"></div>
+            <div style="flex:1;height:3px;border-radius:3px;background:rgba(255,255,255,.1)"></div>
+          </div>
+          <div class="tomer-q">Aşağıdaki cümlede boşluğa uygun kelimeyi seçin:<br><br><strong style="color:var(--t1)">"Yarın toplantıya _____ misin?"</strong></div>
+          <div class="tomer-opt correct">✓ A) katılabilecek</div>
+          <div class="tomer-opt wrong">✗ B) katılmış</div>
+          <div class="tomer-opt" style="opacity:.5">C) katılan</div>
+          <div class="tomer-opt" style="opacity:.5">D) katılmadan</div>
+          <div style="background:rgba(0,200,83,.1);border:1px solid rgba(0,200,83,.2);border-radius:10px;padding:8px 10px;margin-top:8px">
+            <div style="font-size:9px;color:var(--green);font-weight:700;margin-bottom:3px">✓ Doğru! AI Açıklaması:</div>
+            <div style="font-size:10px;color:var(--t2);line-height:1.4">"Katılabilecek misin?" gelecek zaman ile yetenek kipini birleştiriyor.</div>
+          </div>
+          <div class="idiom-card">
+            <div class="idiom-lbl">✦ Günün Deyimi</div>
+            <div class="idiom-phrase">Canına Minnet</div>
+            <div class="idiom-mean">Çok değerli ve güzel; ona minnettar olunur.</div>
+          </div>
+        </div>
+      </div>
+      <div class="gallery-label">📚 TÖMER Hazırlık</div>
+      <div class="gallery-sub">A1'den C1'e quiz + deyim kartları</div>
+    </div>
+
+    <!-- 3: Certificate -->
+    <div class="gallery-item">
+      <div class="gallery-phone">
+        <div style="background:#0A0A0B;padding-top:8px"><div class="gallery-notch"></div></div>
+        <div class="gscr gscr-cert">
+          <div class="cert-bg"></div>
+          <div class="cert-logo-big">🇹🇷</div>
+          <div class="cert-border-title">LearnTurkish AI · Yeterlilik Belgesi</div>
+          <div class="cert-divider"></div>
+          <div class="cert-holder">Metin Kaya</div>
+          <div class="cert-desc">aşağıdaki seviyede Türkçe<br>yeterliliğini tamamlamıştır</div>
+          <div class="cert-level-badge">B1 — Orta Düzey</div>
+          <div class="cert-divider"></div>
+          <div class="cert-qr">⬛</div>
+          <div class="cert-qr-label">QR ile doğrula · LinkedIn'de paylaş</div>
+          <div style="display:flex;gap:8px;margin-top:14px;position:relative;width:100%">
+            <button style="flex:1;background:var(--r);border:none;border-radius:10px;padding:10px;color:#fff;font-size:11px;font-weight:700;font-family:var(--hb);cursor:pointer">Paylaş</button>
+            <button style="flex:1;background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.1);border-radius:10px;padding:10px;color:var(--t1);font-size:11px;font-weight:700;font-family:var(--hb);cursor:pointer">İndir</button>
+          </div>
+        </div>
+      </div>
+      <div class="gallery-label">🎓 Sertifika</div>
+      <div class="gallery-sub">QR kodlu · LinkedIn paylaşılabilir</div>
+    </div>
+
+    <!-- 4: Leaderboard -->
+    <div class="gallery-item">
+      <div class="gallery-phone">
+        <div style="background:#0A0A0B;padding-top:8px"><div class="gallery-notch"></div></div>
+        <div class="gscr gscr-lb">
+          <div class="lb-title">Bu Haftanın Liderleri 🏆</div>
+          <div class="lb-row-item">
+            <div class="lb-rank-num" style="color:var(--gold)">1</div>
+            <div class="lb-av-sm" style="background:rgba(245,197,24,.2);color:var(--gold)">S</div>
+            <div class="lb-name-txt">Sara K.</div>
+            <div class="lb-pts-txt">3,420</div>
+          </div>
+          <div class="lb-row-item">
+            <div class="lb-rank-num" style="color:rgba(200,200,200,.7)">2</div>
+            <div class="lb-av-sm" style="background:rgba(139,92,246,.2);color:var(--purple)">A</div>
+            <div class="lb-name-txt">Ali M.</div>
+            <div class="lb-pts-txt">2,890</div>
+          </div>
+          <div class="lb-row-item">
+            <div class="lb-rank-num" style="color:rgba(180,120,60,.8)">3</div>
+            <div class="lb-av-sm" style="background:rgba(0,200,83,.2);color:var(--green)">L</div>
+            <div class="lb-name-txt">Lena V.</div>
+            <div class="lb-pts-txt">2,640</div>
+          </div>
+          <div style="height:8px"></div>
+          <div style="background:rgba(227,10,23,.06);border:1px solid rgba(227,10,23,.15);border-radius:12px;padding:10px;margin-top:4px;display:flex;align-items:center;gap:8px">
+            <div style="font-size:11px;font-weight:700;color:var(--t3);width:16px;text-align:center">12</div>
+            <div style="width:28px;height:28px;border-radius:50%;background:rgba(227,10,23,.2);color:var(--r);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700">M</div>
+            <div style="flex:1;font-size:11px;font-weight:600;color:var(--r)">Sen (Metin)</div>
+            <div style="font-size:11px;font-weight:700;color:var(--r)">1,240</div>
+          </div>
+          <!-- badges preview -->
+          <div style="margin-top:14px">
+            <div style="font-size:11px;font-weight:700;color:var(--t2);margin-bottom:8px">Rozetlerin</div>
+            <div style="display:flex;gap:6px">
+              <div style="width:44px;height:44px;border-radius:14px;background:rgba(245,197,24,.15);border:1px solid rgba(245,197,24,.25);display:flex;align-items:center;justify-content:center;font-size:18px;position:relative">🔥<div style="position:absolute;top:3px;right:3px;width:6px;height:6px;border-radius:50%;background:var(--gold);box-shadow:0 0 4px var(--gold)"></div></div>
+              <div style="width:44px;height:44px;border-radius:14px;background:rgba(245,197,24,.15);border:1px solid rgba(245,197,24,.25);display:flex;align-items:center;justify-content:center;font-size:18px">⚡</div>
+              <div style="width:44px;height:44px;border-radius:14px;background:rgba(245,197,24,.15);border:1px solid rgba(245,197,24,.25);display:flex;align-items:center;justify-content:center;font-size:18px">📚</div>
+              <div style="width:44px;height:44px;border-radius:14px;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.07);display:flex;align-items:center;justify-content:center;font-size:18px;opacity:.35">🏆</div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="gallery-label">🏆 Liderlik Tablosu</div>
+      <div class="gallery-sub">Haftalık sıralama ve rozetler</div>
+    </div>
+
+    <!-- 5: Life in Turkey Guide -->
+    <div class="gallery-item">
+      <div class="gallery-phone">
+        <div style="background:#0A0A0B;padding-top:8px"><div class="gallery-notch"></div></div>
+        <div class="gscr gscr-guide">
+          <div class="guide-header">🇹🇷 Türkiye Rehberi</div>
+          <div class="guide-card">
+            <div class="guide-card-top">
+              <div class="guide-card-icon" style="background:rgba(0,180,200,.15)">🚌</div>
+              <div><div class="guide-card-title">Ulaşım</div><div class="guide-card-sub">İstanbulkart · Metro · Metrobüs</div></div>
+            </div>
+            <div style="padding:0 12px 10px;font-size:10px;color:var(--t3)">Tam bilet: 24₺ · İstanbulkart ile %40 indirim</div>
+          </div>
+          <div class="guide-card">
+            <div class="guide-card-top">
+              <div class="guide-card-icon" style="background:rgba(139,92,246,.15)">🏠</div>
+              <div><div class="guide-card-title">Konut Kiralama</div><div class="guide-card-sub">Depozito · Kira · Tapkiye</div></div>
+            </div>
+            <div style="padding:0 12px 10px;font-size:10px;color:var(--t3)">Genellikle 2-3 aylık depozito istenir</div>
+          </div>
+          <div class="guide-card">
+            <div class="guide-card-top">
+              <div class="guide-card-icon" style="background:rgba(245,197,24,.15)">📋</div>
+              <div><div class="guide-card-title">Vize & İkamet</div><div class="guide-card-sub">Kısa dönem ikamet · Çalışma vizesi</div></div>
+            </div>
+            <div style="padding:0 12px 10px;font-size:10px;color:var(--t3)">e-devlet üzerinden başvuru yapılabilir</div>
+          </div>
+          <div style="margin-top:6px;background:rgba(0,200,83,.07);border:1px solid rgba(0,200,83,.15);border-radius:12px;padding:10px;display:flex;align-items:center;gap:8px">
+            <span style="font-size:16px">💡</span>
+            <div style="font-size:10px;color:var(--t2);line-height:1.4">AI koçunuz her konu hakkında Türkçe pratik yapmanıza yardım eder!</div>
+          </div>
+        </div>
+      </div>
+      <div class="gallery-label">🗺️ Türkiye'de Yaşam</div>
+      <div class="gallery-sub">Ulaşım · Konut · Vize rehberi</div>
+    </div>
+
+  </div>
+  <div class="gallery-dots" id="galleryDots">
+    <div class="gdot active" onclick="scrollGallery(0)"></div>
+    <div class="gdot" onclick="scrollGallery(1)"></div>
+    <div class="gdot" onclick="scrollGallery(2)"></div>
+    <div class="gdot" onclick="scrollGallery(3)"></div>
+    <div class="gdot" onclick="scrollGallery(4)"></div>
+  </div>
+</div>
+
+<!-- BENTO FEATURES -->
+<div class="section-wrap" id="features">
+  <div class="section-header reveal">
+    <div class="sec-label">Özellikler</div>
+    <h2 class="sec-title">Neden LearnTurkish AI?</h2>
+    <p class="sec-sub">Türkçe konuşma özgüveni kazanmak için ihtiyacın olan her şey tek uygulamada.</p>
+  </div>
+  <div class="bento-grid reveal reveal-delay-1">
+    <div class="bc span2 accent-gold">
+      <div class="bc-deco">🎭</div>
+      <div class="bc-icon" style="background:rgba(245,197,24,.2)">🎭</div>
+      <div class="bc-num" style="color:var(--gold)">25+</div>
+      <div class="bc-title">Gerçek Hayat Senaryoları</div>
+      <div class="bc-body">Restoran, berber, hastane, market, taksi... Gerçek İstanbul lokasyonları ve gerçek fiyatlarla pratik yap. Mandabatmaz kahvesi, Mısır Çarşısı, Taksim taksileri.</div>
+      <div class="bc-tag" style="background:rgba(245,197,24,.15);border:1px solid rgba(245,197,24,.25);color:var(--gold)">Popüler senaryo → Berber</div>
+    </div>
+    <div class="bc accent-teal">
+      <div class="bc-deco">🤖</div>
+      <div class="bc-icon" style="background:rgba(0,180,200,.2)">🤖</div>
+      <div class="bc-title">AI Konuşmalar</div>
+      <div class="bc-body">3 özgün AI koçla sohbet et. Anında düzeltmeler, öneriler ve teşvik.</div>
+      <div class="bc-tag" style="background:rgba(0,180,200,.12);border:1px solid rgba(0,180,200,.25);color:var(--teal)">1-2 saniyede yanıt</div>
+    </div>
+    <div class="bc accent-purple">
+      <div class="bc-deco">🌍</div>
+      <div class="bc-icon" style="background:rgba(139,92,246,.2)">🌍</div>
+      <div class="bc-num" style="color:var(--purple)">14</div>
+      <div class="bc-title">Dil Desteği</div>
+      <div class="bc-body">Türkçe, İngilizce, Arapça, Rusça, Özbekçe ve daha fazlası.</div>
+    </div>
+    <div class="bc accent-red">
+      <div class="bc-deco">🎓</div>
+      <div class="bc-icon" style="background:rgba(227,10,23,.2)">🎓</div>
+      <div class="bc-title">TÖMER Hazırlık</div>
+      <div class="bc-body">A1'den C1'e yıldız puanlı sorular. AI açıklamalarıyla resmi yeterlilik sınavına hazırlan.</div>
+      <div class="bc-tag" style="background:rgba(227,10,23,.12);border:1px solid rgba(227,10,23,.25);color:rgba(255,100,100,.9)">Resmi sınav formatı</div>
+    </div>
+    <div class="bc">
+      <div class="bc-deco">📖</div>
+      <div class="bc-icon" style="background:rgba(59,130,246,.2)">📖</div>
+      <div class="bc-title">AI Sözlük</div>
+      <div class="bc-body">Herhangi bir kelimeyi ara — anlam, örnekler, çekim ve telaffuz. Statik veritabanı değil, gerçek AI.</div>
+    </div>
+    <div class="bc">
+      <div class="bc-deco">🔥</div>
+      <div class="bc-icon" style="background:rgba(245,197,24,.2)">🔥</div>
+      <div class="bc-title">Günlük Meydan Okuma</div>
+      <div class="bc-body">Seri ödülleri, XP puanları, günlük görevler. Her gün geri gelmeni sağlayan oyunlaştırma.</div>
+    </div>
+    <div class="bc span2 accent-teal" style="display:flex;gap:24px;align-items:center">
+      <div>
+        <div class="bc-icon" style="background:rgba(0,200,83,.2)">🏆</div>
+        <div class="bc-title">LinkedIn Sertifikaları</div>
+        <div class="bc-body">QR kod doğrulamalı resmi sertifikalar kazan. LinkedIn profilinde paylaş, özgeçmişinde göster. Minimum 3 ay aktif öğrenme gerekir.</div>
+      </div>
+      <div style="flex-shrink:0;width:90px;height:90px;background:rgba(0,200,83,.1);border:2px solid rgba(0,200,83,.2);border-radius:20px;display:flex;align-items:center;justify-content:center;font-size:40px">🎓</div>
+    </div>
+  </div>
+</div>
+
+<!-- COACHES -->
+<div class="section-wrap" id="coaches">
+  <div class="section-header reveal">
+    <div class="sec-label">AI Koçlar</div>
+    <h2 class="sec-title">Kiminle pratik yapmak<br>istersin?</h2>
+    <p class="sec-sub">Her öğrenme stiline uygun üç özgün karakter. Dilediğin zaman değiştirebilirsin.</p>
+  </div>
+  <div class="coaches-grid reveal reveal-delay-1">
+    <div class="coach-card ayse">
+      <div class="coach-aura"></div>
+      <div class="coach-av-big">A</div>
+      <div class="coach-name">Ayşe</div>
+      <div class="coach-role">Sıcakkanlı Öğretmen</div>
+      <div class="coach-bio">Sabırlı ve anlayışlı. Yeni başlayanlar için mükemmel. "Harika! Çok güzel!" diyerek seni cesaretlendirir. Her hatanı kendi dilinde açıklar.</div>
+      <div class="coach-tag">Başlangıç için ideal</div>
+    </div>
+    <div class="coach-card emre">
+      <div class="coach-aura"></div>
+      <div class="coach-av-big">E</div>
+      <div class="coach-name">Emre</div>
+      <div class="coach-role">Enerjik Sohbet Ortağı</div>
+      <div class="coach-bio">25 yaşında İstanbullu. Günlük dil ve argo. "Abi, hadi ya!" diye konuşur. Gerçek bir Türk arkadaşıyla sohbet gibi hissettirir.</div>
+      <div class="coach-tag">Günlük konuşma için</div>
+    </div>
+    <div class="coach-card demir">
+      <div class="coach-aura"></div>
+      <div class="coach-av-big">P</div>
+      <div class="coach-name">Prof. Demir</div>
+      <div class="coach-role">Akademik Dil Koçu</div>
+      <div class="coach-bio">Detay odaklı profesör. Her dilbilgisi kuralını açıklar. Resmi "siz" hitabı kullanır. Türk atasözlerinden alıntı yapar. TÖMER için en iyi hazırlık.</div>
+      <div class="coach-tag">TÖMER hazırlığı için</div>
+    </div>
+  </div>
+</div>
+
+<!-- LIVE DEMO -->
+<div class="section-wrap">
+  <div class="demo-wrap">
+    <div class="demo-phone-big reveal">
+      <div class="demo-chat-phone">
+        <div style="background:#0A0A0B;padding-top:8px"><div style="height:22px;background:#0A0A0B;border-radius:0 0 14px 14px;width:70px;margin:0 auto"></div></div>
+        <div class="demo-chat-content">
+          <div class="demo-chat-header">
+            <div style="width:36px;height:36px;border-radius:50%;background:rgba(245,197,24,.2);color:var(--gold);display:flex;align-items:center;justify-content:center;font-size:15px;font-weight:800">A</div>
+            <div class="demo-info">
+              <div class="demo-name">Ayşe</div>
+              <div class="demo-status"><span class="demo-dot"></span>Çevrimiçi</div>
+            </div>
+          </div>
+          <div class="demo-msgs">
+            <div class="demo-action">✨ <em>Ayşe restorana hoş geldiniz der...</em></div>
+            <div class="demo-bubble ai">Hoş geldiniz! Taksim'deki Tarihi Çorbacı'ya buyurun. Bugün Adana kebabımız harika! 🍽</div>
+            <div class="demo-bubble usr">Merhaba! Menüye bakabilir miyim?</div>
+            <div class="demo-bubble ai">Tabii efendim! Adana kebap 120 ₺, mercimek çorbası 45 ₺, pide 85 ₺, ayran 20 ₺. Ne istersiniz? 😊</div>
+            <div class="demo-bubble usr">Bir çorba ve ayran lütfen.</div>
+            <div class="demo-action">🎉 <em>Ayşe harika bir seçim diyor...</em></div>
+            <div class="demo-bubble ai">Harika seçim! Mercimek çorbası ve ayran — 65 ₺. Afiyet olsun! 🍲<br><br><span style="font-size:11px;color:rgba(245,197,24,.8)">💡 "Afiyet olsun" = Bon appétit!</span></div>
+          </div>
+          <div class="demo-input-row">
+            <input class="demo-field" placeholder="Türkçe yaz..." readonly/>
+            <button class="demo-send"><svg width="12" height="14" viewBox="0 0 12 14" fill="white"><path d="M0 0l12 7L0 14V0z"/></svg></button>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="demo-right reveal reveal-delay-2">
+      <div class="sec-label">Canlı Demo</div>
+      <h3>AI, 1-2 saniyede<br>doğal Türkçe ile<br>yanıt veriyor</h3>
+      <p>Gerçek bir restoran sahnesinde Ayşe ile sipariş ver. Her doğru cümle için anında geri bildirim al.</p>
+      <div class="demo-feature"><span class="demo-feature-dot"></span> Anında hata düzeltme ve açıklama</div>
+      <div class="demo-feature"><span class="demo-feature-dot"></span> Kültürel ipuçları ve deyim açıklamaları</div>
+      <div class="demo-feature"><span class="demo-feature-dot"></span> Gerçek İstanbul lokasyonları ve fiyatlar</div>
+      <div class="demo-feature"><span class="demo-feature-dot"></span> Kendi dilinde destek (14 dil)</div>
+      <button class="btn-primary" onclick="openModal()" style="margin-top:12px">▶ Tanıtım Videosunu İzle</button>
+    </div>
+  </div>
+</div>
+
+<!-- PRICING -->
+<div class="section-wrap" id="pricing">
+  <div class="section-header reveal">
+    <div class="sec-label">Fiyatlandırma</div>
+    <h2 class="sec-title">Basit ve dürüst fiyatlar</h2>
+    <p class="sec-sub">Ücretsiz başla, hazır olduğunda yükselt. Kredi kartı gerekmez.</p>
+  </div>
+  <div class="pricing-grid reveal reveal-delay-1">
+    <div class="price-card">
+      <div class="price-plan">Ücretsiz</div>
+      <div><span class="price-amount">$0</span><span class="price-per">/sonsuza dek</span></div>
+      <div class="price-desc">Başlamak için ihtiyacın olan her şey</div>
+      <div class="price-divider"></div>
+      <div class="price-feature"><span class="pf-check">✓</span> Günlük 10 AI mesaj</div>
+      <div class="price-feature"><span class="pf-check">✓</span> 8 ücretsiz senaryo</div>
+      <div class="price-feature"><span class="pf-check">✓</span> Temel TÖMER quiz</div>
+      <div class="price-feature"><span class="pf-check">✓</span> Sözlük (10 arama/gün)</div>
+      <div class="price-feature"><span class="pf-check">✓</span> 3 flashcard kategorisi</div>
+      <button class="price-btn outline">Ücretsiz Başla</button>
+    </div>
+    <div class="price-card featured">
+      <div class="price-badge">En Popüler</div>
+      <div class="price-plan">Premium</div>
+      <div><span class="price-amount">$4.99</span><span class="price-per">/ay</span></div>
+      <div class="price-desc">Sınırsız öğrenme deneyimi</div>
+      <div class="price-divider"></div>
+      <div class="price-feature"><span class="pf-check">✓</span> <strong>Sınırsız</strong> AI konuşma</div>
+      <div class="price-feature"><span class="pf-check">✓</span> <strong>Tüm 25+</strong> senaryo</div>
+      <div class="price-feature"><span class="pf-check">✓</span> Tam TÖMER hazırlık (A1-C1)</div>
+      <div class="price-feature"><span class="pf-check">✓</span> Sınırsız AI Sözlük</div>
+      <div class="price-feature"><span class="pf-check">✓</span> 400+ kelime flashcard</div>
+      <div class="price-feature"><span class="pf-check">✓</span> 3 AI koç (Ayşe, Emre, Prof. Demir)</div>
+      <div class="price-feature"><span class="pf-check">✓</span> QR doğrulamalı sertifika</div>
+      <button class="price-btn main">Premium'a Geç →</button>
+    </div>
+    <div class="price-card">
+      <div class="price-plan">Yıllık</div>
+      <div><span class="price-amount">$49.99</span><span class="price-per">/yıl</span></div>
+      <div class="price-save">Aylığa göre %17 tasarruf</div>
+      <div class="price-desc">10 ayın fiyatına 12 ay</div>
+      <div class="price-divider"></div>
+      <div class="price-feature"><span class="pf-check">✓</span> Premium'daki her şey</div>
+      <div class="price-feature"><span class="pf-check">✓</span> 12 ay, 10 ay fiyatına</div>
+      <div class="price-feature"><span class="pf-check">✓</span> İstediğinde iptal et</div>
+      <div class="price-feature"><span class="pf-check">✓</span> Öncelikli AI yanıt</div>
+      <div class="price-feature"><span class="pf-check">✓</span> Reklamsız deneyim</div>
+      <button class="price-btn outline">Yıllık Planı Al →</button>
+    </div>
+  </div>
+</div>
+
+<!-- CTA BANNER -->
+<div class="cta-banner">
+  <div class="cta-banner-glow"></div>
+  <div class="sec-label" style="position:relative">Hazır mısın?</div>
+  <h2>Bugün Türkçe<br>konuşmaya başla 🇹🇷</h2>
+  <p>Binlerce öğrenciye katıl. İlk günden itibaren konuş. Ücretsiz başla.</p>
+  <div class="cta-store-row">
+    <button class="store-lg">
+      <span style="font-size:28px">🍎</span>
+      <div>
+        <div class="store-lg-sub">Download on the</div>
+        <div class="store-lg-name">App Store</div>
+      </div>
+    </button>
+    <button class="store-lg">
+      <span style="font-size:28px">▶️</span>
+      <div>
+        <div class="store-lg-sub">Get it on</div>
+        <div class="store-lg-name">Google Play</div>
+      </div>
+    </button>
+  </div>
+</div>
+
+<!-- FOOTER -->
 <footer>
-  <p style="font-size:20px;margin-bottom:8px">🇹🇷</p>
-  <p style="color:#FFF;font-weight:700;font-size:15px">LearnTurkish AI</p>
-  <p>Learn Turkish by talking with AI</p>
-  <p style="margin-top:16px"><a href="#">Privacy Policy</a> · <a href="#">Terms of Service</a> · <a href="mailto:kilinc.metin@hotmail.com">Contact</a></p>
-  <p style="margin-top:12px">© 2026 LearnTurkish AI. All rights reserved.</p>
-  <p style="margin-top:8px;font-size:11px">Made with ❤️ for Turkish language learners worldwide</p>
+  <div class="footer-logo">
+    <div class="footer-logo-icon">🇹🇷</div>
+    LearnTurkish AI
+  </div>
+  <div class="footer-links">
+    <a href="#">Gizlilik</a>
+    <a href="#">Kullanım Koşulları</a>
+    <a href="mailto:kilinc.metin@hotmail.com">İletişim</a>
+  </div>
+  <div class="footer-copy">© 2026 LearnTurkish AI · Made with ❤️ for learners worldwide</div>
 </footer>
 
+<script>
+// Modal
+function openModal(){ document.getElementById('videoModal').classList.add('open') }
+function closeModal(){ document.getElementById('videoModal').classList.remove('open') }
+document.getElementById('videoModal').addEventListener('click',function(e){ if(e.target===this) closeModal() })
+document.addEventListener('keydown',function(e){ if(e.key==='Escape') closeModal() })
+
+// Scroll reveal
+const observer = new IntersectionObserver((entries)=>{
+  entries.forEach(e=>{ if(e.isIntersecting) e.target.classList.add('visible') })
+},{threshold:.12})
+document.querySelectorAll('.reveal').forEach(el=>observer.observe(el))
+
+// Gallery dots
+const gs = document.getElementById('galleryScroll')
+const dots = document.querySelectorAll('.gdot')
+let activeIdx = 0
+function scrollGallery(idx){
+  const items = gs.querySelectorAll('.gallery-item')
+  if(items[idx]){ items[idx].scrollIntoView({behavior:'smooth',block:'nearest',inline:'center'}) }
+  dots.forEach(d=>d.classList.remove('active'))
+  dots[idx].classList.add('active')
+  activeIdx = idx
+}
+gs.addEventListener('scroll',()=>{
+  const items = gs.querySelectorAll('.gallery-item')
+  const scrollLeft = gs.scrollLeft
+  let closest=0,minDist=Infinity
+  items.forEach((item,i)=>{
+    const dist = Math.abs(item.offsetLeft - scrollLeft - gs.clientWidth/2 + item.offsetWidth/2)
+    if(dist<minDist){minDist=dist;closest=i}
+  })
+  if(closest!==activeIdx){
+    activeIdx=closest
+    dots.forEach(d=>d.classList.remove('active'))
+    if(dots[closest]) dots[closest].classList.add('active')
+  }
+})
+
+// Coach card spring animation
+document.querySelectorAll('.coach-card').forEach(card=>{
+  card.addEventListener('mousedown',()=>{ card.style.transform='translateY(-6px) scale(0.97)' })
+  card.addEventListener('mouseup',()=>{ card.style.transform='' })
+  card.addEventListener('mouseleave',()=>{ card.style.transform='' })
+})
+</script>
 </body>
 </html>
