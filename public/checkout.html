@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>LearnTurkish AI — Premium</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:#0A0A0B;color:#fff;font-family:-apple-system,sans-serif;min-height:100vh;display:flex;align-items:center;justify-content:center;padding:20px}
+.card{background:#131315;border:1px solid rgba(255,255,255,0.08);border-radius:24px;padding:32px;max-width:420px;width:100%;text-align:center}
+.logo{font-size:40px;margin-bottom:12px}
+h1{font-size:22px;font-weight:800;margin-bottom:4px}
+.sub{color:#888;font-size:14px;margin-bottom:24px}
+.btn{display:block;width:100%;padding:16px;background:#E30A17;color:#fff;border:none;border-radius:14px;font-size:16px;font-weight:800;cursor:pointer;margin-bottom:12px}
+.btn.secondary{background:rgba(255,255,255,0.06);color:#fff}
+.status{color:#888;font-size:13px;margin-top:16px}
+</style>
+</head>
+<body>
+<div class="card">
+  <div class="logo">🇹🇷</div>
+  <h1>LearnTurkish AI Premium</h1>
+  <p class="sub">Unlimited conversations · All scenarios · Certificates</p>
+  <button class="btn" id="yearlyBtn">Yearly — $49.99/yr &nbsp;✨ Best Value</button>
+  <button class="btn secondary" id="monthlyBtn">Monthly — $4.99/mo</button>
+  <p class="status" id="status">Loading...</p>
+</div>
+<script src="https://cdn.paddle.com/paddle/v2/paddle.js"></script>
+<script>
+const MONTHLY = 'pri_01kn51tfbdpv4fw9pt7vrmkcvh';
+const YEARLY  = 'pri_01kn520fg7m6wqmejg7w3m1et9';
+const TOKEN   = 'live_7d279f61a3499fed520f7cd8c08';
+
+const params = new URLSearchParams(window.location.search);
+const userEmail = params.get('email') || '';
+const userId = params.get('user_id') || '';
+const priceId = params.get('price_id') || '';
+
+Paddle.Initialize({ token: TOKEN });
+document.getElementById('status').textContent = '';
+
+// Eğer price_id parametresi varsa direkt o planı aç
+if (priceId) {
+  setTimeout(() => openCheckout(priceId), 500);
+}
+
+function openCheckout(pid) {
+  Paddle.Checkout.open({
+    items: [{ priceId: pid, quantity: 1 }],
+    customer: userEmail ? { email: userEmail } : undefined,
+    customData: userId ? { user_id: userId } : undefined,
+  });
+}
+
+document.getElementById('yearlyBtn').onclick = () => openCheckout(YEARLY);
+document.getElementById('monthlyBtn').onclick = () => openCheckout(MONTHLY);
+</script>
+</body>
+</html>
