@@ -65,8 +65,8 @@ nav{position:fixed;top:0;left:0;right:0;z-index:200;height:64px;display:flex;ali
 .phone-back{position:absolute;right:-10px;top:20px;transform:perspective(1200px) rotateY(-20deg) rotateX(5deg) scale(.85);width:210px;z-index:2;opacity:.65;filter:drop-shadow(0 30px 60px rgba(0,0,0,.7))}
 .phone-far{position:absolute;left:-10px;top:50px;transform:perspective(1200px) rotateY(14deg) rotateX(5deg) scale(.75);width:190px;z-index:1;opacity:.4;filter:drop-shadow(0 20px 40px rgba(0,0,0,.6))}
 .phone-frame{background:#111113;border-radius:42px;border:2px solid rgba(255,255,255,.15);overflow:hidden;box-shadow:0 0 0 1px rgba(255,255,255,.05);position:relative}
-.phone-notch{position:absolute;top:0;left:50%;transform:translateX(-50%);width:80px;height:24px;background:#0A0A0B;border-radius:0 0 14px 14px;z-index:10}
-.phone-screen{background:#0A0A0B;min-height:390px;padding:26px 0 0}
+.phone-notch{position:absolute;top:0;left:50%;transform:translateX(-50%);width:80px;height:24px;background:#111111;min-height:60px;border-radius:0 0 14px 14px;z-index:10}
+.phone-screen{background:#111111;min-height:60px;min-height:390px;padding:26px 0 0}
 .phone-glow-main{position:absolute;width:230px;height:160px;border-radius:50%;background:radial-gradient(ellipse,rgba(227,10,23,.3),transparent 70%);bottom:-60px;left:50%;transform:translateX(-50%);pointer-events:none}
 
 /* phone screen elements */
@@ -230,7 +230,7 @@ nav{position:fixed;top:0;left:0;right:0;z-index:200;height:64px;display:flex;ali
 .store-lg-name{font-size:18px;font-weight:700;color:var(--t1);line-height:1;margin-top:3px;font-family:var(--hh)}
 
 /* FOOTER */
-footer{border-top:1px solid rgba(255,255,255,.07);padding:36px clamp(16px,5vw,80px);display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:16px}
+footer{border-top:1px solid rgba(255,255,255,.07);padding:36px clamp(16px,5vw,80px) 24px;display:flex;flex-direction:column;align-items:center;gap:16px;text-align:center}
 .footer-logo{display:flex;align-items:center;gap:8px;font-family:var(--hh);font-size:15px;font-weight:700;color:var(--t1)}
 .footer-logo-icon{width:28px;height:28px;background:var(--r);border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:13px}
 .footer-links{display:flex;gap:20px}
@@ -242,8 +242,8 @@ footer{border-top:1px solid rgba(255,255,255,.07);padding:36px clamp(16px,5vw,80
 .showcase-phone{flex-shrink:0;display:flex;flex-direction:column;align-items:center;gap:10px;transition:transform .3s ease}
 .showcase-phone:hover .sp-frame{transform:translateY(-8px) scale(1.02)}
 .sp-frame{background:#111113;border-radius:36px;border:2px solid rgba(255,255,255,.15);overflow:hidden;box-shadow:0 32px 80px rgba(0,0,0,.7),0 0 0 1px rgba(255,255,255,.05);position:relative;width:170px;transition:transform .3s ease}
-.sp-notch{position:absolute;top:0;left:50%;transform:translateX(-50%);width:70px;height:20px;background:#0A0A0B;border-radius:0 0 12px 12px;z-index:10}
-.sp-screen{background:#0A0A0B;padding:22px 0 0;min-height:360px}
+.sp-notch{position:absolute;top:0;left:50%;transform:translateX(-50%);width:70px;height:20px;background:#111111;min-height:60px;border-radius:0 0 12px 12px;z-index:10}
+.sp-screen{background:#111111;min-height:60px;padding:22px 0 0;min-height:360px}
 .sp-status{display:flex;justify-content:space-between;padding:6px 12px 4px;font-size:8px;color:rgba(255,255,255,.4);font-weight:600}
 .sp-label{font-size:11px;font-weight:700;color:rgba(245,245,247,.4);letter-spacing:.5px;text-align:center;margin-top:8px}
 .p1 .sp-frame{transform:perspective(800px) rotateY(6deg) rotateX(2deg)}
@@ -258,8 +258,8 @@ footer{border-top:1px solid rgba(255,255,255,.07);padding:36px clamp(16px,5vw,80
 .showcase-phone{flex-shrink:0;display:flex;flex-direction:column;align-items:center;gap:10px;transition:transform .3s ease}
 .showcase-phone:hover .sp-frame{transform:translateY(-8px) scale(1.02)}
 .sp-frame{background:#111113;border-radius:36px;border:2px solid rgba(255,255,255,.15);overflow:hidden;box-shadow:0 32px 80px rgba(0,0,0,.7),0 0 0 1px rgba(255,255,255,.05);position:relative;width:170px;transition:transform .3s ease}
-.sp-notch{position:absolute;top:0;left:50%;transform:translateX(-50%);width:70px;height:20px;background:#0A0A0B;border-radius:0 0 12px 12px;z-index:10}
-.sp-screen{background:#0A0A0B;padding:22px 0 0;min-height:360px}
+.sp-notch{position:absolute;top:0;left:50%;transform:translateX(-50%);width:70px;height:20px;background:#111111;min-height:60px;border-radius:0 0 12px 12px;z-index:10}
+.sp-screen{background:#111111;min-height:60px;padding:22px 0 0;min-height:360px}
 .sp-status{display:flex;justify-content:space-between;padding:6px 12px 4px;font-size:8px;color:rgba(255,255,255,.4);font-weight:600}
 .sp-label{font-size:11px;font-weight:700;color:rgba(245,245,247,.4);letter-spacing:.5px;text-align:center;margin-top:8px}
 .p1 .sp-frame{transform:perspective(800px) rotateY(6deg) rotateX(2deg)}
@@ -274,8 +274,8 @@ footer{border-top:1px solid rgba(255,255,255,.07);padding:36px clamp(16px,5vw,80
 .showcase-phone{flex-shrink:0;display:flex;flex-direction:column;align-items:center;gap:10px;transition:transform .3s ease}
 .showcase-phone:hover .sp-frame{transform:translateY(-8px) scale(1.02)}
 .sp-frame{background:#111113;border-radius:36px;border:2px solid rgba(255,255,255,.15);overflow:hidden;box-shadow:0 32px 80px rgba(0,0,0,.7),0 0 0 1px rgba(255,255,255,.05);position:relative;width:170px;transition:transform .3s ease}
-.sp-notch{position:absolute;top:0;left:50%;transform:translateX(-50%);width:70px;height:20px;background:#0A0A0B;border-radius:0 0 12px 12px;z-index:10}
-.sp-screen{background:#0A0A0B;padding:22px 0 0;min-height:360px}
+.sp-notch{position:absolute;top:0;left:50%;transform:translateX(-50%);width:70px;height:20px;background:#111111;min-height:60px;border-radius:0 0 12px 12px;z-index:10}
+.sp-screen{background:#111111;min-height:60px;padding:22px 0 0;min-height:360px}
 .sp-status{display:flex;justify-content:space-between;padding:6px 12px 4px;font-size:8px;color:rgba(255,255,255,.4);font-weight:600}
 .sp-label{font-size:11px;font-weight:700;color:rgba(245,245,247,.4);letter-spacing:.5px;text-align:center;margin-top:8px}
 .p1 .sp-frame{transform:perspective(800px) rotateY(6deg) rotateX(2deg)}
@@ -806,7 +806,16 @@ footer{border-top:1px solid rgba(255,255,255,.07);padding:36px clamp(16px,5vw,80
     <a href="/privacy.html" data-i18n="footer_privacy">Privacy</a>
     <a href="/terms.html" data-i18n="footer_terms">Terms</a>
     <a href="/refund.html" data-i18n="footer_refund">Refund Policy</a>
-    <a href="mailto:support@learnturkishai.com" data-i18n="footer_contact">Contact</a>
+    <a href="mailto:learnturkishai@gmail.com" data-i18n="footer_contact">Contact</a>
+    <span style="color:rgba(255,255,255,.2)">|</span>
+    <a href="https://www.facebook.com/profile.php?id=61575333279681" target="_blank" style="color:rgba(255,255,255,.6);text-decoration:none;">📘</a>
+    <a href="https://instagram.com/learnturkish.ai" target="_blank" style="color:rgba(255,255,255,.6);text-decoration:none;">📷</a>
+    <a href="https://youtube.com/@LearnTurkishAi" target="_blank" style="color:rgba(255,255,255,.6);text-decoration:none;">▶️</a>
+  </div>
+  <div style="display:flex;gap:24px;margin-top:8px;">
+    <a href="https://www.facebook.com/profile.php?id=61575333279681" target="_blank" style="color:rgba(255,255,255,.6);text-decoration:none;font-size:13px;font-weight:600;">📘 Facebook</a>
+    <a href="https://instagram.com/learnturkish.ai" target="_blank" style="color:rgba(255,255,255,.6);text-decoration:none;font-size:13px;font-weight:600;">📷 Instagram</a>
+    <a href="https://youtube.com/@LearnTurkishAi" target="_blank" style="color:rgba(255,255,255,.6);text-decoration:none;font-size:13px;font-weight:600;">▶️ YouTube</a>
   </div>
   <div class="footer-copy">&#xA9; 2026 MK Edtech O&#xDC; &#xB7; Made with &#x2764;&#xFE0F; for learners worldwide</div>
 </footer>

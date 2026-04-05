@@ -13,7 +13,11 @@
       "destination": "/refund.html"
     },
     {
-      "source": "/(.*)",
+      "source": "/checkout",
+      "destination": "/checkout.html"
+    },
+    {
+      "source": "/((?!tutors).*)",
       "destination": "/index.html"
     }
   ],
@@ -35,5 +39,6 @@
         }
       ]
     }
-  ]
+  ],
+  "cleanUrls": true
 }
