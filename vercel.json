@@ -30,11 +30,11 @@
     },
     {
       "src": "/admin",
-      "dest": "/admin/index.html"
+      "dest": "/admin.html"
     },
     {
       "src": "/admin/(.*)",
-      "dest": "/admin/index.html"
+      "dest": "/admin.html"
     },
     {
       "src": "/(.*)",
