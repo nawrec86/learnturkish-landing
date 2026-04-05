@@ -21,8 +21,8 @@
       "dest": "/tutors.html"
     },
     {
-      "src": "/(.*)",
-      "dest": "/index.html"
+      "src": "/tutors.html",
+      "dest": "/tutors.html"
     }
   ]
 }
