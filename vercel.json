@@ -1,6 +1,10 @@
 {
   "routes": [
     {
+      "src": "/",
+      "dest": "/index.html"
+    },
+    {
       "src": "/privacy",
       "dest": "/privacy.html"
     },
@@ -23,6 +27,10 @@
     {
       "src": "/tutors.html",
       "dest": "/tutors.html"
+    },
+    {
+      "src": "/(.*)",
+      "dest": "/index.html"
     }
   ]
 }
