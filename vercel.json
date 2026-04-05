@@ -1,28 +1,28 @@
 {
-  "rewrites": [
+  "routes": [
     {
-      "source": "/privacy",
-      "destination": "/privacy.html"
+      "src": "/privacy",
+      "dest": "/privacy.html"
     },
     {
-      "source": "/terms",
-      "destination": "/terms.html"
+      "src": "/terms",
+      "dest": "/terms.html"
     },
     {
-      "source": "/refund",
-      "destination": "/refund.html"
+      "src": "/refund",
+      "dest": "/refund.html"
     },
     {
-      "source": "/checkout",
-      "destination": "/checkout.html"
+      "src": "/checkout",
+      "dest": "/checkout.html"
     },
     {
-      "source": "/tutors",
-      "destination": "/tutors/index.html"
+      "src": "/tutors",
+      "dest": "/tutors/index.html"
     },
     {
-      "source": "/(.*)",
-      "destination": "/index.html"
+      "src": "/(.*)",
+      "dest": "/index.html"
     }
   ],
   "headers": [
