@@ -1,32 +1,11 @@
 {
-  "routes": [
-    {
-      "src": "/privacy",
-      "dest": "/privacy.html"
-    },
-    {
-      "src": "/terms",
-      "dest": "/terms.html"
-    },
-    {
-      "src": "/refund",
-      "dest": "/refund.html"
-    },
-    {
-      "src": "/checkout",
-      "dest": "/checkout.html"
-    },
-    {
-      "src": "/tutors",
-      "dest": "/tutors.html"
-    },
-    {
-      "src": "/admin",
-      "dest": "/admin.html"
-    },
-    {
-      "src": "/(.*)",
-      "dest": "/index.html"
-    }
+  "cleanUrls": true,
+  "rewrites": [
+    { "source": "/privacy", "destination": "/privacy.html" },
+    { "source": "/terms", "destination": "/terms.html" },
+    { "source": "/refund", "destination": "/refund.html" },
+    { "source": "/checkout", "destination": "/checkout.html" },
+    { "source": "/tutors", "destination": "/tutors.html" },
+    { "source": "/admin", "destination": "/admin.html" }
   ]
 }
