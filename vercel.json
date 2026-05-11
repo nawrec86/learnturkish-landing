@@ -1,12 +1,4 @@
 {
-  "cleanUrls": false,
-  "redirects": [
-    {
-      "source": "/tutors.html",
-      "destination": "/tutors",
-      "permanent": true
-    }
-  ],
   "rewrites": [
     {
       "source": "/admin",
