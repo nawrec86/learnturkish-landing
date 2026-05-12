@@ -232,7 +232,19 @@
 const SUPABASE_URL = 'https://ilxahosomxpgokyilpco.supabase.co';
 const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImlseGFob3NvbXhwZ29reWlscGNvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzM2NjA2MTcsImV4cCI6MjA4OTIzNjYxN30.pF7Wqf8PaKQFr7bNbQr0GHzNnqJMD1GCgYfFOJCPb6g';
 
-const sbClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+// CDN UMD build of supabase-js@2 doesn't auto-attach apikey to
+// /auth/v1/token requests, causing a 401 "No apikey" on signInWithPassword.
+// Setting it via global.headers fixes both auth + REST paths.
+const sbClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY, {
+  auth: {
+    autoRefreshToken: true,
+    persistSession: true,
+    detectSessionInUrl: false,
+  },
+  global: {
+    headers: { apikey: SUPABASE_KEY },
+  },
+});
 
 let accessToken = null;
 
