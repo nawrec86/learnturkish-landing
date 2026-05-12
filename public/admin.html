@@ -94,9 +94,10 @@
     <div style="font-size:48px;margin-bottom:16px">🔐</div>
     <h1>LearnTurkish AI</h1>
     <p>Admin Panel</p>
-    <input type="password" class="inp" id="pwd" placeholder="Admin password" onkeydown="if(event.key==='Enter')doLogin()">
-    <button class="btn" onclick="doLogin()">Login →</button>
-    <div class="error" id="loginError">Wrong password</div>
+    <input type="email" class="inp" id="email" placeholder="E-posta" autocomplete="email" onkeydown="if(event.key==='Enter')document.getElementById('pwd').focus()">
+    <input type="password" class="inp" id="pwd" placeholder="Şifre" autocomplete="current-password" onkeydown="if(event.key==='Enter')doLogin()">
+    <button class="btn" onclick="doLogin()">Giriş Yap →</button>
+    <div class="error" id="loginError"></div>
   </div>
 </div>
 
@@ -226,32 +227,61 @@
 
 <div id="toast"></div>
 
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script>
 const SUPABASE_URL = 'https://ilxahosomxpgokyilpco.supabase.co';
 const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImlseGFob3NvbXhwZ29reWlscGNvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzM2NjA2MTcsImV4cCI6MjA4OTIzNjYxN30.pF7Wqf8PaKQFr7bNbQr0GHzNnqJMD1GCgYfFOJCPb6g';
-const ADMIN_PWD = 'nawrec2026admin';
+
+const sbClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+let accessToken = null;
 
 function sb(path, opts={}) {
   return fetch(SUPABASE_URL + '/rest/v1/' + path, {
     ...opts,
-    headers: { 'Content-Type':'application/json', 'apikey':SUPABASE_KEY, 'Authorization':'Bearer '+SUPABASE_KEY, ...(opts.headers||{}) }
+    headers: {
+      'Content-Type':'application/json',
+      'apikey':SUPABASE_KEY,
+      'Authorization':'Bearer '+(accessToken || SUPABASE_KEY),
+      ...(opts.headers||{})
+    }
   }).then(r => r.json());
 }
 
-function doLogin() {
-  const pwd = document.getElementById('pwd').value;
-  if (pwd === ADMIN_PWD) {
-    localStorage.setItem('lt_admin', '1');
-    document.getElementById('login').style.display = 'none';
-    document.getElementById('dashboard').style.display = 'block';
-    loadAll();
-  } else {
-    document.getElementById('loginError').style.display = 'block';
-  }
+function showError(msg) {
+  const e = document.getElementById('loginError');
+  e.textContent = msg;
+  e.style.display = 'block';
 }
 
-function logout() {
-  localStorage.removeItem('lt_admin');
+async function doLogin() {
+  document.getElementById('loginError').style.display = 'none';
+  const email = document.getElementById('email').value.trim();
+  const password = document.getElementById('pwd').value;
+  if (!email || !password) { showError('E-posta ve şifre gerekli'); return; }
+
+  const { data, error } = await sbClient.auth.signInWithPassword({ email, password });
+  if (error || !data.session) { showError('Geçersiz e-posta veya şifre'); return; }
+
+  accessToken = data.session.access_token;
+
+  const { data: isAdmin, error: rpcErr } = await sbClient.rpc('is_admin');
+  if (rpcErr || !isAdmin) {
+    await sbClient.auth.signOut();
+    accessToken = null;
+    showError('Bu hesabın yönetici yetkisi yok');
+    return;
+  }
+
+  document.getElementById('login').style.display = 'none';
+  document.getElementById('dashboard').style.display = 'block';
+  loadAll();
+  checkRatings();
+}
+
+async function logout() {
+  await sbClient.auth.signOut();
+  accessToken = null;
   location.reload();
 }
 
@@ -275,16 +305,18 @@ async function loadAll() {
 }
 
 async function loadStats() {
-  const [tutors, demos, bookings] = await Promise.all([
+  const [users, prems, tutors, demos, bookings] = await Promise.all([
+    sb('profiles?select=id'),
+    sb('subscriptions?select=user_id&status=eq.active'),
     sb('tutors?select=id,is_active&is_active=eq.true'),
     sb('demo_requests?select=id'),
     sb('tutor_bookings?select=id'),
   ]);
+  document.getElementById('statUsers').textContent = users.length || 0;
+  document.getElementById('statPrem').textContent = prems.length || 0;
   document.getElementById('statTutors').textContent = tutors.length || 0;
   document.getElementById('statDemos').textContent = demos.length || 0;
   document.getElementById('statBookings').textContent = bookings.length || 0;
-  document.getElementById('statUsers').textContent = '-';
-  document.getElementById('statPrem').textContent = '-';
 }
 
 async function loadTutors() {
@@ -425,16 +457,27 @@ async function checkRatings() {
   }
 }
 
-// Init
-window.onload = () => {
-  if (localStorage.getItem('lt_admin') === '1') {
-    document.getElementById('login').style.display = 'none';
-    document.getElementById('dashboard').style.display = 'block';
-    loadAll();
-    checkRatings();
+// Init: restore session if present, verify is_admin, then show dashboard.
+// Migration: clear the legacy lt_admin localStorage flag from the old
+// password-based login so it can't accidentally bypass auth on stale tabs.
+window.addEventListener('load', async () => {
+  if (localStorage.getItem('lt_admin')) localStorage.removeItem('lt_admin');
+  const { data: { session } } = await sbClient.auth.getSession();
+  if (session) {
+    accessToken = session.access_token;
+    const { data: isAdmin } = await sbClient.rpc('is_admin');
+    if (isAdmin) {
+      document.getElementById('login').style.display = 'none';
+      document.getElementById('dashboard').style.display = 'block';
+      loadAll();
+      checkRatings();
+      return;
+    }
+    await sbClient.auth.signOut();
+    accessToken = null;
   }
-  document.getElementById('pwd').focus();
-};
+  document.getElementById('email').focus();
+});
 </script>
 </body>
 </html>
