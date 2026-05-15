@@ -7,6 +7,10 @@
     {
       "source": "/tutors",
       "destination": "/tutors/index.html"
+    },
+    {
+      "source": "/dl",
+      "destination": "/api/dl"
     }
   ]
 }
