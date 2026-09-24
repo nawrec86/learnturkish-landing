@@ -843,6 +843,7 @@ async function viewOverview(silent){
   const costMonth = usd(X.month) + (ads.spend_month||0);
   const netMonth = incomeMonth - costMonth;
   const LT = B.lifetime || {};
+  window.__B = B;
   window.__LT = LT; window.__SR = SR;
   const ltSince = LT.started_on ? fmtD(LT.started_on) : 'başlangıç';
   const stat = (num, lbl, color, sub, on) => `<div class="stat${on?' click':''}"${on?` onclick="${on}"`:''}><div class="num"${color?` style="color:${color}"`:''}>${num}</div><div class="lbl">${lbl}</div>${sub?`<div class="small muted" style="margin-top:4px">${sub}</div>`:''}</div>`;
@@ -951,6 +952,45 @@ async function viewOverview(silent){
       : `<p class="small">İndirme verisi mağaza raporları bağlanınca gelir (App Store satış raporu ve Google Play istatistik dosyaları). Kurulum adımları sohbette.</p>`}
     </div>
 
+    <div class="grid">
+      <div class="card" id="usage-card"><h3>📱 Cihazlar ve kullanım</h3>
+        ${(()=>{
+          const U = B.usage || {};
+          const dl = sumObj(IN.total);
+          const SCR = {'tab:home':'Ana sayfa','tab:sc':'Senaryolar','tab:dict':'Sözlük','tab:tomer':'TYS / TÖMER','tab:pc':'Partner sohbet','tab:pr':'Profil','tab:tm':'Gramer (TÖMER)','tab:exam':'Sınav','tab:gr':'Gramer','tab:st':'Sezon teması','tab:lb':'Liderlik tablosu','tab:tr':'Türkiye rehberi','tab:ch':'1v1 Challenge','tab:pod':'Podcast','tab:gm':'Oyunlar','tab:progress':'İlerleme','tab:pron':'Telaffuz','scr:chat':'AI sohbet','scr:login':'Giriş ekranı','scr:onb':'Kurulum (onboarding)','scr:levelTest':'Seviye testi','scr:weeklyTest':'Haftalık test','scr:dailyChallenge':'Günlük görev','paywall:premium':'Paywall (Premium)','paywall:tomer_pro':'Paywall (TÖMER Pro)'};
+          const scr = U.screens_30d || [];
+          const mxS = Math.max(1, ...scr.map(x=>+x.views));
+          const feats = (U.features_30d||[]).filter(f=>+f.events_30d>0).sort((a,b)=>b.events_30d-a.events_30d);
+          const mxF = Math.max(1, ...feats.map(f=>+f.events_30d));
+          const pa = U.platform_active_30d || {};
+          return `<div class="stats" style="margin:0 0 12px">
+            ${stat(nf(dl),'Toplam indirme',null,`App Store ${nf((IN.total||{}).app_store||0)} · Play ${nf((IN.total||{}).google_play||0)}${(IN.total||{}).google_play?'':' (Play bağlanınca)'}`)}
+            ${stat(nf(U.push_devices),'Bildirim açık cihaz',null,'uygulamada kayıtlı telefon')}
+            ${stat(nf(A.active_30d),'Aktif kullanıcı (30g)','var(--blue)',`${nf(A.active_7d)} haftalık · ${nf(A.active_1d)} bugün`)}
+            ${stat(dl?pct(A.active_30d,dl)+'%':'-','Aktif / indirme',null,'30 gün aktif ÷ toplam indirme')}
+            ${IN.active_devices?stat(nf(IN.active_devices.count),'Aktif Android cihaz',null,'Play, '+fmtD(IN.active_devices.day)):''}
+          </div>
+          ${Object.keys(pa).length?`<p class="small muted">Son 30 gün aktif (ölçüm başladığından beri): ${Object.entries(pa).map(([k,v])=>`${k==='ios'?'iPhone':k==='android'?'Android':k} ${nf(v)}`).join(' · ')}</p>`:''}
+          <h4 style="margin:12px 0 6px">En çok kullanılan ekranlar (30 gün)</h4>
+          ${scr.length?`<table><thead><tr><th>Ekran</th><th>Açılış</th><th>Kişi</th><th style="width:35%"></th></tr></thead><tbody>${scr.slice(0,12).map(x=>`<tr><td>${esc(SCR[x.screen]||x.screen)}</td><td><b>${nf(x.views)}</b></td><td>${nf(x.users)}</td><td>${hbar(+x.views,mxS,'var(--blue)')}</td></tr>`).join('')}</tbody></table><p class="small muted">Ölçüm ${fmtD(U.screens_since)} tarihinde başladı.</p>`:'<p class="small muted">Ekran ölçümü yeni eklendi; kullanıcılar uygulamayı güncelleyip açtıkça dolacak.</p>'}
+          <h4 style="margin:14px 0 6px">Özellik kullanımı (30 gün, gerçek kayıt)</h4>
+          ${feats.length?`<table><thead><tr><th>Özellik</th><th>Kullanım</th><th>Kişi</th><th style="width:35%"></th></tr></thead><tbody>${feats.map(f=>`<tr><td>${esc(f.feature)}</td><td><b>${nf(f.events_30d)}</b></td><td>${f.users_30d==null?'-':nf(f.users_30d)}</td><td>${hbar(+f.events_30d,mxF,'var(--gold)')}</td></tr>`).join('')}</tbody></table>`:'<p class="small muted">Veri yok.</p>'}
+          ${U.error?`<p class="small" style="color:#FF6B6B">${esc(U.error)} (202612010000 SQL çalıştırılmadı mı?)</p>`:''}`;
+        })()}
+      </div>
+      <div class="card"><h3>🆕 Son üyelikler ve satışlar</h3>
+        ${(()=>{
+          const RC = B.recent || {};
+          const subs = (RC.subscriptions||[]).slice(0,10);
+          const sales = (RC.store_sales||[]).slice(0,10);
+          return `<h4 style="margin:4px 0 6px">Uygulamada son üyelikler</h4>
+          ${subs.length?`<div class="tbl-wrap"><table><thead><tr><th>Tarih</th><th>Kişi</th><th>Paket</th><th>Tutar</th><th>Ülke</th></tr></thead><tbody>${subs.map(x=>`<tr><td class="small">${fmtDT(x.at)}</td><td class="small">${esc(x.name||'')}<div class="muted">${esc(x.email||'')}</div></td><td class="small">${esc(x.tier)}:${esc(x.plan||'')}<div class="muted">${esc(x.platform||'?')}${x.status&&x.status!=='active'?' · '+esc(x.status):''}</div></td><td>${x.paid?`<b>${money(x.price)}</b>`:'<span class="badge b-grey">hediye</span>'}</td><td class="small">${x.country?`${FLAGS[x.country.toUpperCase()]||'🌐'} ${esc(x.country.toUpperCase())}`:(x.native_lang?`<span class="muted">dil: ${esc(x.native_lang)}</span>`:'-')}</td></tr>`).join('')}</tbody></table></div>`:'<p class="small muted">Kayıt yok.</p>'}
+          <h4 style="margin:14px 0 6px">Mağazada son satışlar (gerçek, ülke ile)</h4>
+          ${sales.length?`<table><thead><tr><th>Gün</th><th>Mağaza</th><th>Ülke</th><th>Ürün</th><th>Net</th></tr></thead><tbody>${sales.map(x=>`<tr><td class="small">${fmtD(x.day)}</td><td class="small">${x.store==='app_store'?'App Store':'Play'}</td><td>${FLAGS[(x.country||'').toUpperCase()]||'🌐'} ${esc(x.country||'')}</td><td class="small">${esc(x.product||'')}${x.units>1?` ×${x.units}`:''}</td><td><b style="color:var(--green)">${money(x.net)}</b></td></tr>`).join('')}</tbody></table>`:'<p class="small muted">Mağaza satış verisi yok.</p>'}`;
+        })()}
+      </div>
+    </div>
+
     <div class="card" id="meta-ads"><div class="row between" style="margin-bottom:12px"><h3 style="margin:0">📣 Meta reklamları (Facebook / Instagram, boost dahil)</h3>
       ${MA.configured?`<button class="btn ghost sm" id="ma_sync" onclick="metaSync()">↻ Tüm geçmişi çek</button>`:''}</div>
       ${MA.has_data ? `<div class="stats" style="margin:0 0 12px">
@@ -1043,6 +1083,9 @@ async function viewOverview(silent){
     <div class="card"><h3>🎓 Özel ders</h3><div class="stats" style="margin:0">
       ${stat(nf(tutors),'Aktif öğretmen',null,null,"location.hash='#/tutors'")}${stat(nf(students),'Öğrenci profili',null,null,"location.hash='#/students'")}${stat(nf(courses),'Aktif / planlı kur',null,null,"location.hash='#/students'")}
     </div></div>
+    <div class="card" id="ai-card"><div class="row between" style="margin-bottom:12px"><h3 style="margin:0">🤖 AI yorumu: daha fazla satış için ne yapmalı?</h3><button class="btn sm" id="ai_btn" onclick="aiAdvice()">${window.__AI?'↻ Yeniden yorumla':'✨ Yorumla'}</button></div>
+      <div id="ai_out">${window.__AI?renderAdvice(window.__AI):'<p class="small muted">Paneldeki tüm rakamlar (kullanıcı, tutunma, abone, mağaza, ülkeler, reklam kampanyaları) AI\'a verilir; somut öneri ve bütçe tavsiyesi döner.</p>'}</div>
+    </div>
     <p class="muted small"><span style="color:var(--green)">●</span> Canlı: her dakika kendini yeniler · son güncelleme ${new Date(B.generated_at).toLocaleTimeString('tr-TR')} · Meta harcaması saatlik, mağaza kazancı günlük otomatik çekilir.</p>`;
   if (silent) window.scrollTo(0, keepY);
   // Canli: sadece Genel Bakis acikken ve bir detay penceresi acik degilken yenile
@@ -1110,6 +1153,32 @@ async function storeSync(){
   try { const r = await invokeFn('store-revenue', { action:'sync', days:30 }); toast(Object.entries(r.results||{}).map(([k,v])=>`${k}: ${v.rows} satır`).join(' · ')); }
   catch(e) { toast('Mağaza verisi çekilemedi: '+e.message, false); }
   viewOverview();
+}
+function renderAdvice(a){
+  let html = '', inList = false;
+  for (const raw of String(a.advice||'').split('\n')) {
+    const line = esc(raw.trim()).replace(/\*\*(.+?)\*\*/g,'<b>$1</b>');
+    const li = /^[-*] (.+)/.exec(line);
+    if (li) { if (!inList) { html += '<ul style="margin:4px 0 8px 18px">'; inList = true; } html += `<li>${li[1]}</li>`; continue; }
+    if (inList) { html += '</ul>'; inList = false; }
+    if (!line) continue;
+    const h = /^#{1,4} (.+)/.exec(line);
+    html += h ? `<h4 style="margin:12px 0 4px">${h[1]}</h4>` : `<p style="margin:4px 0">${line}</p>`;
+  }
+  if (inList) html += '</ul>';
+  return `<div style="line-height:1.55">${html}</div><p class="small muted" style="margin-top:8px">${fmtDT(a.generated_at)} · claude-sonnet-4-5</p>`;
+}
+async function aiAdvice(){
+  const B = window.__B || {}; const b = $('ai_btn'); if (b) { b.disabled = true; b.textContent = 'Düşünüyor...'; }
+  const MA = B.meta_ads || {};
+  const summary = { auth: B.auth, app: { ...(B.app||{}), signups_by_day: undefined }, lifetime: { ...(B.lifetime||{}) }, revenue: B.revenue,
+    store_revenue: { month: B.store_revenue?.month, total: B.store_revenue?.total, by_country_total: B.store_revenue?.by_country_total },
+    installs: { total: B.installs?.total, d30: B.installs?.d30, by_country_total: B.installs?.by_country_total },
+    meta_ads: { spend_total: MA.spend_total, spend_30d: MA.spend_30d, campaigns: (MA.campaigns||[]).map(c=>({ name:c.name, objective:c.objective, spend:c.spend, reach:c.reach, clicks:c.clicks, results:c.results, last_day:c.last_day })) },
+    stores: B.stores, social: { followers: B.social?.followers ?? B.social?.platforms, targets: B.social?.targets }, usage: B.usage, recent_sales: B.recent?.store_sales };
+  try { const r = await invokeFn('business-stats', { action:'ai_advice', summary }); window.__AI = r; $('ai_out').innerHTML = renderAdvice(r); }
+  catch(e) { toast('AI yorumu alınamadı: '+e.message, false); }
+  if (b) { b.disabled = false; b.textContent = '↻ Yeniden yorumla'; }
 }
 async function storeSyncAll(){
   const LT = window.__LT || {};
