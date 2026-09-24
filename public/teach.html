@@ -180,10 +180,13 @@ async function enter(){
   $('login').style.display='none'; $('app').style.display='block';
   $('whoLbl').textContent = ME.is_admin ? 'Yönetici' : ('Öğretmen: ' + (ME.tutor_name||''));
   await loadTutors();
+  loadMeetStatus();
   buildTabs();
   route();
 }
 async function logout(){ await db.auth.signOut(); location.hash=''; location.reload(); }
+let MEET_OK = false;   // Google Calendar bagliysa ders tarihi girilince Meet daveti otomatik
+async function loadMeetStatus(){ try { MEET_OK = !!(await invokeFn('tuition-meet', { action:'status' })).configured; } catch(_) { MEET_OK = false; } }
 async function loadTutors(){ TUTORS = await q(db.from('tutors').select('id,full_name,is_active,user_id,meet_link,zoom_link,bio,languages').order('full_name')); }
 
 // ---------------------------------------------------------------------------
@@ -511,7 +514,17 @@ async function autoPlan(){
     await Promise.all(todo.map((l,i)=>q(db.from('tuition_lessons').update({ scheduled_at: updates[i] }).eq('id', l.id))));
     if (!CUR.c.start_date) await q(db.from('tuition_courses').update({ start_date: start }).eq('id', CUR.c.id));
   }, todo.length+' ders planlandı');
-  closeModal(); viewCourse(CUR.c.id);
+  closeModal();
+  if (MEET_OK) { try { const r = await invokeFn('tuition-meet', { action:'sync_course', course_id: CUR.c.id }); toast(`${r.synced} derse Google Meet daveti gönderildi`); } catch(e) { toast('Meet daveti oluşturulamadı: '+e.message, false); } }
+  else {
+    // Google bagli degilse ogretmenin kalici Meet odasi linkini derslere otomatik yaz
+    const tutor = TUTORS.find(t=>t.id===CUR.c.tutor_id);
+    if (tutor && tutor.meet_link) {
+      const empty = todo.filter(l=>!l.meet_link);
+      if (empty.length) await run(()=>Promise.all(empty.map(l=>q(db.from('tuition_lessons').update({ meet_link: tutor.meet_link }).eq('id', l.id)))), `${empty.length} derse öğretmenin Meet linki eklendi`);
+    }
+  }
+  viewCourse(CUR.c.id);
 }
 
 function lessonModal(id){
@@ -536,8 +549,8 @@ async function saveLesson(id){
     duration_min: parseInt(val('lm_dur'))||50, meet_link: val('lm_meet'), attendance: att, attendance_note: val('lm_attnote') };
   if (att !== l.attendance) { patch.attendance_marked_at = att==='scheduled'?null:new Date().toISOString(); patch.attendance_marked_by = att==='scheduled'?null:user.id; }
   await run(()=>q(db.from('tuition_lessons').update(patch).eq('id', id)), 'Ders kaydedildi');
-  if (l.calendar_event_id) {
-    if (att === 'cancelled' && l.attendance !== 'cancelled') { try { await invokeFn('tuition-meet', { action:'cancel_lesson', lesson_id: id }); toast('Takvim daveti iptal edildi'); } catch(e) { toast('Takvim iptal edilemedi: '+e.message, false); } }
+  if (l.calendar_event_id || MEET_OK) {
+    if (att === 'cancelled' && l.attendance !== 'cancelled' && l.calendar_event_id) { try { await invokeFn('tuition-meet', { action:'cancel_lesson', lesson_id: id }); toast('Takvim daveti iptal edildi'); } catch(e) { toast('Takvim iptal edilemedi: '+e.message, false); } }
     else if (patch.scheduled_at !== l.scheduled_at && new Date(patch.scheduled_at||0).getTime() !== new Date(l.scheduled_at||0).getTime()) await meetResync(id);
   }
   closeModal(); viewCourse(CUR.c.id);
@@ -751,7 +764,8 @@ async function meetSyncCourse(){
 // Takvim daveti gonderilmis bir dersin saati degisince davet de guncellensin
 async function meetResync(lessonId){
   const l = CUR && CUR.lessons.find(x=>x.id===lessonId);
-  if (!l || !l.calendar_event_id) return;
+  // Google bagliysa tarih girilen her ders icin davet otomatik olusur/guncellenir
+  if (!l || (!l.calendar_event_id && !MEET_OK)) return;
   try { await invokeFn('tuition-meet', { action:'sync_lesson', lesson_id: lessonId }); toast('Takvim daveti güncellendi'); } catch(e) { toast('Takvim güncellenemedi: '+e.message, false); }
 }
 
@@ -813,6 +827,7 @@ async function viewOverview(silent){
     countOf('tuition_courses', x => x.in('status',['planned','active'])),
   ]);
   const A = B.app || {}, S = A.subscriptions || {}, R = B.revenue || {}, X = B.expenses || {}, SO = B.social || {};
+  const AU = B.auth || {}, IN = B.installs || {};
   const MA = B.meta_ads || {};
   // Meta Marketing API verisi varsa gercek reklam gideri odur; yoksa nawrec.social ad_metrics
   const ads = MA.has_data ? MA : (SO.ads || { spend_total:0, spend_30d:0, spend_month:0, results_30d:0 });
@@ -840,7 +855,7 @@ async function viewOverview(silent){
 
   $('view').innerHTML = `
     <div class="stats">
-      ${stat(nf(A.users_total),'Toplam kullanıcı',null,`+${nf(A.users_new_7d)} son 7 gün`,"usersModal({title:'Tüm kullanıcılar'})")}
+      ${stat(nf(AU.real_accounts ?? A.users_total),'Gerçek hesap',null,AU.real_accounts!=null?`${nf(AU.anonymous)} misafir · +${nf(AU.new_real_7d)} son 7 gün`:`+${nf(A.users_new_7d)} son 7 gün`,"usersModal({title:'Tüm kullanıcılar'})")}
       ${stat(nf(A.active_30d),'Aktif (30 gün)','var(--blue)',`${nf(A.active_7d)} son 7 gün · ${nf(A.active_1d)} bugün`,"usersModal({title:'Son 30 günde aktif',activeDays:30,order:'last_active'})")}
       ${stat(nf(S.paid),'Ödeyen abone','var(--gold)',`${nf(S.active)} aktif premium (${nf(S.gifted)} hediye)`,"subsModal()")}
       ${realRev ? stat(money(storeMonth),'Bu ay mağaza kazancı (net)','var(--green)',`App Store ${money((SR.month||{}).app_store||0)} · Play ${money((SR.month||{}).google_play||0)}${SR.estimated?' (Play tahmini)':''}`,"document.getElementById('store-rev').scrollIntoView({behavior:'smooth'})") : stat(money(R.mrr_estimate||0),'Tahmini aylık gelir','var(--green)','abonelik, komisyon öncesi',"document.getElementById('store-rev').scrollIntoView({behavior:'smooth'})")}
@@ -854,6 +869,10 @@ async function viewOverview(silent){
           <tr class="clickrow" onclick="usersModal({title:'Son 7 günde aktif',activeDays:7,order:'last_active'})"><td>Aktif: bugün / 7 gün / 30 gün ›</td><td><b>${nf(A.active_1d)}</b> / <b>${nf(A.active_7d)}</b> / <b>${nf(A.active_30d)}</b></td></tr>
           <tr><td>Aktiflik oranı (30 gün / toplam)</td><td><b>${pct(A.active_30d, A.users_total) ?? '-'}%</b></td></tr>
           <tr><td>Tutunma (30-60 gün önce gelip hâlâ aktif)</td><td><b>${retention ?? '-'}%</b> <span class="muted small">(${nf(A.retention_active)} / ${nf(A.retention_cohort)})</span></td></tr>
+          ${AU.real_accounts!=null?`<tr><td>Hesaplar: gerçek / misafir / profilsiz</td><td><b>${nf(AU.real_accounts)}</b> / ${nf(AU.anonymous)} / ${nf(AU.without_profile)}</td></tr>
+          <tr><td>Giriş yapan (7 / 30 gün, gerçek hesap)</td><td><b>${nf(AU.signin_7d)}</b> / <b>${nf(AU.signin_30d)}</b></td></tr>
+          <tr><td>Giriş yöntemi</td><td class="small">${Object.entries(AU.providers||{}).map(([k,v])=>`${esc(k)} ${nf(v)}`).join(' · ')}</td></tr>
+          <tr><td>Test / ekip hesabı (tahmini)</td><td>${nf(AU.test_like)}</td></tr>`:''}
           <tr><td>Kurulumu tamamlayan</td><td><b>${nf(A.onboarded)}</b> <span class="muted small">(${pct(A.onboarded, A.users_total) ?? '-'}%)</span></td></tr>
         </tbody></table>
         <p class="small muted" style="margin-top:12px">Son 30 gün günlük kayıt</p>
@@ -893,6 +912,20 @@ async function viewOverview(silent){
         ${and.note?`<p class="small muted">${esc(and.note)}</p>`:''}
         <p class="small" style="margin-top:8px">${ios.url?`<a href="${esc(ios.url)}" target="_blank" rel="noopener">App Store sayfası</a> · `:''}<a href="${esc(and.url||'#')}" target="_blank" rel="noopener">Google Play sayfası</a></p>
       </div>
+    </div>
+
+    <div class="card" id="installs"><h3>📲 Mağaza indirmeleri (App Store + Google Play)</h3>
+      ${IN.has_data ? (()=>{ const sum=o=>Object.values(o||{}).reduce((a,b)=>a+Number(b||0),0); const daily=Object.entries(IN.daily||{}).sort(); const mx=Math.max(1,...daily.map(d=>d[1])); const byC=Object.entries(IN.by_country_30d||{}).sort((a,b)=>b[1]-a[1]).slice(0,10); const mxC=Math.max(1,...byC.map(c=>c[1]));
+        return `<div class="stats" style="margin:0 0 12px">
+          ${stat(nf(sum(IN.month)),'Bu ay indirme',null,`App Store ${nf((IN.month||{}).app_store||0)} · Play ${nf((IN.month||{}).google_play||0)}`)}
+          ${stat(nf(sum(IN.d30)),'Son 30 gün indirme')}
+          ${stat(nf(IN.uninstalls_30d),'Kaldırma (30 gün, Play)','#FF6B6B')}
+          ${stat(IN.active_devices?nf(IN.active_devices.count):'-','Aktif Android cihaz',null,IN.active_devices?fmtD(IN.active_devices.day):'')}
+          ${stat(nf(sum(IN.total)),'Toplam (400 gün)')}</div>
+          <div class="grid"><div><p class="small muted">Son 30 gün günlük indirme</p><div style="display:flex;align-items:flex-end;gap:2px;height:60px;margin-top:6px">${daily.map(([d,v])=>`<div title="${d}: ${v}" style="flex:1;background:var(--gold);opacity:.85;height:${Math.max(3,v/mx*100)}%;border-radius:2px"></div>`).join('')}</div></div>
+          <div><table><tbody>${byC.map(([c,v])=>`<tr><td>${FLAGS[c]||'🌐'} ${esc(c)}</td><td><b>${nf(v)}</b></td><td style="width:45%">${hbar(v,mxC,'var(--gold)')}</td></tr>`).join('')}</tbody></table></div></div>
+          <p class="small muted" style="margin-top:8px">Mağazalar veriyi günde bir, bir önceki gün için yayınlar. Son veri: ${fmtD(IN.last_day)}</p>`; })()
+      : `<p class="small">İndirme verisi mağaza raporları bağlanınca gelir (App Store satış raporu ve Google Play istatistik dosyaları). Kurulum adımları sohbette.</p>`}
     </div>
 
     <div class="card" id="meta-ads"><div class="row between" style="margin-bottom:12px"><h3 style="margin:0">📣 Meta reklamları (Facebook / Instagram, boost dahil)</h3>
