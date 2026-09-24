@@ -1033,7 +1033,7 @@ async function viewOverview(silent){
         <p class="small"><a href="https://nawrec-social.vercel.app/targets" target="_blank" rel="noopener">Hedefleri düzenle (nawrec.social)</a></p>
       </div>
     </div>
-    <div class="card"><h3>🚀 Reklam / boost kampanyaları</h3>
+    ${MA.has_data ? '' : `    <div class="card"><h3>🚀 Reklam / boost kampanyaları</h3>
       <div class="stats" style="margin:0 0 12px">
         ${stat(money(ads.spend_month),'Bu ay harcama')}${stat(money(ads.spend_30d),'Son 30 gün harcama')}${stat(money(ads.spend_total),'Toplam harcama')}
         ${stat(nf(ads.results_30d),'Sonuç (30 gün)',null, ads.results_30d?`${cpr(ads.spend_30d/ads.results_30d)} / sonuç`:'')}
@@ -1043,13 +1043,15 @@ async function viewOverview(silent){
       </tbody></table></div>
     </div>`}
 
+`}
+
     <div class="card" id="pl-card"><h3>📊 Kâr / zarar</h3>
       <div class="tbl-wrap"><table><thead><tr><th></th><th>Bu ay</th><th>Başladığımızdan beri (${ltSince})</th></tr></thead><tbody>
-        ${realRev ? `<tr><td>Mağaza kazancı (net, komisyon düşülmüş)</td><td>${money(storeMonth)}</td><td>${money(sumObj(SR.total))}${SR.first_day?` <span class="muted small">(mağaza verisi ${fmtD(SR.first_day)} itibarıyla)</span>`:''}</td></tr>` : `<tr><td>Abonelik geliri (tahmini)</td><td>${money(R.mrr_estimate||0)}</td><td>${money(LT.subs_gross_estimate||0)} <span class="muted small">(tahmini, komisyon öncesi)</span></td></tr>`}
+        ${LT.sources ? `<tr><td>App Store ${LT.sources.ios==='real'?'(gerçek net)':'(tahmini)'}</td><td>${money(curRow?curRow.ios:0)}</td><td>${money(LT.ios_total||0)}</td></tr><tr><td>Google Play ${LT.sources.android==='real'?'(gerçek net)':'<span class="muted small">(tahmini, Play bağlanınca gerçek)</span>'}</td><td>${money(curRow?curRow.android:0)}</td><td>${money(LT.android_total||0)}</td></tr>` : realRev ? `<tr><td>Mağaza kazancı (net, komisyon düşülmüş)</td><td>${money(storeMonth)}</td><td>${money(sumObj(SR.total))}${SR.first_day?` <span class="muted small">(mağaza verisi ${fmtD(SR.first_day)} itibarıyla)</span>`:''}</td></tr>` : `<tr><td>Abonelik geliri (tahmini)</td><td>${money(R.mrr_estimate||0)}</td><td>${money(LT.subs_gross_estimate||0)} <span class="muted small">(tahmini, komisyon öncesi)</span></td></tr>`}
         <tr><td>Özel ders tahsilatı</td><td>${money(usd(A.tuition_paid_month))}${otherCur(A.tuition_paid_month)?' + '+otherCur(A.tuition_paid_month):''}</td><td>${money(usd(A.tuition_paid_total))}${otherCur(A.tuition_paid_total)?' + '+otherCur(A.tuition_paid_total):''}</td></tr>
         <tr><td>Reklam harcaması (${MA.has_data?'Meta':'nawrec.social'})</td><td style="color:#FF6B6B">-${money(ads.spend_month)}</td><td style="color:#FF6B6B">-${money(ads.spend_total)}</td></tr>
         <tr><td>Diğer giderler (defter)</td><td style="color:#FF6B6B">-${money(usd(X.month))}${otherCur(X.month)?' + '+otherCur(X.month):''}</td><td style="color:#FF6B6B">-${money(usd(X.total))}${otherCur(X.total)?' + '+otherCur(X.total):''}</td></tr>
-        <tr><td><b>Net</b></td><td><b style="color:${netMonth>=0?'var(--green)':'#FF6B6B'}">${money(netMonth)}</b></td><td>${(()=>{ const t = (realRev ? sumObj(SR.total) : (LT.subs_gross_estimate||0)) + usd(A.tuition_paid_total) - (ads.spend_total||0) - usd(X.total); return `<b style="color:${t>=0?'var(--green)':'#FF6B6B'}">${money(t)}</b>${realRev?'':' <span class="muted small">(tahmini)</span>'}`; })()}</td></tr>
+        <tr><td><b>Net</b></td><td><b style="color:${netMonth>=0?'var(--green)':'#FF6B6B'}">${money(netMonth)}</b></td><td>${LT.sources ? `<b style="color:${(LT.profit_usd||0)>=0?'var(--green)':'#FF6B6B'}">${money(LT.profit_usd||0)}</b>` : (()=>{ const t = (realRev ? sumObj(SR.total) : (LT.subs_gross_estimate||0)) + usd(A.tuition_paid_total) - (ads.spend_total||0) - usd(X.total); return `<b style="color:${t>=0?'var(--green)':'#FF6B6B'}">${money(t)}</b>${realRev?'':' <span class="muted small">(tahmini)</span>'}`; })()}</td></tr>
       </tbody></table></div>
       <p class="small muted" style="margin-top:8px">USD dışı tutarlar ayrı gösterilir, net hesaba katılmaz. Gider kategorileri (USD): ${Object.entries(X.by_category_usd||{}).map(([k,v])=>`${esc(EXP_CATS[k]||k)} ${money(v)}`).join(' · ')||'-'}</p>
     </div>
