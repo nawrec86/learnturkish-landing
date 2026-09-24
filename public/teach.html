@@ -1098,15 +1098,23 @@ async function saveTutor(id){
     closeModal(); viewTutors();
   }
 }
+// Pano API'si odak/izin yoksa sessizce reddediyor -> execCommand yedegi + her durumda geri bildirim
+async function copyText(id){
+  const el = $(id);
+  el.focus(); el.select(); el.setSelectionRange(0, el.value.length);
+  try { await navigator.clipboard.writeText(el.value); toast('Link kopyalandı'); return; } catch(_) {}
+  try { if (document.execCommand('copy')) { toast('Link kopyalandı'); return; } } catch(_) {}
+  toast('Otomatik kopyalanamadı: link seçildi, Cmd+C ile kopyalayın', false);
+}
 function showLinkModal(name, email, link, mailed, kind){
   const msg = `Merhaba ${name}, LearnTurkish AI Özel Ders Paneli için şifreni belirleyip giriş yapabileceğin link: ${link}`;
   openModal(`<h3>${kind==='invite'?'Öğretmen eklendi':'Giriş linki hazır'}</h3>
     <p class="small" style="margin-bottom:12px">${mailed ? `✅ Link <b>${esc(email||'')}</b> adresine e-postayla gönderildi. İsterseniz aşağıdan WhatsApp ile de iletebilirsiniz.` : `E-posta otomatik gönderilmedi (e-posta servisi henüz kurulmadı). Aşağıdaki linki öğretmene <b>WhatsApp veya e-postayla</b> iletin; öğretmen linke tıklayınca şifresini belirleyip panele girer.`}</p>
     <textarea class="form-inp" id="lk_link" rows="3" readonly onclick="this.select()">${esc(link)}</textarea>
-    <p class="muted small" style="margin-top:8px">Link tek kullanımlıktır ve kısa süre (varsayılan 24 saat) geçerlidir. Süresi dolarsa "Giriş linki gönder" ile yenisini üretin.</p>
+    <p class="muted small" style="margin-top:8px">WhatsApp / e-posta düğmesi açılmazsa (bazı gömülü tarayıcılar engeller) linki kopyalayıp kendiniz yapıştırın. Link tek kullanımlıktır ve kısa süre (varsayılan 24 saat) geçerlidir. Süresi dolarsa "Giriş linki gönder" ile yenisini üretin.</p>
     <div class="row" style="margin-top:14px">
-      <button class="btn" onclick="navigator.clipboard.writeText($('lk_link').value).then(()=>toast('Link kopyalandı'))">Linki kopyala</button>
-      <a class="btn ghost" style="text-decoration:none" target="_blank" rel="noopener" href="https://wa.me/?text=${encodeURIComponent(msg)}">WhatsApp ile gönder</a>
+      <button class="btn" onclick="copyText('lk_link')">Linki kopyala</button>
+      <a class="btn ghost" style="text-decoration:none" target="_blank" rel="noopener" href="https://api.whatsapp.com/send?text=${encodeURIComponent(msg)}">WhatsApp ile gönder</a>
       ${email?`<a class="btn ghost" style="text-decoration:none" href="mailto:${esc(email)}?subject=${encodeURIComponent('LearnTurkish AI - Öğretmen paneli')}&body=${encodeURIComponent(msg)}">E-postayla gönder</a>`:''}
       <button class="btn ghost" onclick="closeModal()">Kapat</button></div>`);
 }
