@@ -943,7 +943,7 @@ async function viewOverview(silent){
           ${stat(nf(sum(IN.d30)),'Son 30 gün indirme')}
           ${stat(nf(IN.uninstalls_30d),'Kaldırma (30 gün, Play)','#FF6B6B')}
           ${stat(IN.active_devices?nf(IN.active_devices.count):'-','Aktif Android cihaz',null,IN.active_devices?fmtD(IN.active_devices.day):'')}
-          ${stat(nf(sum(IN.total)),'Toplam (400 gün)')}</div>
+          ${stat(nf(sum(IN.total)),'Toplam (başlangıçtan beri)')}</div>
           <div class="grid"><div><p class="small muted">Son 30 gün günlük indirme</p><div style="display:flex;align-items:flex-end;gap:2px;height:60px;margin-top:6px">${daily.map(([d,v])=>`<div title="${d}: ${v}" style="flex:1;background:var(--gold);opacity:.85;height:${Math.max(3,v/mx*100)}%;border-radius:2px"></div>`).join('')}</div></div>
           <div><table><tbody>${byC.map(([c,v])=>`<tr><td>${FLAGS[c]||'🌐'} ${esc(c)}</td><td><b>${nf(v)}</b></td><td style="width:45%">${hbar(v,mxC,'var(--gold)')}</td></tr>`).join('')}</tbody></table></div></div>
           <p class="small muted" style="margin-top:8px">Mağazalar veriyi günde bir, bir önceki gün için yayınlar. Son veri: ${fmtD(IN.last_day)}</p>`; })()
@@ -953,7 +953,7 @@ async function viewOverview(silent){
     <div class="card" id="meta-ads"><div class="row between" style="margin-bottom:12px"><h3 style="margin:0">📣 Meta reklamları (Facebook / Instagram, boost dahil)</h3>
       ${MA.configured?`<button class="btn ghost sm" id="ma_sync" onclick="metaSync()">↻ Tüm geçmişi çek</button>`:''}</div>
       ${MA.has_data ? `<div class="stats" style="margin:0 0 12px">
-          ${stat(money(MA.spend_month),'Bu ay harcama','#FF6B6B')}${stat(money(MA.spend_30d),'Son 30 gün')}${stat(money(MA.spend_total),'Toplam (400 gün)')}
+          ${stat(money(MA.spend_month),'Bu ay harcama','#FF6B6B')}${stat(money(MA.spend_30d),'Son 30 gün')}${stat(money(MA.spend_total),'Toplam (başlangıçtan beri)')}
           ${stat(nf(MA.results_30d),'Sonuç (30 gün)',null, MA.results_30d?`${money(MA.spend_30d/MA.results_30d)} / sonuç`:'')}</div>
         <div class="tbl-wrap"><table><thead><tr><th>Kampanya / boost</th><th>Amaç</th><th>Harcama</th><th>30 gün</th><th>Erişim</th><th>Gösterim</th><th>Tık</th><th>Sonuç</th><th>Sonuç başı</th><th>Son gün</th></tr></thead><tbody>
         ${(MA.campaigns||[]).map(c=>`<tr><td><b>${esc(c.name||c.id)}</b></td><td class="small">${esc(c.objective||'')}</td><td><b>${money(c.spend)}</b></td><td>${money(c.spend30)}</td><td>${nf(c.reach)}</td><td>${nf(c.impressions)}</td><td>${nf(c.clicks)}</td><td>${nf(c.results)}</td><td>${c.results?money(c.spend/c.results):'-'}</td><td class="small">${fmtD(c.last_day)}</td></tr>`).join('')}
