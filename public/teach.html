@@ -225,14 +225,14 @@ async function viewHome(){
       <td>${showJoin && l.meet_link ? `<a href="${esc(l.meet_link)}" target="_blank" rel="noopener" onclick="event.stopPropagation()">Meet</a>` : ''}</td></tr>`;
   $('view').innerHTML = `
     <div class="stats">
-      <div class="stat"><div class="num">${courses.length}</div><div class="lbl">Aktif / planlı kur</div></div>
-      <div class="stat"><div class="num">${upcoming.length}</div><div class="lbl">7 gün icinde ders</div></div>
-      <div class="stat"><div class="num" style="color:${unmarked.length?'#FF6B6B':'inherit'}">${unmarked.length}</div><div class="lbl">Katılımı girilmemiş</div></div>
-      <div class="stat"><div class="num" style="color:${toReview.length?'var(--gold)':'inherit'}">${toReview.length}</div><div class="lbl">Değerlendirilecek ödev</div></div>
+      <div class="stat click" onclick="location.hash='#/students'"><div class="num">${courses.length}</div><div class="lbl">Aktif / planlı kur</div></div>
+      <div class="stat click" onclick="document.getElementById('h-upcoming').scrollIntoView({behavior:'smooth'})"><div class="num">${upcoming.length}</div><div class="lbl">7 gün içinde ders</div></div>
+      <div class="stat click" onclick="(document.getElementById('h-unmarked')||document.getElementById('h-upcoming')).scrollIntoView({behavior:'smooth'})"><div class="num" style="color:${unmarked.length?'#FF6B6B':'inherit'}">${unmarked.length}</div><div class="lbl">Katılımı girilmemiş</div></div>
+      <div class="stat click" onclick="(document.getElementById('h-review')||document.getElementById('h-upcoming')).scrollIntoView({behavior:'smooth'})"><div class="num" style="color:${toReview.length?'var(--gold)':'inherit'}">${toReview.length}</div><div class="lbl">Değerlendirilecek ödev</div></div>
     </div>
-    ${unmarked.length ? `<div class="card"><h3>⚠️ Katılım ve gözlem bekleyen dersler</h3><div class="tbl-wrap"><table><thead><tr><th>Tarih</th><th>Öğrenci</th><th>Ders</th><th></th></tr></thead><tbody>${unmarked.map(l=>lessonRow(l,false)).join('')}</tbody></table></div></div>` : ''}
-    <div class="card"><h3>📅 Önümüzdeki 7 gün</h3>${upcoming.length ? `<div class="tbl-wrap"><table><thead><tr><th>Tarih</th><th>Öğrenci</th><th>Ders</th><th></th></tr></thead><tbody>${upcoming.map(l=>lessonRow(l,true)).join('')}</tbody></table></div>` : '<div class="empty">Planlı ders yok</div>'}</div>
-    ${toReview.length ? `<div class="card"><h3>📝 Teslim edilen ödevler</h3><div class="tbl-wrap"><table><thead><tr><th>Teslim</th><th>Öğrenci</th><th>Ödev</th></tr></thead><tbody>${toReview.map(h=>`<tr class="click" onclick="location.hash='#/course/${h.course_id}'"><td>${fmtDT(h.submitted_at)}</td><td>${esc(h.tuition_courses.tuition_students.full_name)}</td><td>${esc(h.title)}</td></tr>`).join('')}</tbody></table></div></div>` : ''}
+    ${unmarked.length ? `<div class="card" id="h-unmarked"><h3>⚠️ Katılım ve gözlem bekleyen dersler</h3><div class="tbl-wrap"><table><thead><tr><th>Tarih</th><th>Öğrenci</th><th>Ders</th><th></th></tr></thead><tbody>${unmarked.map(l=>lessonRow(l,false)).join('')}</tbody></table></div></div>` : ''}
+    <div class="card" id="h-upcoming"><h3>📅 Önümüzdeki 7 gün</h3>${upcoming.length ? `<div class="tbl-wrap"><table><thead><tr><th>Tarih</th><th>Öğrenci</th><th>Ders</th><th></th></tr></thead><tbody>${upcoming.map(l=>lessonRow(l,true)).join('')}</tbody></table></div>` : '<div class="empty">Planlı ders yok</div>'}</div>
+    ${toReview.length ? `<div class="card" id="h-review"><h3>📝 Teslim edilen ödevler</h3><div class="tbl-wrap"><table><thead><tr><th>Teslim</th><th>Öğrenci</th><th>Ödev</th></tr></thead><tbody>${toReview.map(h=>`<tr class="click" onclick="location.hash='#/course/${h.course_id}'"><td>${fmtDT(h.submitted_at)}</td><td>${esc(h.tuition_courses.tuition_students.full_name)}</td><td>${esc(h.title)}</td></tr>`).join('')}</tbody></table></div></div>` : ''}
     <p class="muted small">Saatler tarayıcınızın saat diliminde gösterilir.</p>`;
 }
 
