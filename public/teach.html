@@ -886,9 +886,24 @@ async function viewOverview(silent){
         <div style="display:flex;align-items:flex-end;gap:2px;height:60px;margin-top:6px">${days.map(d=>`<div title="${d.d}: ${d.n}" style="flex:1;background:var(--blue);opacity:.8;height:${Math.max(3,d.n/maxDay*100)}%;border-radius:2px"></div>`).join('')}</div>
       </div>
       <div class="card"><h3>🌍 Ülkeler</h3>
-        <table><thead><tr><th>Ülke</th><th>Kullanıcı</th><th>Aktif 30g</th><th style="width:40%"></th></tr></thead><tbody>
-        ${countries.map(c=>`<tr class="clickrow" onclick="usersModal({title:'${esc(c.country)} kullanıcıları',country:'${esc(c.country)}'})"><td>${c.country==='?'?'❔ Bilinmiyor <span class="small muted">(uygulamayı açınca dolar)</span>':`${FLAGS[c.country]||'🌐'} ${esc(c.country)}`}</td><td><b>${nf(c.users)}</b></td><td>${nf(c.active_30d)}</td><td>${hbar(c.users,maxC,'var(--blue)')}</td></tr>`).join('') || '<tr><td colspan="4" class="muted">Veri yok</td></tr>'}
-        </tbody></table>
+        ${(()=>{
+          const fl = c => `${FLAGS[(c||'').toUpperCase()]||'🌐'} ${esc((c||'??').toUpperCase())}`;
+          const inst = Object.entries(IN.by_country_total||{}).sort((a,b)=>b[1]-a[1]);
+          const i30 = IN.by_country_30d||{};
+          const maxI = Math.max(1, ...inst.map(x=>x[1]));
+          const pay = Object.entries(SR.by_country_total||{}).sort((a,b)=>b[1].net-a[1].net);
+          const maxP = Math.max(1, ...pay.map(x=>x[1].net));
+          const known = countries.filter(c=>c.country!=='?');
+          const unknown = countries.find(c=>c.country==='?');
+          return `
+          <h4 style="margin:4px 0 6px">📲 İndirmeler (mağaza verisi, gerçek)${IN.first_day?` <span class="small muted">${fmtD(IN.first_day)} itibarıyla</span>`:''}</h4>
+          ${inst.length?`<table><thead><tr><th>Ülke</th><th>Toplam</th><th>Son 30g</th><th style="width:40%"></th></tr></thead><tbody>
+            ${inst.slice(0,12).map(([c,n])=>`<tr><td>${fl(c)}</td><td><b>${nf(n)}</b></td><td>${nf(i30[c]||0)}</td><td>${hbar(n,maxI,'var(--blue)')}</td></tr>`).join('')}
+          </tbody></table>${inst.length>12?`<p class="small muted">+${inst.length-12} ülke daha · toplam ${nf(inst.reduce((a,x)=>a+x[1],0))} indirme</p>`:''}`:'<p class="small muted">Mağaza indirme verisi henüz yok (App Store bağlandı; Mağaza kazançları kartında "Şimdi çek" ile gelir).</p>'}
+          <h4 style="margin:14px 0 6px">💳 Ödeme yapan ülkeler (başlangıçtan beri, net)</h4>
+          ${pay.length?`<table><tbody>${pay.slice(0,10).map(([c,v])=>`<tr><td>${fl(c)}</td><td><b>${money(v.net)}</b></td><td class="small muted">${nf(v.units)} işlem</td><td style="width:40%">${hbar(v.net,maxP,'var(--green)')}</td></tr>`).join('')}</tbody></table>`:'<p class="small muted">Mağaza kazancı verisi yok.</p>'}
+          <p class="small muted" style="margin-top:10px">Uygulama içi (profil) ülke: ${known.map(c=>`<a href="#" onclick="event.preventDefault();usersModal({title:'${esc(c.country)} kullanıcıları',country:'${esc(c.country)}'})">${fl(c.country)} ${nf(c.users)}</a>`).join(' · ')||'-'}${unknown?` · bilinmiyor ${nf(unknown.users)} (uygulamayı açtıkça dolar)`:''}</p>`;
+        })()}
         <p class="small muted" style="margin-top:8px">Ana dil: ${(A.native_langs||[]).map(l=>`${esc(l.lang)} ${nf(l.users)}`).join(' · ')}</p>
       </div>
     </div>
