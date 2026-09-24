@@ -835,7 +835,10 @@ async function viewOverview(silent){
   const sumObj = o => Object.values(o||{}).reduce((a,b)=>a+Number(b||0),0);
   const storeMonth = sumObj(SR.month);
   const realRev = !!SR.has_data;
-  const incomeMonth = (realRev ? storeMonth : (R.mrr_estimate||0)) + usd(A.tuition_paid_month);
+  const LT0 = B.lifetime || {}, curYm = new Date().toISOString().slice(0,7);
+  const curRow = (LT0.monthly||[]).find(m=>m.month===curYm);
+  // Ay ay tablo varsa (App Store gercek + Play tahmin) bu ay onu kullan; yoksa eski davranis
+  const incomeMonth = curRow && LT0.sources ? curRow.revenue : (realRev ? storeMonth : (R.mrr_estimate||0)) + usd(A.tuition_paid_month);
   const costMonth = usd(X.month) + (ads.spend_month||0);
   const netMonth = incomeMonth - costMonth;
   const LT = B.lifetime || {};
@@ -862,7 +865,7 @@ async function viewOverview(silent){
       ${stat(nf(A.active_30d),'Aktif (30 gün)','var(--blue)',`${nf(A.active_7d)} son 7 gün · ${nf(A.active_1d)} bugün`,"usersModal({title:'Son 30 günde aktif',activeDays:30,order:'last_active'})")}
       ${stat(nf(S.paid),'Ödeyen abone','var(--gold)',`${nf(S.active)} aktif premium (${nf(S.gifted)} hediye)`,"subsModal()")}
       ${realRev ? stat(money(storeMonth),'Bu ay mağaza kazancı (net)','var(--green)',`App Store ${money((SR.month||{}).app_store||0)} · Play ${money((SR.month||{}).google_play||0)}${SR.estimated?' (Play tahmini)':''}`,"document.getElementById('store-rev').scrollIntoView({behavior:'smooth'})") : stat(money(R.mrr_estimate||0),'Tahmini aylık gelir','var(--green)','abonelik, komisyon öncesi',"document.getElementById('store-rev').scrollIntoView({behavior:'smooth'})")}
-      ${LT.error ? stat('-','Toplam gelir (başladığımızdan beri)',null,'202611300000 SQL henüz çalıştırılmadı') : stat(money(LT.revenue_usd||0),'Toplam gelir (başladığımızdan beri)','var(--green)',`${ltSince} → bugün · ${LT.store_net_is_real?'mağaza net':'abonelik tahmini'} + özel ders · kâr/zarar ${money(LT.profit_usd||0)}`,"lifetimeModal()")}
+      ${LT.error ? stat('-','Toplam gelir (başladığımızdan beri)',null,'202611300000 SQL henüz çalıştırılmadı') : stat(money(LT.revenue_usd||0),'Toplam gelir (başladığımızdan beri)','var(--green)',`${ltSince} → bugün · ${LT.sources?`App Store ${LT.sources.ios==='real'?'gerçek':'tahmini'} + Play ${LT.sources.android==='real'?'gerçek':'tahmini'}`:(LT.store_net_is_real?'mağaza net':'abonelik tahmini')} + özel ders · kâr/zarar ${money(LT.profit_usd||0)}`,"lifetimeModal()")}
       ${stat(money(netMonth),'Bu ay kâr / zarar', netMonth>=0?'var(--green)':'#FF6B6B', `gelir ${money(incomeMonth)} - gider ${money(costMonth)}`,"document.getElementById('pl-card').scrollIntoView({behavior:'smooth'})")}
     </div>
 
@@ -996,11 +999,11 @@ async function viewOverview(silent){
     </div>
 
     <div class="card" id="monthly-card"><h3>📅 Ay ay gelir / gider (başladığımızdan beri)</h3>
-      ${(LT.monthly||[]).length?(()=>{ const M=LT.monthly, T=k=>M.reduce((a,r)=>a+(r[k]||0),0), col=v=>`<b style="color:${v>=0?'var(--green)':'#FF6B6B'}">${money(v)}</b>`, ml=ym=>{const [y,m]=ym.split('-');return new Date(Date.UTC(+y,+m-1,1)).toLocaleDateString('tr-TR',{month:'long',year:'numeric',timeZone:'UTC'});}; return `<div class="tbl-wrap"><table><thead><tr><th>Ay</th><th>Uygulama geliri${LT.app_revenue_is_estimate?' (tahmini)':' (net)'}</th><th>Özel ders</th><th>Toplam gelir</th><th>Reklam</th><th>Diğer gider</th><th>Kâr / zarar</th></tr></thead><tbody>
-        ${M.map(r=>`<tr><td><b>${ml(r.month)}</b></td><td>${money(r.app_revenue)}</td><td>${money(r.tuition)}</td><td><b>${money(r.revenue)}</b></td><td style="color:#FF6B6B">${r.ads?'-'+money(r.ads):'-'}</td><td style="color:#FF6B6B">${r.expenses?'-'+money(r.expenses):'-'}</td><td>${col(r.net)}</td></tr>`).join('')}
-        <tr style="border-top:2px solid var(--border,#ccc)"><td><b>TOPLAM</b></td><td><b>${money(T('app_revenue'))}</b></td><td><b>${money(T('tuition'))}</b></td><td><b>${money(T('revenue'))}</b></td><td style="color:#FF6B6B"><b>-${money(T('ads'))}</b></td><td style="color:#FF6B6B"><b>-${money(T('expenses'))}</b></td><td>${col(T('net'))}</td></tr>
+      ${(LT.monthly||[]).length?(()=>{ const M=LT.monthly, T=k=>M.reduce((a,r)=>a+(r[k]||0),0), col=v=>`<b style="color:${v>=0?'var(--green)':'#FF6B6B'}">${money(v)}</b>`, ml=ym=>{const [y,m]=ym.split('-');return new Date(Date.UTC(+y,+m-1,1)).toLocaleDateString('tr-TR',{month:'long',year:'numeric',timeZone:'UTC'});}; return `<div class="tbl-wrap"><table><thead><tr><th>Ay</th>${LT.sources?`<th>App Store${LT.sources.ios==='real'?' (net)':' (tahmini)'}</th><th>Google Play${LT.sources.android==='real'?' (net)':' (tahmini)'}</th>`:`<th>Uygulama geliri${LT.app_revenue_is_estimate?' (tahmini)':' (net)'}</th>`}<th>Özel ders</th><th>Toplam gelir</th><th>Reklam</th><th>Diğer gider</th><th>Kâr / zarar</th></tr></thead><tbody>
+        ${M.map(r=>`<tr><td><b>${ml(r.month)}</b></td>${LT.sources?`<td>${money(r.ios)}</td><td>${money(r.android)}</td>`:`<td>${money(r.app_revenue)}</td>`}<td>${money(r.tuition)}</td><td><b>${money(r.revenue)}</b></td><td style="color:#FF6B6B">${r.ads?'-'+money(r.ads):'-'}</td><td style="color:#FF6B6B">${r.expenses?'-'+money(r.expenses):'-'}</td><td>${col(r.net)}</td></tr>`).join('')}
+        <tr style="border-top:2px solid var(--border,#ccc)"><td><b>TOPLAM</b></td>${LT.sources?`<td><b>${money(T('ios'))}</b></td><td><b>${money(T('android'))}</b></td>`:`<td><b>${money(T('app_revenue'))}</b></td>`}<td><b>${money(T('tuition'))}</b></td><td><b>${money(T('revenue'))}</b></td><td style="color:#FF6B6B"><b>-${money(T('ads'))}</b></td><td style="color:#FF6B6B"><b>-${money(T('expenses'))}</b></td><td>${col(T('net'))}</td></tr>
       </tbody></table></div>
-      <p class="small muted" style="margin-top:8px">${LT.app_revenue_is_estimate?'Uygulama geliri mağaza bağlanana kadar abonelik kayıtlarından tahmindir (liste fiyatı, komisyon öncesi; aylık abonelik her ay, yıllık abonelik alındığı ay yazılır).':'Uygulama geliri App Store + Google Play gerçek net kazançtır.'} Özel ders ve giderler yalnızca USD.</p>`; })():'<div class="muted small">Veri yok.</div>'}
+      <p class="small muted" style="margin-top:8px">${LT.sources?esc(LT.note||'')+' ':''}${LT.sources?'':LT.app_revenue_is_estimate?'Uygulama geliri mağaza bağlanana kadar abonelik kayıtlarından tahmindir (liste fiyatı, komisyon öncesi; aylık abonelik her ay, yıllık abonelik alındığı ay yazılır).':'Uygulama geliri App Store + Google Play gerçek net kazançtır.'} Özel ders ve giderler yalnızca USD.</p>`; })():'<div class="muted small">Veri yok.</div>'}
     </div>
 
     <div class="card"><div class="row between" style="margin-bottom:12px"><h3 style="margin:0">🧾 Gider defteri</h3><button class="btn sm" onclick="expenseModal()">+ Gider ekle</button></div>
@@ -1096,7 +1099,8 @@ function lifetimeModal(){
   const other = o => Object.entries(o||{}).map(([c,v])=>money(v,c)).join(' + ');
   openModal(`<h3>Başladığımızdan beri (${LT.started_on?fmtD(LT.started_on):'-'} → bugün)</h3>
     <div class="tbl-wrap"><table><tbody>
-      <tr><td>Mağaza geliri ${LT.store_net_is_real?'(gerçek net, komisyon düşülmüş)':'(TAHMİNİ: liste fiyatı x ödenmiş dönem)'}</td><td><b>${money(LT.store_net_is_real?LT.store_net:LT.subs_gross_estimate)}</b></td></tr>
+      ${LT.sources?`<tr><td>App Store ${LT.sources.ios==='real'?'(gerçek net)':'(tahmini)'}</td><td><b>${money(LT.ios_total||0)}</b></td></tr><tr><td>Google Play ${LT.sources.android==='real'?'(gerçek net)':'(tahmini, Play bağlanınca gerçek)'}</td><td><b>${money(LT.android_total||0)}</b></td></tr>`:''}
+      <tr style="${LT.sources?'display:none':''}"><td>Mağaza geliri ${LT.store_net_is_real?'(gerçek net, komisyon düşülmüş)':'(TAHMİNİ: liste fiyatı x ödenmiş dönem)'}</td><td><b>${money(LT.store_net_is_real?LT.store_net:LT.subs_gross_estimate)}</b></td></tr>
       <tr><td>Özel ders tahsilatı</td><td><b>${money(LT.tuition_usd||0)}</b>${other(LT.tuition_other)?' + '+other(LT.tuition_other):''}</td></tr>
       <tr><td><b>Toplam gelir</b></td><td><b style="color:var(--green)">${money(LT.revenue_usd||0)}</b></td></tr>
       <tr><td>Toplam gider (reklam + defter)</td><td style="color:#FF6B6B">-${money(LT.expenses_usd||0)}${other(LT.expenses_other)?' + '+other(LT.expenses_other):''}</td></tr>
