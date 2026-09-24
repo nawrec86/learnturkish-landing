@@ -140,6 +140,7 @@ function fmtDT(v){ if(!v) return '<span class="muted">-</span>'; const d=new Dat
 function fmtD(v){ if(!v) return '-'; return new Date(v).toLocaleDateString('tr-TR',{day:'2-digit',month:'short',year:'numeric'}); }
 function toLocalInput(v){ if(!v) return ''; const d=new Date(v); const p=n=>String(n).padStart(2,'0'); return `${d.getFullYear()}-${p(d.getMonth()+1)}-${p(d.getDate())}T${p(d.getHours())}:${p(d.getMinutes())}`; }
 function fromLocalInput(v){ return v ? new Date(v).toISOString() : null; }
+function cpr(n){ return '$' + Number(n||0).toLocaleString('en-US',{maximumSignificantDigits:2, maximumFractionDigits:4}); }
 function money(n, cur='USD'){ return (cur==='USD'?'$':'') + Number(n||0).toLocaleString('en-US',{maximumFractionDigits:2}) + (cur==='USD'?'':' '+cur); }
 function opt(map, sel){ return Object.entries(map).map(([k,v])=>`<option value="${k}" ${k===sel?'selected':''}>${esc(Array.isArray(v)?v[0]:v)}</option>`).join(''); }
 function tutorName(id){ const t=TUTORS.find(x=>x.id===id); return t ? t.full_name : '-'; }
@@ -954,9 +955,9 @@ async function viewOverview(silent){
       ${MA.configured?`<button class="btn ghost sm" id="ma_sync" onclick="metaSync()">↻ Tüm geçmişi çek</button>`:''}</div>
       ${MA.has_data ? `<div class="stats" style="margin:0 0 12px">
           ${stat(money(MA.spend_month),'Bu ay harcama','#FF6B6B')}${stat(money(MA.spend_30d),'Son 30 gün')}${stat(money(MA.spend_total),'Toplam (başlangıçtan beri)')}
-          ${stat(nf(MA.results_30d),'Sonuç (30 gün)',null, MA.results_30d?`${money(MA.spend_30d/MA.results_30d)} / sonuç`:'')}</div>
+          ${stat(nf(MA.results_30d),'Sonuç (30 gün)',null, MA.results_30d?`${cpr(MA.spend_30d/MA.results_30d)} / sonuç`:'')}</div>
         <div class="tbl-wrap"><table><thead><tr><th>Kampanya / boost</th><th>Amaç</th><th>Harcama</th><th>30 gün</th><th>Erişim</th><th>Gösterim</th><th>Tık</th><th>Sonuç</th><th>Sonuç başı</th><th>Son gün</th></tr></thead><tbody>
-        ${(MA.campaigns||[]).map(c=>`<tr><td><b>${esc(c.name||c.id)}</b></td><td class="small">${esc(c.objective||'')}</td><td><b>${money(c.spend)}</b></td><td>${money(c.spend30)}</td><td>${nf(c.reach)}</td><td>${nf(c.impressions)}</td><td>${nf(c.clicks)}</td><td>${nf(c.results)}</td><td>${c.results?money(c.spend/c.results):'-'}</td><td class="small">${fmtD(c.last_day)}</td></tr>`).join('')}
+        ${(MA.campaigns||[]).map(c=>`<tr><td><b>${esc(c.name||c.id)}</b></td><td class="small">${esc(c.objective||'')}</td><td><b>${money(c.spend)}</b></td><td>${money(c.spend30)}</td><td>${nf(c.reach)}</td><td>${nf(c.impressions)}</td><td>${nf(c.clicks)}</td><td>${nf(c.results)}</td><td>${c.results?cpr(c.spend/c.results):'-'}</td><td class="small">${fmtD(c.last_day)}</td></tr>`).join('')}
         </tbody></table></div>`
       : `<p class="small">${MA.configured?'Meta bağlı, henüz veri çekilmedi. "Tüm geçmişi çek" ile başlangıçtan beri tüm harcamayı alın.':'<b>Meta reklam hesabı bağlı değil.</b> Bağlanınca tüm kampanya ve boost harcamaları saatlik otomatik gelir ve gider olarak kâr/zarara yansır. Kurulum adımları sohbette.'}</p>`}
       ${MA.error?`<p class="small" style="color:#FF6B6B">${esc(MA.error)}</p>`:''}
@@ -995,10 +996,10 @@ async function viewOverview(silent){
     <div class="card"><h3>🚀 Reklam / boost kampanyaları</h3>
       <div class="stats" style="margin:0 0 12px">
         ${stat(money(ads.spend_month),'Bu ay harcama')}${stat(money(ads.spend_30d),'Son 30 gün harcama')}${stat(money(ads.spend_total),'Toplam harcama')}
-        ${stat(nf(ads.results_30d),'Sonuç (30 gün)',null, ads.results_30d?`${money(ads.spend_30d/ads.results_30d)} / sonuç`:'')}
+        ${stat(nf(ads.results_30d),'Sonuç (30 gün)',null, ads.results_30d?`${cpr(ads.spend_30d/ads.results_30d)} / sonuç`:'')}
       </div>
       <div class="tbl-wrap"><table><thead><tr><th>Kampanya</th><th>Amaç</th><th>Durum</th><th>Günlük bütçe</th><th>Harcama</th><th>Gösterim</th><th>Tık</th><th>Sonuç</th><th>Sonuç başı</th></tr></thead><tbody>
-      ${(SO.campaigns||[]).map(c=>`<tr><td><b>${esc(c.name)}</b><div class="small muted">${esc(c.platform||'')}</div></td><td>${esc(c.objective||'')}</td><td>${esc(c.status||'')}</td><td>${c.daily_budget?money(c.daily_budget,c.currency||'USD'):'-'}</td><td><b>${money(c.spend)}</b></td><td>${nf(c.impressions)}</td><td>${nf(c.clicks)}</td><td>${nf(c.results)}</td><td>${c.results?money(c.spend/c.results):'-'}</td></tr>`).join('') || '<tr><td colspan="9" class="muted">Kampanya yok</td></tr>'}
+      ${(SO.campaigns||[]).map(c=>`<tr><td><b>${esc(c.name)}</b><div class="small muted">${esc(c.platform||'')}</div></td><td>${esc(c.objective||'')}</td><td>${esc(c.status||'')}</td><td>${c.daily_budget?money(c.daily_budget,c.currency||'USD'):'-'}</td><td><b>${money(c.spend)}</b></td><td>${nf(c.impressions)}</td><td>${nf(c.clicks)}</td><td>${nf(c.results)}</td><td>${c.results?cpr(c.spend/c.results):'-'}</td></tr>`).join('') || '<tr><td colspan="9" class="muted">Kampanya yok</td></tr>'}
       </tbody></table></div>
     </div>`}
 
