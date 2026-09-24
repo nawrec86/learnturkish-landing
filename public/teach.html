@@ -41,7 +41,11 @@
   .grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:12px}
   .stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:12px;margin-bottom:16px}
   .stat{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:16px;text-align:center}
-  .stat .num{font-size:26px;font-weight:900}.stat .lbl{font-size:12px;color:var(--t3);margin-top:2px}
+  .stat .num{font-size:26px;font-weight:900}
+  .stat.click{cursor:pointer;transition:border-color .15s,background .15s}.stat.click:hover{border-color:rgba(227,10,23,0.6);background:rgba(227,10,23,0.06)}
+  .stat.click .lbl::after{content:' ›';opacity:.6}
+  tr.clickrow{cursor:pointer}tr.clickrow:hover td{background:rgba(255,255,255,0.04)}
+  .modal.wide{max-width:1000px}.stat .lbl{font-size:12px;color:var(--t3);margin-top:2px}
   .fg{display:flex;flex-direction:column;gap:6px}.fg label{font-size:12px;font-weight:700;color:var(--t3)}
   .full{grid-column:1/-1}
   .tbl-wrap{overflow-x:auto}
@@ -142,7 +146,7 @@ function tutorName(id){ const t=TUTORS.find(x=>x.id===id); return t ? t.full_nam
 function tutorOptions(sel, allowEmpty=true){ return (allowEmpty?'<option value="">- Atanmadı -</option>':'') + TUTORS.map(t=>`<option value="${t.id}" ${t.id===sel?'selected':''}>${esc(t.full_name)}${t.is_active?'':' (pasif)'}</option>`).join(''); }
 function val(id){ const e=$(id); if(!e) return null; const v=e.value.trim(); return v===''?null:v; }
 function openModal(html){ $('modal').innerHTML=html; $('modalBg').style.display='flex'; }
-function closeModal(){ $('modalBg').style.display='none'; $('modal').innerHTML=''; }
+function closeModal(){ $('modalBg').style.display='none'; $('modal').innerHTML=''; $('modal').classList.remove('wide'); }
 function attendanceBar(lessons){
   const n = lessons.length || 1;
   const c = k => lessons.filter(l=>l.attendance===k).length;
@@ -809,7 +813,7 @@ async function viewOverview(){
   const incomeMonth = (R.mrr_estimate||0) + usd(A.tuition_paid_month);
   const costMonth = usd(X.month) + (ads.spend_month||0);
   const netMonth = incomeMonth - costMonth;
-  const stat = (num, lbl, color, sub) => `<div class="stat"><div class="num"${color?` style="color:${color}"`:''}>${num}</div><div class="lbl">${lbl}</div>${sub?`<div class="small muted" style="margin-top:4px">${sub}</div>`:''}</div>`;
+  const stat = (num, lbl, color, sub, on) => `<div class="stat${on?' click':''}"${on?` onclick="${on}"`:''}><div class="num"${color?` style="color:${color}"`:''}>${num}</div><div class="lbl">${lbl}</div>${sub?`<div class="small muted" style="margin-top:4px">${sub}</div>`:''}</div>`;
   const retention = pct(A.retention_active, A.retention_cohort);
   const days = A.signups_by_day || [];
   const maxDay = Math.max(1, ...days.map(d=>d.n));
@@ -826,18 +830,18 @@ async function viewOverview(){
 
   $('view').innerHTML = `
     <div class="stats">
-      ${stat(nf(A.users_total),'Toplam kullanıcı',null,`+${nf(A.users_new_7d)} son 7 gün`)}
-      ${stat(nf(A.active_30d),'Aktif (30 gün)','var(--blue)',`${nf(A.active_7d)} son 7 gün · ${nf(A.active_1d)} bugün`)}
-      ${stat(nf(S.paid),'Ödeyen abone','var(--gold)',`${nf(S.active)} aktif premium (${nf(S.gifted)} hediye)`)}
+      ${stat(nf(A.users_total),'Toplam kullanıcı',null,`+${nf(A.users_new_7d)} son 7 gün`,"usersModal({title:'Tüm kullanıcılar'})")}
+      ${stat(nf(A.active_30d),'Aktif (30 gün)','var(--blue)',`${nf(A.active_7d)} son 7 gün · ${nf(A.active_1d)} bugün`,"usersModal({title:'Son 30 günde aktif',activeDays:30,order:'last_active'})")}
+      ${stat(nf(S.paid),'Ödeyen abone','var(--gold)',`${nf(S.active)} aktif premium (${nf(S.gifted)} hediye)`,"subsModal()")}
       ${stat(money(R.mrr_estimate||0),'Tahmini aylık gelir','var(--green)','abonelik, komisyon öncesi')}
-      ${stat(money(netMonth),'Bu ay kâr / zarar', netMonth>=0?'var(--green)':'#FF6B6B', `gelir ${money(incomeMonth)} - gider ${money(costMonth)}`)}
+      ${stat(money(netMonth),'Bu ay kâr / zarar', netMonth>=0?'var(--green)':'#FF6B6B', `gelir ${money(incomeMonth)} - gider ${money(costMonth)}`,"document.getElementById('pl-card').scrollIntoView({behavior:'smooth'})")}
     </div>
 
     <div class="grid">
       <div class="card"><h3>👥 Kullanıcılar ve devam edenler</h3>
         <table><tbody>
-          <tr><td>Yeni kayıt (7 / 30 gün)</td><td><b>${nf(A.users_new_7d)}</b> / <b>${nf(A.users_new_30d)}</b></td></tr>
-          <tr><td>Aktif: bugün / 7 gün / 30 gün</td><td><b>${nf(A.active_1d)}</b> / <b>${nf(A.active_7d)}</b> / <b>${nf(A.active_30d)}</b></td></tr>
+          <tr class="clickrow" onclick="usersModal({title:'Son 30 günde kayıt olanlar',newDays:30})"><td>Yeni kayıt (7 / 30 gün) ›</td><td><b>${nf(A.users_new_7d)}</b> / <b>${nf(A.users_new_30d)}</b></td></tr>
+          <tr class="clickrow" onclick="usersModal({title:'Son 7 günde aktif',activeDays:7,order:'last_active'})"><td>Aktif: bugün / 7 gün / 30 gün ›</td><td><b>${nf(A.active_1d)}</b> / <b>${nf(A.active_7d)}</b> / <b>${nf(A.active_30d)}</b></td></tr>
           <tr><td>Aktiflik oranı (30 gün / toplam)</td><td><b>${pct(A.active_30d, A.users_total) ?? '-'}%</b></td></tr>
           <tr><td>Tutunma (30-60 gün önce gelip hâlâ aktif)</td><td><b>${retention ?? '-'}%</b> <span class="muted small">(${nf(A.retention_active)} / ${nf(A.retention_cohort)})</span></td></tr>
           <tr><td>Kurulumu tamamlayan</td><td><b>${nf(A.onboarded)}</b> <span class="muted small">(${pct(A.onboarded, A.users_total) ?? '-'}%)</span></td></tr>
@@ -847,7 +851,7 @@ async function viewOverview(){
       </div>
       <div class="card"><h3>🌍 Ülkeler</h3>
         <table><thead><tr><th>Ülke</th><th>Kullanıcı</th><th>Aktif 30g</th><th style="width:40%"></th></tr></thead><tbody>
-        ${countries.map(c=>`<tr><td>${FLAGS[c.country]||'🌐'} ${esc(c.country)}</td><td><b>${nf(c.users)}</b></td><td>${nf(c.active_30d)}</td><td>${hbar(c.users,maxC,'var(--blue)')}</td></tr>`).join('') || '<tr><td colspan="4" class="muted">Veri yok</td></tr>'}
+        ${countries.map(c=>`<tr class="clickrow" onclick="usersModal({title:'${esc(c.country)} kullanıcıları',country:'${esc(c.country)}'})"><td>${FLAGS[c.country]||'🌐'} ${esc(c.country)}</td><td><b>${nf(c.users)}</b></td><td>${nf(c.active_30d)}</td><td>${hbar(c.users,maxC,'var(--blue)')}</td></tr>`).join('') || '<tr><td colspan="4" class="muted">Veri yok</td></tr>'}
         </tbody></table>
         <p class="small muted" style="margin-top:8px">Ana dil: ${(A.native_langs||[]).map(l=>`${esc(l.lang)} ${nf(l.users)}`).join(' · ')}</p>
       </div>
@@ -856,7 +860,7 @@ async function viewOverview(){
     <div class="grid">
       <div class="card"><h3>💎 Abonelik ve gelir</h3>
         <table><tbody>
-          <tr><td>Aktif premium (toplam)</td><td><b>${nf(S.active)}</b></td></tr>
+          <tr class="clickrow" onclick="subsModal()"><td>Aktif premium (toplam) ›</td><td><b>${nf(S.active)}</b></td></tr>
           <tr><td>Ödeyen (mağaza işlemi olan)</td><td><b style="color:var(--gold)">${nf(S.paid)}</b></td></tr>
           <tr><td>Hediye / elle verilen</td><td>${nf(S.gifted)}</td></tr>
           <tr><td>Son 30 gün yeni ödeyen</td><td><b>${nf(S.new_paid_30d)}</b></td></tr>
@@ -908,7 +912,7 @@ async function viewOverview(){
       </tbody></table></div>
     </div>`}
 
-    <div class="card"><h3>📊 Kâr / zarar</h3>
+    <div class="card" id="pl-card"><h3>📊 Kâr / zarar</h3>
       <div class="tbl-wrap"><table><thead><tr><th></th><th>Bu ay</th><th>Toplam (kayıtlı)</th></tr></thead><tbody>
         <tr><td>Abonelik geliri (tahmini)</td><td>${money(R.mrr_estimate||0)}</td><td class="muted small">mağaza raporu gerekli</td></tr>
         <tr><td>Özel ders tahsilatı</td><td>${money(usd(A.tuition_paid_month))}${otherCur(A.tuition_paid_month)?' + '+otherCur(A.tuition_paid_month):''}</td><td>${money(usd(A.tuition_paid_total))}${otherCur(A.tuition_paid_total)?' + '+otherCur(A.tuition_paid_total):''}</td></tr>
@@ -926,10 +930,57 @@ async function viewOverview(){
     </div>
 
     <div class="card"><h3>🎓 Özel ders</h3><div class="stats" style="margin:0">
-      ${stat(nf(tutors),'Aktif öğretmen')}${stat(nf(students),'Öğrenci profili')}${stat(nf(courses),'Aktif / planlı kur')}
+      ${stat(nf(tutors),'Aktif öğretmen',null,null,"location.hash='#/tutors'")}${stat(nf(students),'Öğrenci profili',null,null,"location.hash='#/students'")}${stat(nf(courses),'Aktif / planlı kur',null,null,"location.hash='#/students'")}
     </div></div>
     <p class="muted small">Veri zamanı: ${fmtDT(B.generated_at)} · Sayfayı yenileyince güncellenir.</p>`;
 }
+// ---- Detay pencereleri (kartlara tiklayinca) ----
+let UM = null;
+async function usersModal(opts){
+  UM = Object.assign({ page:0, search:'' }, opts);
+  $('modal').classList.add('wide');
+  openModal(`<div class="row between"><h3 style="margin:0">${esc(UM.title)}</h3><button class="btn ghost sm" onclick="closeModal()">Kapat</button></div>
+    <div class="row" style="margin:12px 0"><input class="form-inp" id="um_q" placeholder="Ara: ad, e-posta" style="max-width:320px" onkeydown="if(event.key==='Enter'){UM.search=this.value.trim();UM.page=0;loadUsers()}"><button class="btn ghost sm" onclick="UM.search=$('um_q').value.trim();UM.page=0;loadUsers()">Ara</button><span class="small muted" id="um_count"></span></div>
+    <div id="um_body"><div class="empty">Yükleniyor...</div></div>`);
+  loadUsers();
+}
+async function loadUsers(){
+  const PS = 50;
+  let qb = db.from('profiles').select('id,full_name,name,display_name,email,country,native_lang,level,created_at,last_active,is_premium,xp,streak', { count:'exact' });
+  if (UM.country) qb = UM.country==='?' ? qb.or('country.is.null,country.eq.') : qb.ilike('country', UM.country);
+  if (UM.activeDays) qb = qb.gte('last_active', new Date(Date.now()-UM.activeDays*864e5).toISOString());
+  if (UM.newDays) qb = qb.gte('created_at', new Date(Date.now()-UM.newDays*864e5).toISOString());
+  if (UM.search) { const t = UM.search.replace(/[%,()]/g,' '); qb = qb.or(`email.ilike.%${t}%,full_name.ilike.%${t}%,name.ilike.%${t}%`); }
+  qb = qb.order(UM.order || 'created_at', { ascending:false, nullsFirst:false }).range(UM.page*PS, UM.page*PS+PS-1);
+  const { data, count, error } = await qb;
+  if (error) { $('um_body').innerHTML = `<div class="card">Hata: ${esc(error.message)}</div>`; return; }
+  $('um_count').textContent = `${nf(count)} kişi`;
+  const nm = u => u.full_name || u.display_name || u.name || (u.email||'').split('@')[0] || '-';
+  $('um_body').innerHTML = `<div class="tbl-wrap"><table><thead><tr><th>Ad</th><th>E-posta</th><th>Ülke</th><th>Dil</th><th>Seviye</th><th>XP</th><th>Seri</th><th>Kayıt</th><th>Son giriş</th><th>Premium</th></tr></thead><tbody>
+    ${data.map(u=>`<tr><td><b>${esc(nm(u))}</b></td><td class="small">${esc(u.email||'')}</td><td>${FLAGS[(u.country||'').toUpperCase()]||''} ${esc(u.country||'-')}</td><td>${esc(u.native_lang||'-')}</td><td>${esc(u.level||'-')}</td><td>${nf(u.xp)}</td><td>${nf(u.streak)}</td><td class="small">${fmtD(u.created_at)}</td><td class="small">${u.last_active?fmtD(u.last_active):'-'}</td><td>${u.is_premium?'<span class="badge b-gold">Premium</span>':''}</td></tr>`).join('') || '<tr><td colspan="10" class="empty">Kayıt yok</td></tr>'}
+  </tbody></table></div>
+  <div class="row" style="margin-top:12px">${UM.page>0?`<button class="btn ghost sm" onclick="UM.page--;loadUsers()">‹ Önceki</button>`:''}<span class="small muted">Sayfa ${UM.page+1} / ${Math.max(1,Math.ceil((count||0)/PS))}</span>${(UM.page+1)*PS<(count||0)?`<button class="btn ghost sm" onclick="UM.page++;loadUsers()">Sonraki ›</button>`:''}</div>`;
+}
+async function subsModal(){
+  $('modal').classList.add('wide');
+  openModal(`<div class="row between"><h3 style="margin:0">Aktif premium aboneler</h3><button class="btn ghost sm" onclick="closeModal()">Kapat</button></div><div id="sm_body" style="margin-top:12px"><div class="empty">Yükleniyor...</div></div>`);
+  const nowIso = new Date().toISOString();
+  const { data: subs, error } = await db.from('subscriptions').select('*').eq('status','active').or('expires_at.is.null,expires_at.gt.'+nowIso).range(0, 4999);
+  if (error) { $('sm_body').innerHTML = `<div class="card">Hata: ${esc(error.message)}</div>`; return; }
+  const ids = [...new Set(subs.map(s=>s.user_id))];
+  const profs = {};
+  for (let i=0; i<ids.length; i+=200) {
+    const { data } = await db.from('profiles').select('id,full_name,name,email,country,last_active').in('id', ids.slice(i,i+200));
+    (data||[]).forEach(p=>profs[p.id]=p);
+  }
+  const rows = subs.map(s=>({ s, p: profs[s.user_id]||{} })).sort((a,b)=>(!!b.s.transaction_id)-(!!a.s.transaction_id) || String(b.s.created_at||'').localeCompare(String(a.s.created_at||'')));
+  const paid = rows.filter(r=>r.s.transaction_id).length;
+  $('sm_body').innerHTML = `<p class="small muted" style="margin-bottom:10px">${rows.length} aktif abonelik · ${paid} ödeyen (mağaza işlemi var) · ${rows.length-paid} hediye / elle verilen</p>
+    <div class="tbl-wrap"><table><thead><tr><th>Kullanıcı</th><th>Ülke</th><th>Paket</th><th>Plan</th><th>Platform</th><th>Tür</th><th>Başlangıç</th><th>Bitiş</th><th>Son giriş</th></tr></thead><tbody>
+    ${rows.map(({s,p})=>`<tr><td><b>${esc(p.full_name||p.name||'-')}</b><div class="small muted">${esc(p.email||s.user_id)}</div></td><td>${FLAGS[(p.country||'').toUpperCase()]||''} ${esc(p.country||'-')}</td><td>${esc(s.tier||'premium')}</td><td>${esc(s.plan||'-')}</td><td>${esc(s.platform||'-')}</td><td>${s.transaction_id?'<span class="badge b-green">Ödeyen</span>':'<span class="badge b-grey">Hediye</span>'}</td><td class="small">${s.created_at?fmtD(s.created_at):'-'}</td><td class="small">${s.expires_at?fmtD(s.expires_at):'süresiz'}</td><td class="small">${p.last_active?fmtD(p.last_active):'-'}</td></tr>`).join('')}
+    </tbody></table></div>`;
+}
+
 function expenseModal(){
   openModal(`<h3>Gider ekle</h3><div class="grid">
     <div class="fg"><label>Tarih</label><input class="form-inp" type="date" id="ex_on" value="${new Date().toISOString().slice(0,10)}"></div>
