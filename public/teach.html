@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta name="robots" content="noindex,nofollow">
-<title>Özel Ders Paneli | LearnTurkish AI</title>
+<title>Yönetim Paneli | LearnTurkish AI</title>
 <style>
   @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800;900&display=swap');
   :root{--r:#E30A17;--bg:#0A0A0B;--t1:#F5F5F7;--t2:rgba(255,255,255,0.72);--t3:rgba(255,255,255,0.42);--card:rgba(255,255,255,0.04);--border:rgba(255,255,255,0.09);--green:#00C853;--gold:#F5C518;--blue:#60A5FA;--orange:#FF9F43;--font:'Inter','Segoe UI',Roboto,Arial,sans-serif}
@@ -77,7 +77,7 @@
   <div class="login-box">
     <div style="font-size:44px;margin-bottom:14px">🎓</div>
     <h1>LearnTurkish AI</h1>
-    <p>Özel Ders Paneli - Öğretmen / Yönetici</p>
+    <p>Yönetim ve Özel Ders Paneli</p>
     <input type="email" class="inp" id="email" placeholder="E-posta" autocomplete="email" onkeydown="if(event.key==='Enter')document.getElementById('pwd').focus()">
     <input type="password" class="inp" id="pwd" placeholder="Şifre" autocomplete="current-password" onkeydown="if(event.key==='Enter')doLogin()">
     <button class="btn block" id="loginBtn" onclick="doLogin()">Giriş Yap</button>
@@ -88,7 +88,7 @@
 
 <div id="app">
   <nav>
-    <div class="brand">LearnTurkish <span>Özel Ders</span></div>
+    <div class="brand">LearnTurkish <span>Panel</span></div>
     <div class="tabs" id="tabs"></div>
     <div class="who"><span id="whoLbl"></span><button class="btn ghost sm" onclick="logout()">Çıkış</button></div>
   </nav>
@@ -187,7 +187,7 @@ async function loadTutors(){ TUTORS = await q(db.from('tutors').select('id,full_
 // ---------------------------------------------------------------------------
 function buildTabs(){
   const tabs = [['home','Bugün'],['students','Öğrenciler']];
-  if (ME.is_admin) tabs.push(['requests','Talepler'],['tutors','Öğretmenler']);
+  if (ME.is_admin) tabs.push(['requests','Talepler'],['tutors','Öğretmenler'],['overview','Genel Bakış'],['settings','Ayarlar']);
   $('tabs').innerHTML = tabs.map(([k,l])=>`<button class="tab" data-tab="${k}" onclick="location.hash='#/${k}'">${l}</button>`).join('');
 }
 window.addEventListener('hashchange', () => { if (!/access_token=/.test(location.hash)) route(); });
@@ -196,7 +196,8 @@ function route(){
   const [, page, id] = (location.hash || '#/home').split('/');
   document.querySelectorAll('.tab').forEach(t=>t.classList.toggle('active', t.dataset.tab===page || (page==='student'&&t.dataset.tab==='students') || (page==='course'&&t.dataset.tab==='students')));
   $('view').innerHTML = '<div class="empty">Yükleniyor...</div>';
-  const pages = { home:viewHome, students:viewStudents, student:viewStudent, course:viewCourse, tutors:viewTutors, requests:viewRequests };
+  const pages = { home:viewHome, students:viewStudents, student:viewStudent, course:viewCourse, tutors:viewTutors, requests:viewRequests, overview:viewOverview, settings:viewSettings };
+  if (!ME.is_admin && ['tutors','requests','overview','settings'].includes(page)) { location.hash = '#/home'; return; }
   (pages[page] || viewHome)(id).catch(e => { $('view').innerHTML = `<div class="card"><b>Hata:</b> ${esc(e.message)}</div>`; });
 }
 
@@ -753,9 +754,10 @@ async function meetResync(lessonId){
 // TALEPLER (admin): uygulamadan gelen demo talepleri + rezervasyonlar
 // ---------------------------------------------------------------------------
 async function viewRequests(){
-  const [demos, students] = await Promise.all([
+  const [demos, students, bookings] = await Promise.all([
     q(db.from('demo_requests').select('*').order('created_at',{ascending:false}).limit(200)),
     q(db.from('tuition_students').select('id,user_id,full_name,email')),
+    q(db.from('tutor_bookings').select('*').order('created_at',{ascending:false}).limit(100)),
   ]);
   const byUser = Object.fromEntries(students.filter(s=>s.user_id).map(s=>[s.user_id,s]));
   $('view').innerHTML = `<div class="card"><h3>Uygulamadan gelen ders talepleri (${demos.length})</h3>
@@ -765,9 +767,90 @@ async function viewRequests(){
       <td class="small">${d.preferred_date?fmtD(d.preferred_date):''} ${d.preferred_time?esc(String(d.preferred_time).slice(0,5)):''}</td><td class="small">${esc(d.message||'')}</td>
       <td><select class="form-inp" style="width:auto" onchange="setDemo('${d.id}',this.value)">${['pending','confirmed','completed','rejected'].map(x=>`<option ${x===d.status?'selected':''}>${x}</option>`).join('')}</select></td>
       <td>${s?`<button class="btn sm" onclick="location.hash='#/student/${s.id}'">Profil</button>`:''}</td></tr>`; }).join('') || '<tr><td colspan="6" class="empty">Talep yok</td></tr>'}
-    </tbody></table></div></div>`;
+    </tbody></table></div></div>
+    <div class="card"><h3>Eski rezervasyon kayıtları (${bookings.length})</h3>
+    ${bookings.length?`<div class="tbl-wrap"><table><thead><tr><th>Tarih</th><th>Öğrenci</th><th>Tür</th><th>Durum</th><th>Ücret</th></tr></thead><tbody>
+      ${bookings.map(b=>{ const s=byUser[b.student_id]; return `<tr><td class="small">${esc(b.booking_date||'')} ${esc(String(b.start_time||'').slice(0,5))}</td><td>${s?esc(s.full_name):'-'}</td><td>${esc(b.lesson_type||'')}</td><td>${esc(b.status||'')}</td><td>${b.price?money(b.price):'-'}</td></tr>`; }).join('')}
+    </tbody></table></div>`:'<div class="muted small">Kayıt yok. Yeni dersler artık öğrenci profilindeki kurlardan yönetiliyor.</div>'}</div>`;
 }
 async function setDemo(id, status){ await run(()=>q(db.from('demo_requests').update({status}).eq('id', id)), 'Talep güncellendi'); }
+
+// ---------------------------------------------------------------------------
+// GENEL BAKIS (admin) - eski /admin sayfasinin istatistikleri + ozel ders ozeti
+// ---------------------------------------------------------------------------
+async function countOf(table, filter = x => x){
+  const { count, error } = await filter(db.from(table).select('*', { count:'exact', head:true }));
+  if (error) { console.error(table, error); return '!'; }
+  return count ?? 0;
+}
+async function viewOverview(){
+  const nowIso = new Date().toISOString();
+  const weekAgo = new Date(Date.now()-7*864e5).toISOString();
+  const weekAhead = new Date(Date.now()+7*864e5).toISOString();
+  const [users, newUsers, prem, tutors, students, courses, demos, pendingDemos, bookings, lessonsWeek, attendedWeek, pays] = await Promise.all([
+    countOf('profiles'),
+    countOf('profiles', x => x.gte('created_at', weekAgo)),
+    (async () => {
+      const { data, error } = await db.from('subscriptions').select('user_id').eq('status','active').or('expires_at.is.null,expires_at.gt.'+nowIso).range(0, 9999);
+      return error ? '!' : new Set(data.map(r=>r.user_id)).size;
+    })(),
+    countOf('tutors', x => x.eq('is_active', true)),
+    countOf('tuition_students'),
+    countOf('tuition_courses', x => x.in('status',['planned','active'])),
+    countOf('demo_requests'),
+    countOf('demo_requests', x => x.eq('status','pending')),
+    countOf('tutor_bookings'),
+    countOf('tuition_lessons', x => x.gte('scheduled_at', nowIso).lte('scheduled_at', weekAhead).eq('attendance','scheduled')),
+    countOf('tuition_lessons', x => x.gte('scheduled_at', weekAgo).lte('scheduled_at', nowIso).in('attendance',['attended','late'])),
+    q(db.from('tuition_payments').select('amount,currency,paid_on')),
+  ]);
+  const monthStart = new Date(); monthStart.setDate(1);
+  const byCur = {}; const byCurMonth = {};
+  pays.forEach(p => { byCur[p.currency]=(byCur[p.currency]||0)+Number(p.amount); if (new Date(p.paid_on) >= monthStart) byCurMonth[p.currency]=(byCurMonth[p.currency]||0)+Number(p.amount); });
+  const moneyList = m => Object.keys(m).length ? Object.entries(m).map(([c,v])=>money(v,c)).join(' + ') : money(0);
+  const stat = (num, lbl, color) => `<div class="stat"><div class="num"${color?` style="color:${color}"`:''}>${num}</div><div class="lbl">${lbl}</div></div>`;
+  $('view').innerHTML = `
+    <div class="card"><h3>📱 Uygulama</h3><div class="stats" style="margin:0">
+      ${stat(users,'Toplam kullanıcı')}${stat(newUsers,'Son 7 günde yeni')}${stat(prem,'Aktif premium','var(--gold)')}
+    </div></div>
+    <div class="card"><h3>🎓 Özel ders</h3><div class="stats" style="margin:0">
+      ${stat(tutors,'Aktif öğretmen')}${stat(students,'Öğrenci profili')}${stat(courses,'Aktif / planlı kur')}
+      ${stat(lessonsWeek,'Önümüzdeki 7 gün ders')}${stat(attendedWeek,'Son 7 gün yapılan ders','var(--green)')}
+      ${stat(pendingDemos+' / '+demos,'Bekleyen / toplam talep', pendingDemos?'var(--gold)':'')}${stat(bookings,'Eski rezervasyon')}
+    </div></div>
+    <div class="card"><h3>💵 Tahsilat (elle girilen)</h3><div class="stats" style="margin:0">
+      ${stat(moneyList(byCurMonth),'Bu ay','var(--green)')}${stat(moneyList(byCur),'Toplam')}
+    </div></div>
+    <p class="muted small">Premium = aktif ve süresi dolmamış abonelik, her kullanıcı bir kez sayılır. "!" görünen değer okunamadı demektir.</p>`;
+}
+
+// ---------------------------------------------------------------------------
+// AYARLAR (admin) - uygulamadaki canli ders karti (app_settings.private_tuition)
+// ---------------------------------------------------------------------------
+async function viewSettings(){
+  const { data } = await db.from('app_settings').select('value,updated_at').eq('key','private_tuition').maybeSingle();
+  const v = (data && data.value) || {};
+  $('view').innerHTML = `<div class="card"><h3>📱 Uygulamadaki "Öğretmenle canlı ders" kartı</h3>
+    <p class="muted small" style="margin-bottom:14px">Kart açıkken uygulamanın ana ekranında ve profil sayfasında görünür, öğrenciyi rezervasyon formuna ve WhatsApp'a yönlendirir. Kursu olan öğrenciler karttan her zaman "Derslerim"e ulaşır (bu ayardan bağımsız). Değişiklik uygulama güncellemesi gerektirmez.</p>
+    <div class="grid">
+      <div class="fg"><label>Durum</label><select class="form-inp" id="st_enabled"><option value="1" ${v.enabled?'selected':''}>Açık</option><option value="0" ${!v.enabled?'selected':''}>Kapalı</option></select></div>
+      <div class="fg"><label>WhatsApp numarası (ülke koduyla)</label><input class="form-inp" id="st_wa" placeholder="905xxxxxxxxx" value="${esc(v.whatsapp||'')}"></div>
+      <div class="fg"><label>Başlangıç tarihi (opsiyonel)</label><input class="form-inp" type="date" id="st_start" value="${esc((v.start_date||'').slice(0,10))}"></div>
+      <div class="fg"><label>Bitiş tarihi (opsiyonel)</label><input class="form-inp" type="date" id="st_end" value="${esc((v.end_date||'').slice(0,10))}"></div>
+    </div>
+    <div class="row" style="margin-top:16px"><button class="btn" id="st_save" onclick="saveSettings()">Kaydet</button>
+      ${data&&data.updated_at?`<span class="muted small">Son güncelleme: ${fmtDT(data.updated_at)}</span>`:''}</div>
+  </div>`;
+}
+async function saveSettings(){
+  const wa = (val('st_wa')||'').replace(/\D/g,'');
+  if (val('st_enabled')==='1' && wa.length < 8) { toast('Kart açıkken geçerli bir WhatsApp numarası gerekli', false); return; }
+  $('st_save').disabled = true;
+  try {
+    await run(()=>invokeFn('tuition-admin', { action:'save_settings', value:{ enabled: val('st_enabled')==='1', whatsapp: wa, start_date: val('st_start'), end_date: val('st_end') } }), 'Ayarlar kaydedildi');
+    viewSettings();
+  } catch(_) { $('st_save').disabled = false; }
+}
 
 // ---------------------------------------------------------------------------
 // OGRETMENLER (admin): giriş hesabı bağla, aktif/pasif, Meet odasi
