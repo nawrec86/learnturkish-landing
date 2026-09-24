@@ -863,8 +863,8 @@ async function viewOverview(silent){
 
   $('view').innerHTML = `
     <div class="stats">
-      ${stat(nf(AU.real_accounts ?? A.users_total),'Gerçek hesap',null,AU.real_accounts!=null?`${nf(AU.anonymous)} misafir · +${nf(AU.new_real_7d)} son 7 gün`:`+${nf(A.users_new_7d)} son 7 gün`,"usersModal({title:'Tüm kullanıcılar'})")}
-      ${stat(nf(A.active_30d),'Aktif (30 gün)','var(--blue)',`${nf(A.active_7d)} son 7 gün · ${nf(A.active_1d)} bugün`,"usersModal({title:'Son 30 günde aktif',activeDays:30,order:'last_active'})")}
+      ${stat(nf(AU.real_accounts ?? A.users_total),'Kayıtlı hesap (toplam)',null,AU.real_accounts!=null?`${nf(AU.anonymous)} misafir · +${nf(AU.new_real_7d)} son 7 gün`:`+${nf(A.users_new_7d)} son 7 gün`,"usersModal({title:'Tüm kullanıcılar'})")}
+      ${stat(nf(A.active_30d),'Aktif kullanan (30 gün)','var(--blue)',`${nf(A.active_7d)} son 7 gün · ${nf(A.active_1d)} bugün`,"usersModal({title:'Son 30 günde aktif',activeDays:30,order:'last_active'})")}
       ${stat(nf(S.paid),'Ödeyen abone','var(--gold)',`${nf(S.active)} aktif premium (${nf(S.gifted)} hediye)`,"subsModal()")}
       ${realRev ? stat(money(storeMonth),'Bu ay mağaza kazancı (net)','var(--green)',`App Store ${money((SR.month||{}).app_store||0)} · Play ${money((SR.month||{}).google_play||0)}${SR.estimated?' (Play tahmini)':''}`,"document.getElementById('store-rev').scrollIntoView({behavior:'smooth'})") : stat(money(R.mrr_estimate||0),'Tahmini aylık gelir','var(--green)','abonelik, komisyon öncesi',"document.getElementById('store-rev').scrollIntoView({behavior:'smooth'})")}
       ${LT.error ? stat('-','Toplam gelir (başladığımızdan beri)',null,'202611300000 SQL henüz çalıştırılmadı') : stat(money(LT.revenue_usd||0),'Toplam gelir (başladığımızdan beri)','var(--green)',`${ltSince} → bugün · ${LT.sources?`App Store ${LT.sources.ios==='real'?'gerçek':'tahmini'} + Play ${LT.sources.android==='real'?'gerçek':'tahmini'}`:(LT.store_net_is_real?'mağaza net':'abonelik tahmini')} + özel ders · kâr/zarar ${money(LT.profit_usd||0)}`,"lifetimeModal()")}
