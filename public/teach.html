@@ -862,7 +862,7 @@ async function viewOverview(silent){
       ${stat(nf(A.active_30d),'Aktif (30 gün)','var(--blue)',`${nf(A.active_7d)} son 7 gün · ${nf(A.active_1d)} bugün`,"usersModal({title:'Son 30 günde aktif',activeDays:30,order:'last_active'})")}
       ${stat(nf(S.paid),'Ödeyen abone','var(--gold)',`${nf(S.active)} aktif premium (${nf(S.gifted)} hediye)`,"subsModal()")}
       ${realRev ? stat(money(storeMonth),'Bu ay mağaza kazancı (net)','var(--green)',`App Store ${money((SR.month||{}).app_store||0)} · Play ${money((SR.month||{}).google_play||0)}${SR.estimated?' (Play tahmini)':''}`,"document.getElementById('store-rev').scrollIntoView({behavior:'smooth'})") : stat(money(R.mrr_estimate||0),'Tahmini aylık gelir','var(--green)','abonelik, komisyon öncesi',"document.getElementById('store-rev').scrollIntoView({behavior:'smooth'})")}
-      ${stat(money(LT.revenue_usd||0),'Toplam gelir (başladığımızdan beri)','var(--green)',`${ltSince} → bugün · ${LT.store_net_is_real?'mağaza net':'abonelik tahmini'} + özel ders · kâr/zarar ${money(LT.profit_usd||0)}`,"lifetimeModal()")}
+      ${LT.error ? stat('-','Toplam gelir (başladığımızdan beri)',null,'202611300000 SQL henüz çalıştırılmadı') : stat(money(LT.revenue_usd||0),'Toplam gelir (başladığımızdan beri)','var(--green)',`${ltSince} → bugün · ${LT.store_net_is_real?'mağaza net':'abonelik tahmini'} + özel ders · kâr/zarar ${money(LT.profit_usd||0)}`,"lifetimeModal()")}
       ${stat(money(netMonth),'Bu ay kâr / zarar', netMonth>=0?'var(--green)':'#FF6B6B', `gelir ${money(incomeMonth)} - gider ${money(costMonth)}`,"document.getElementById('pl-card').scrollIntoView({behavior:'smooth'})")}
     </div>
 
@@ -884,7 +884,7 @@ async function viewOverview(silent){
       </div>
       <div class="card"><h3>🌍 Ülkeler</h3>
         <table><thead><tr><th>Ülke</th><th>Kullanıcı</th><th>Aktif 30g</th><th style="width:40%"></th></tr></thead><tbody>
-        ${countries.map(c=>`<tr class="clickrow" onclick="usersModal({title:'${esc(c.country)} kullanıcıları',country:'${esc(c.country)}'})"><td>${FLAGS[c.country]||'🌐'} ${esc(c.country)}</td><td><b>${nf(c.users)}</b></td><td>${nf(c.active_30d)}</td><td>${hbar(c.users,maxC,'var(--blue)')}</td></tr>`).join('') || '<tr><td colspan="4" class="muted">Veri yok</td></tr>'}
+        ${countries.map(c=>`<tr class="clickrow" onclick="usersModal({title:'${esc(c.country)} kullanıcıları',country:'${esc(c.country)}'})"><td>${c.country==='?'?'❔ Bilinmiyor <span class="small muted">(uygulamayı açınca dolar)</span>':`${FLAGS[c.country]||'🌐'} ${esc(c.country)}`}</td><td><b>${nf(c.users)}</b></td><td>${nf(c.active_30d)}</td><td>${hbar(c.users,maxC,'var(--blue)')}</td></tr>`).join('') || '<tr><td colspan="4" class="muted">Veri yok</td></tr>'}
         </tbody></table>
         <p class="small muted" style="margin-top:8px">Ana dil: ${(A.native_langs||[]).map(l=>`${esc(l.lang)} ${nf(l.users)}`).join(' · ')}</p>
       </div>
