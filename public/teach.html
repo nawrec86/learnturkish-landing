@@ -838,6 +838,9 @@ async function viewOverview(silent){
   const incomeMonth = (realRev ? storeMonth : (R.mrr_estimate||0)) + usd(A.tuition_paid_month);
   const costMonth = usd(X.month) + (ads.spend_month||0);
   const netMonth = incomeMonth - costMonth;
+  const LT = B.lifetime || {};
+  window.__LT = LT; window.__SR = SR;
+  const ltSince = LT.started_on ? fmtD(LT.started_on) : 'başlangıç';
   const stat = (num, lbl, color, sub, on) => `<div class="stat${on?' click':''}"${on?` onclick="${on}"`:''}><div class="num"${color?` style="color:${color}"`:''}>${num}</div><div class="lbl">${lbl}</div>${sub?`<div class="small muted" style="margin-top:4px">${sub}</div>`:''}</div>`;
   const retention = pct(A.retention_active, A.retention_cohort);
   const days = A.signups_by_day || [];
@@ -859,6 +862,7 @@ async function viewOverview(silent){
       ${stat(nf(A.active_30d),'Aktif (30 gün)','var(--blue)',`${nf(A.active_7d)} son 7 gün · ${nf(A.active_1d)} bugün`,"usersModal({title:'Son 30 günde aktif',activeDays:30,order:'last_active'})")}
       ${stat(nf(S.paid),'Ödeyen abone','var(--gold)',`${nf(S.active)} aktif premium (${nf(S.gifted)} hediye)`,"subsModal()")}
       ${realRev ? stat(money(storeMonth),'Bu ay mağaza kazancı (net)','var(--green)',`App Store ${money((SR.month||{}).app_store||0)} · Play ${money((SR.month||{}).google_play||0)}${SR.estimated?' (Play tahmini)':''}`,"document.getElementById('store-rev').scrollIntoView({behavior:'smooth'})") : stat(money(R.mrr_estimate||0),'Tahmini aylık gelir','var(--green)','abonelik, komisyon öncesi',"document.getElementById('store-rev').scrollIntoView({behavior:'smooth'})")}
+      ${stat(money(LT.revenue_usd||0),'Toplam gelir (başladığımızdan beri)','var(--green)',`${ltSince} → bugün · ${LT.store_net_is_real?'mağaza net':'abonelik tahmini'} + özel ders · kâr/zarar ${money(LT.profit_usd||0)}`,"lifetimeModal()")}
       ${stat(money(netMonth),'Bu ay kâr / zarar', netMonth>=0?'var(--green)':'#FF6B6B', `gelir ${money(incomeMonth)} - gider ${money(costMonth)}`,"document.getElementById('pl-card').scrollIntoView({behavior:'smooth'})")}
     </div>
 
@@ -941,7 +945,7 @@ async function viewOverview(silent){
     </div>
 
     <div class="card" id="store-rev"><div class="row between" style="margin-bottom:12px"><h3 style="margin:0">🏪 Mağaza kazançları (App Store + Google Play)</h3>
-      ${(SR.configured||{}).app_store||(SR.configured||{}).google_play?`<button class="btn ghost sm" id="sr_sync" onclick="storeSync()">↻ Şimdi çek (30 gün)</button>`:''}</div>
+      ${(SR.configured||{}).app_store||(SR.configured||{}).google_play?`<button class="btn ghost sm" id="sr_sync" onclick="storeSync()">↻ Şimdi çek (30 gün)</button> <button class="btn ghost sm" id="sr_sync_all" onclick="storeSyncAll()">⏮ Başlangıçtan beri çek</button>`:''}</div>
       ${realRev ? (()=>{ const daily = Object.entries(SR.daily||{}).sort(); const mx = Math.max(1,...daily.map(d=>d[1])); const byC = Object.entries(SR.by_country||{}).sort((a,b)=>b[1]-a[1]).slice(0,10); const mxC = Math.max(1,...byC.map(c=>c[1]));
         return `<div class="stats" style="margin:0 0 12px">
           ${stat(money(storeMonth),'Bu ay net','var(--green)')}${stat(money(sumObj(SR.d30)),'Son 30 gün net')}${stat(money(sumObj(SR.total)),'Toplam net (400 gün)')}
@@ -981,12 +985,12 @@ async function viewOverview(silent){
     </div>`}
 
     <div class="card" id="pl-card"><h3>📊 Kâr / zarar</h3>
-      <div class="tbl-wrap"><table><thead><tr><th></th><th>Bu ay</th><th>Toplam (kayıtlı)</th></tr></thead><tbody>
-        ${realRev ? `<tr><td>Mağaza kazancı (net, komisyon düşülmüş)</td><td>${money(storeMonth)}</td><td>${money(sumObj(SR.total))} <span class="muted small">(son 400 gün)</span></td></tr>` : `<tr><td>Abonelik geliri (tahmini)</td><td>${money(R.mrr_estimate||0)}</td><td class="muted small">mağaza raporu bağlanınca gerçek</td></tr>`}
+      <div class="tbl-wrap"><table><thead><tr><th></th><th>Bu ay</th><th>Başladığımızdan beri (${ltSince})</th></tr></thead><tbody>
+        ${realRev ? `<tr><td>Mağaza kazancı (net, komisyon düşülmüş)</td><td>${money(storeMonth)}</td><td>${money(sumObj(SR.total))}${SR.first_day?` <span class="muted small">(mağaza verisi ${fmtD(SR.first_day)} itibarıyla)</span>`:''}</td></tr>` : `<tr><td>Abonelik geliri (tahmini)</td><td>${money(R.mrr_estimate||0)}</td><td>${money(LT.subs_gross_estimate||0)} <span class="muted small">(tahmini, komisyon öncesi)</span></td></tr>`}
         <tr><td>Özel ders tahsilatı</td><td>${money(usd(A.tuition_paid_month))}${otherCur(A.tuition_paid_month)?' + '+otherCur(A.tuition_paid_month):''}</td><td>${money(usd(A.tuition_paid_total))}${otherCur(A.tuition_paid_total)?' + '+otherCur(A.tuition_paid_total):''}</td></tr>
         <tr><td>Reklam harcaması (${MA.has_data?'Meta':'nawrec.social'})</td><td style="color:#FF6B6B">-${money(ads.spend_month)}</td><td style="color:#FF6B6B">-${money(ads.spend_total)}</td></tr>
         <tr><td>Diğer giderler (defter)</td><td style="color:#FF6B6B">-${money(usd(X.month))}${otherCur(X.month)?' + '+otherCur(X.month):''}</td><td style="color:#FF6B6B">-${money(usd(X.total))}${otherCur(X.total)?' + '+otherCur(X.total):''}</td></tr>
-        <tr><td><b>Net</b></td><td><b style="color:${netMonth>=0?'var(--green)':'#FF6B6B'}">${money(netMonth)}</b></td><td>${realRev ? (()=>{ const t = sumObj(SR.total) + usd(A.tuition_paid_total) - (ads.spend_total||0) - usd(X.total); return `<b style="color:${t>=0?'var(--green)':'#FF6B6B'}">${money(t)}</b>`; })() : '<span class="muted small">mağaza raporu bağlanınca hesaplanır</span>'}</td></tr>
+        <tr><td><b>Net</b></td><td><b style="color:${netMonth>=0?'var(--green)':'#FF6B6B'}">${money(netMonth)}</b></td><td>${(()=>{ const t = (realRev ? sumObj(SR.total) : (LT.subs_gross_estimate||0)) + usd(A.tuition_paid_total) - (ads.spend_total||0) - usd(X.total); return `<b style="color:${t>=0?'var(--green)':'#FF6B6B'}">${money(t)}</b>${realRev?'':' <span class="muted small">(tahmini)</span>'}`; })()}</td></tr>
       </tbody></table></div>
       <p class="small muted" style="margin-top:8px">USD dışı tutarlar ayrı gösterilir, net hesaba katılmaz. Gider kategorileri (USD): ${Object.entries(X.by_category_usd||{}).map(([k,v])=>`${esc(EXP_CATS[k]||k)} ${money(v)}`).join(' · ')||'-'}</p>
     </div>
@@ -1067,6 +1071,34 @@ async function storeSync(){
   try { const r = await invokeFn('store-revenue', { action:'sync', days:30 }); toast(Object.entries(r.results||{}).map(([k,v])=>`${k}: ${v.rows} satır`).join(' · ')); }
   catch(e) { toast('Mağaza verisi çekilemedi: '+e.message, false); }
   viewOverview();
+}
+async function storeSyncAll(){
+  const LT = window.__LT || {};
+  const from = (LT.started_on || '2025-01-01').slice(0, 7);
+  if (!confirm(`${from} ayından bugüne tüm mağaza raporları çekilsin mi? (1-2 dakika sürebilir)`)) return;
+  const b = $('sr_sync_all'); if (b) { b.disabled = true; b.textContent = 'Geçmiş çekiliyor...'; }
+  try { const r = await invokeFn('store-revenue', { action:'sync', days:31, from }); toast(Object.entries(r.results||{}).map(([k,v])=>`${k}: ${v.rows} satır`).join(' · ')); }
+  catch(e) { toast('Geçmiş çekilemedi: '+e.message, false); }
+  viewOverview();
+}
+function lifetimeModal(){
+  const LT = window.__LT || {}, SR = window.__SR || {};
+  const pp = Object.entries(LT.paid_periods||{});
+  const months = Object.entries(SR.by_month||{}).sort((a,b)=>b[0].localeCompare(a[0]));
+  const other = o => Object.entries(o||{}).map(([c,v])=>money(v,c)).join(' + ');
+  openModal(`<h3>Başladığımızdan beri (${LT.started_on?fmtD(LT.started_on):'-'} → bugün)</h3>
+    <div class="tbl-wrap"><table><tbody>
+      <tr><td>Mağaza geliri ${LT.store_net_is_real?'(gerçek net, komisyon düşülmüş)':'(TAHMİNİ: liste fiyatı x ödenmiş dönem)'}</td><td><b>${money(LT.store_net_is_real?LT.store_net:LT.subs_gross_estimate)}</b></td></tr>
+      <tr><td>Özel ders tahsilatı</td><td><b>${money(LT.tuition_usd||0)}</b>${other(LT.tuition_other)?' + '+other(LT.tuition_other):''}</td></tr>
+      <tr><td><b>Toplam gelir</b></td><td><b style="color:var(--green)">${money(LT.revenue_usd||0)}</b></td></tr>
+      <tr><td>Toplam gider (reklam + defter)</td><td style="color:#FF6B6B">-${money(LT.expenses_usd||0)}${other(LT.expenses_other)?' + '+other(LT.expenses_other):''}</td></tr>
+      <tr><td><b>Kâr / zarar</b></td><td><b style="color:${(LT.profit_usd||0)>=0?'var(--green)':'#FF6B6B'}">${money(LT.profit_usd||0)}</b></td></tr>
+      <tr><td>Bugüne kadar ödeme yapan kişi</td><td>${nf(LT.subs_paid_ever)}</td></tr>
+      ${pp.map(([k,n])=>`<tr><td class="small">${esc(k)} - ödenmiş dönem</td><td class="small">${nf(n)}</td></tr>`).join('')}
+    </tbody></table></div>
+    ${months.length?`<h4 style="margin-top:14px">Mağaza net, ay ay</h4><div class="tbl-wrap"><table><tbody>${months.map(([m,v])=>`<tr><td>${m}</td><td>${money(v)}</td></tr>`).join('')}</tbody></table></div>`:''}
+    <p class="small muted" style="margin-top:10px">${esc(LT.note||'')}</p>
+    <div class="row" style="margin-top:12px"><button class="btn ghost" onclick="closeModal()">Kapat</button></div>`);
 }
 function expenseModal(){
   openModal(`<h3>Gider ekle</h3><div class="grid">
