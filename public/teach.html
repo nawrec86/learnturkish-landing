@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta name="robots" content="noindex,nofollow">
-<title>Ozel Ders Paneli | LearnTurkish AI</title>
+<title>Özel Ders Paneli | LearnTurkish AI</title>
 <style>
   @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800;900&display=swap');
   :root{--r:#E30A17;--bg:#0A0A0B;--t1:#F5F5F7;--t2:rgba(255,255,255,0.72);--t3:rgba(255,255,255,0.42);--card:rgba(255,255,255,0.04);--border:rgba(255,255,255,0.09);--green:#00C853;--gold:#F5C518;--blue:#60A5FA;--orange:#FF9F43;--font:'Inter','Segoe UI',Roboto,Arial,sans-serif}
@@ -77,19 +77,19 @@
   <div class="login-box">
     <div style="font-size:44px;margin-bottom:14px">🎓</div>
     <h1>LearnTurkish AI</h1>
-    <p>Ozel Ders Paneli - Ogretmen / Yonetici</p>
+    <p>Özel Ders Paneli - Öğretmen / Yönetici</p>
     <input type="email" class="inp" id="email" placeholder="E-posta" autocomplete="email" onkeydown="if(event.key==='Enter')document.getElementById('pwd').focus()">
-    <input type="password" class="inp" id="pwd" placeholder="Sifre" autocomplete="current-password" onkeydown="if(event.key==='Enter')doLogin()">
-    <button class="btn block" id="loginBtn" onclick="doLogin()">Giris Yap</button>
+    <input type="password" class="inp" id="pwd" placeholder="Şifre" autocomplete="current-password" onkeydown="if(event.key==='Enter')doLogin()">
+    <button class="btn block" id="loginBtn" onclick="doLogin()">Giriş Yap</button>
     <div class="error" id="loginError"></div>
   </div>
 </div>
 
 <div id="app">
   <nav>
-    <div class="brand">LearnTurkish <span>Ozel Ders</span></div>
+    <div class="brand">LearnTurkish <span>Özel Ders</span></div>
     <div class="tabs" id="tabs"></div>
-    <div class="who"><span id="whoLbl"></span><button class="btn ghost sm" onclick="logout()">Cikis</button></div>
+    <div class="who"><span id="whoLbl"></span><button class="btn ghost sm" onclick="logout()">Çıkış</button></div>
   </nav>
   <div class="main" id="view"></div>
 </div>
@@ -110,13 +110,13 @@ const db = supabase.createClient(SUPABASE_URL, SUPABASE_KEY, {
 // Sabitler
 // ---------------------------------------------------------------------------
 const LEVELS = ['A0','A1','A2','B1','B2','C1','C2'];
-const HEARD = { instagram:'Instagram', tiktok:'TikTok', youtube:'YouTube', google:'Google', app_store:'App Store / Google Play', friend:'Arkadas tavsiyesi', other:'Diger' };
-const STUDENT_STATUS = { lead:['Aday','b-gold'], active:['Aktif','b-green'], paused:['Beklemede','b-orange'], completed:['Tamamladi','b-blue'], archived:['Arsiv','b-grey'] };
-const COURSE_STATUS = { planned:['Planlandi','b-gold'], active:['Devam ediyor','b-green'], paused:['Durduruldu','b-orange'], completed:['Tamamlandi','b-blue'], cancelled:['Iptal','b-grey'] };
-const ATT = { scheduled:['Planli','b-grey'], attended:['Katildi','b-green'], late:['Gec katildi','b-gold'], absent:['Gelmedi','b-red'], excused:['Izinli','b-blue'], cancelled:['Iptal','b-grey'] };
-const HW = { assigned:['Verildi','b-gold'], submitted:['Teslim edildi','b-blue'], reviewed:['Degerlendirildi','b-green'], missing:['Teslim yok','b-red'] };
-const SKILLS = [['speaking','Konusma'],['listening','Dinleme'],['reading','Okuma'],['writing','Yazma'],['grammar','Dilbilgisi'],['vocabulary','Kelime'],['pronunciation','Telaffuz'],['participation','Derse katilim']];
-const WEEKDAYS = [[1,'Pzt'],[2,'Sal'],[3,'Car'],[4,'Per'],[5,'Cum'],[6,'Cmt'],[0,'Paz']];
+const HEARD = { instagram:'Instagram', tiktok:'TikTok', youtube:'YouTube', google:'Google', app_store:'App Store / Google Play', friend:'Arkadaş tavsiyesi', other:'Diğer' };
+const STUDENT_STATUS = { lead:['Aday','b-gold'], active:['Aktif','b-green'], paused:['Beklemede','b-orange'], completed:['Tamamladı','b-blue'], archived:['Arşiv','b-grey'] };
+const COURSE_STATUS = { planned:['Planlandı','b-gold'], active:['Devam ediyor','b-green'], paused:['Durduruldu','b-orange'], completed:['Tamamlandı','b-blue'], cancelled:['İptal','b-grey'] };
+const ATT = { scheduled:['Planlı','b-grey'], attended:['Katıldı','b-green'], late:['Geç katıldı','b-gold'], absent:['Gelmedi','b-red'], excused:['İzinli','b-blue'], cancelled:['İptal','b-grey'] };
+const HW = { assigned:['Verildi','b-gold'], submitted:['Teslim edildi','b-blue'], reviewed:['Değerlendirildi','b-green'], missing:['Teslim yok','b-red'] };
+const SKILLS = [['speaking','Konuşma'],['listening','Dinleme'],['reading','Okuma'],['writing','Yazma'],['grammar','Dilbilgisi'],['vocabulary','Kelime'],['pronunciation','Telaffuz'],['participation','Derse katılım']];
+const WEEKDAYS = [[1,'Pzt'],[2,'Sal'],[3,'Çar'],[4,'Per'],[5,'Cum'],[6,'Cmt'],[0,'Paz']];
 
 let ME = { is_admin:false, tutor_id:null, tutor_name:null };
 let TUTORS = [];
@@ -129,7 +129,7 @@ function esc(v){ return v==null ? '' : String(v).replace(/[&<>"']/g, c => ({'&':
 function badge(map, key){ const m = map[key] || [key,'b-grey']; return `<span class="badge ${m[1]}">${esc(m[0])}</span>`; }
 function toast(msg, ok=true){ const t=$('toast'); t.textContent=msg; t.style.background= ok ? '#00A844' : '#C62828'; t.style.display='block'; clearTimeout(t._h); t._h=setTimeout(()=>t.style.display='none', ok?2500:6000); }
 // Supabase yazma hatalari throw etmez, { error } doner -> her cagriyi bundan gecir.
-async function q(p){ const { data, error } = await p; if (error) { console.error(error); throw new Error(error.message || 'Islem basarisiz'); } return data; }
+async function q(p){ const { data, error } = await p; if (error) { console.error(error); throw new Error(error.message || 'İşlem başarısız'); } return data; }
 async function run(fn, okMsg){ try { const r = await fn(); if (okMsg) toast(okMsg); return r; } catch(e){ toast('Hata: ' + e.message, false); throw e; } }
 function fmtDT(v){ if(!v) return '<span class="muted">-</span>'; const d=new Date(v); return d.toLocaleDateString('tr-TR',{day:'2-digit',month:'short',year:'numeric'})+' '+d.toLocaleTimeString('tr-TR',{hour:'2-digit',minute:'2-digit'}); }
 function fmtD(v){ if(!v) return '-'; return new Date(v).toLocaleDateString('tr-TR',{day:'2-digit',month:'short',year:'numeric'}); }
@@ -138,7 +138,7 @@ function fromLocalInput(v){ return v ? new Date(v).toISOString() : null; }
 function money(n, cur='USD'){ return (cur==='USD'?'$':'') + Number(n||0).toLocaleString('en-US',{maximumFractionDigits:2}) + (cur==='USD'?'':' '+cur); }
 function opt(map, sel){ return Object.entries(map).map(([k,v])=>`<option value="${k}" ${k===sel?'selected':''}>${esc(Array.isArray(v)?v[0]:v)}</option>`).join(''); }
 function tutorName(id){ const t=TUTORS.find(x=>x.id===id); return t ? t.full_name : '-'; }
-function tutorOptions(sel, allowEmpty=true){ return (allowEmpty?'<option value="">- Atanmadi -</option>':'') + TUTORS.map(t=>`<option value="${t.id}" ${t.id===sel?'selected':''}>${esc(t.full_name)}${t.is_active?'':' (pasif)'}</option>`).join(''); }
+function tutorOptions(sel, allowEmpty=true){ return (allowEmpty?'<option value="">- Atanmadı -</option>':'') + TUTORS.map(t=>`<option value="${t.id}" ${t.id===sel?'selected':''}>${esc(t.full_name)}${t.is_active?'':' (pasif)'}</option>`).join(''); }
 function val(id){ const e=$(id); if(!e) return null; const v=e.value.trim(); return v===''?null:v; }
 function openModal(html){ $('modal').innerHTML=html; $('modalBg').style.display='flex'; }
 function closeModal(){ $('modalBg').style.display='none'; $('modal').innerHTML=''; }
@@ -150,30 +150,30 @@ function attendanceBar(lessons){
 }
 
 // ---------------------------------------------------------------------------
-// Giris
+// Giriş
 // ---------------------------------------------------------------------------
 function showLoginError(m){ const e=$('loginError'); e.textContent=m; e.style.display='block'; }
 async function doLogin(){
   $('loginError').style.display='none';
   const email=$('email').value.trim(), password=$('pwd').value;
-  if(!email||!password){ showLoginError('E-posta ve sifre gerekli'); return; }
+  if(!email||!password){ showLoginError('E-posta ve şifre gerekli'); return; }
   $('loginBtn').disabled=true;
   const { data, error } = await db.auth.signInWithPassword({ email, password });
   $('loginBtn').disabled=false;
-  if(error||!data.session){ showLoginError('Gecersiz e-posta veya sifre'); return; }
+  if(error||!data.session){ showLoginError('Geçersiz e-posta veya şifre'); return; }
   await enter();
 }
 async function enter(){
   const { data, error } = await db.rpc('tuition_whoami');
-  if (error) { await db.auth.signOut(); showLoginError('Ozel ders modulu henuz kurulmamis (tuition_whoami yok). Yoneticiye bildirin.'); return; }
+  if (error) { await db.auth.signOut(); showLoginError('Özel ders modülü henüz kurulmamış (tuition_whoami yok). Yöneticiye bildirin.'); return; }
   ME = data || {};
   if (!ME.is_admin && !ME.tutor_id) {
     await db.auth.signOut();
-    showLoginError('Bu hesap bir ogretmen kaydina bagli degil ya da ogretmen pasif. Yonetici "Ogretmenler" sekmesinden baglamali.');
+    showLoginError('Bu hesap bir öğretmen kaydına bağlı değil ya da öğretmen pasif. Yönetici "Öğretmenler" sekmesinden bağlamalı.');
     return;
   }
   $('login').style.display='none'; $('app').style.display='block';
-  $('whoLbl').textContent = ME.is_admin ? 'Yonetici' : ('Ogretmen: ' + (ME.tutor_name||''));
+  $('whoLbl').textContent = ME.is_admin ? 'Yönetici' : ('Öğretmen: ' + (ME.tutor_name||''));
   await loadTutors();
   buildTabs();
   route();
@@ -185,8 +185,8 @@ async function loadTutors(){ TUTORS = await q(db.from('tutors').select('id,full_
 // Yonlendirme (#/home, #/students, #/student/<id>, #/course/<id>, #/tutors, #/requests)
 // ---------------------------------------------------------------------------
 function buildTabs(){
-  const tabs = [['home','Bugun'],['students','Ogrenciler']];
-  if (ME.is_admin) tabs.push(['requests','Talepler'],['tutors','Ogretmenler']);
+  const tabs = [['home','Bugün'],['students','Öğrenciler']];
+  if (ME.is_admin) tabs.push(['requests','Talepler'],['tutors','Öğretmenler']);
   $('tabs').innerHTML = tabs.map(([k,l])=>`<button class="tab" data-tab="${k}" onclick="location.hash='#/${k}'">${l}</button>`).join('');
 }
 window.addEventListener('hashchange', route);
@@ -194,13 +194,13 @@ function route(){
   if ($('app').style.display!=='block') return;
   const [, page, id] = (location.hash || '#/home').split('/');
   document.querySelectorAll('.tab').forEach(t=>t.classList.toggle('active', t.dataset.tab===page || (page==='student'&&t.dataset.tab==='students') || (page==='course'&&t.dataset.tab==='students')));
-  $('view').innerHTML = '<div class="empty">Yukleniyor...</div>';
+  $('view').innerHTML = '<div class="empty">Yükleniyor...</div>';
   const pages = { home:viewHome, students:viewStudents, student:viewStudent, course:viewCourse, tutors:viewTutors, requests:viewRequests };
   (pages[page] || viewHome)(id).catch(e => { $('view').innerHTML = `<div class="card"><b>Hata:</b> ${esc(e.message)}</div>`; });
 }
 
 // ---------------------------------------------------------------------------
-// BUGUN: yaklasan dersler, katilim girilmemis dersler, degerlendirme bekleyen odevler
+// BUGUN: yaklasan dersler, katılım girilmemiş dersler, degerlendirme bekleyen ödevler
 // ---------------------------------------------------------------------------
 async function viewHome(){
   const now = new Date();
@@ -219,15 +219,15 @@ async function viewHome(){
       <td>${showJoin && l.meet_link ? `<a href="${esc(l.meet_link)}" target="_blank" rel="noopener" onclick="event.stopPropagation()">Meet</a>` : ''}</td></tr>`;
   $('view').innerHTML = `
     <div class="stats">
-      <div class="stat"><div class="num">${courses.length}</div><div class="lbl">Aktif / planli kur</div></div>
-      <div class="stat"><div class="num">${upcoming.length}</div><div class="lbl">7 gun icinde ders</div></div>
-      <div class="stat"><div class="num" style="color:${unmarked.length?'#FF6B6B':'inherit'}">${unmarked.length}</div><div class="lbl">Katilimi girilmemis</div></div>
-      <div class="stat"><div class="num" style="color:${toReview.length?'var(--gold)':'inherit'}">${toReview.length}</div><div class="lbl">Degerlendirilecek odev</div></div>
+      <div class="stat"><div class="num">${courses.length}</div><div class="lbl">Aktif / planlı kur</div></div>
+      <div class="stat"><div class="num">${upcoming.length}</div><div class="lbl">7 gün icinde ders</div></div>
+      <div class="stat"><div class="num" style="color:${unmarked.length?'#FF6B6B':'inherit'}">${unmarked.length}</div><div class="lbl">Katılımı girilmemiş</div></div>
+      <div class="stat"><div class="num" style="color:${toReview.length?'var(--gold)':'inherit'}">${toReview.length}</div><div class="lbl">Değerlendirilecek ödev</div></div>
     </div>
-    ${unmarked.length ? `<div class="card"><h3>⚠️ Katilim ve gozlem bekleyen dersler</h3><div class="tbl-wrap"><table><thead><tr><th>Tarih</th><th>Ogrenci</th><th>Ders</th><th></th></tr></thead><tbody>${unmarked.map(l=>lessonRow(l,false)).join('')}</tbody></table></div></div>` : ''}
-    <div class="card"><h3>📅 Onumuzdeki 7 gun</h3>${upcoming.length ? `<div class="tbl-wrap"><table><thead><tr><th>Tarih</th><th>Ogrenci</th><th>Ders</th><th></th></tr></thead><tbody>${upcoming.map(l=>lessonRow(l,true)).join('')}</tbody></table></div>` : '<div class="empty">Planli ders yok</div>'}</div>
-    ${toReview.length ? `<div class="card"><h3>📝 Teslim edilen odevler</h3><div class="tbl-wrap"><table><thead><tr><th>Teslim</th><th>Ogrenci</th><th>Odev</th></tr></thead><tbody>${toReview.map(h=>`<tr class="click" onclick="location.hash='#/course/${h.course_id}'"><td>${fmtDT(h.submitted_at)}</td><td>${esc(h.tuition_courses.tuition_students.full_name)}</td><td>${esc(h.title)}</td></tr>`).join('')}</tbody></table></div></div>` : ''}
-    <p class="muted small">Saatler tarayicinizin saat diliminde gosterilir.</p>`;
+    ${unmarked.length ? `<div class="card"><h3>⚠️ Katılım ve gözlem bekleyen dersler</h3><div class="tbl-wrap"><table><thead><tr><th>Tarih</th><th>Öğrenci</th><th>Ders</th><th></th></tr></thead><tbody>${unmarked.map(l=>lessonRow(l,false)).join('')}</tbody></table></div></div>` : ''}
+    <div class="card"><h3>📅 Önümüzdeki 7 gün</h3>${upcoming.length ? `<div class="tbl-wrap"><table><thead><tr><th>Tarih</th><th>Öğrenci</th><th>Ders</th><th></th></tr></thead><tbody>${upcoming.map(l=>lessonRow(l,true)).join('')}</tbody></table></div>` : '<div class="empty">Planlı ders yok</div>'}</div>
+    ${toReview.length ? `<div class="card"><h3>📝 Teslim edilen ödevler</h3><div class="tbl-wrap"><table><thead><tr><th>Teslim</th><th>Öğrenci</th><th>Ödev</th></tr></thead><tbody>${toReview.map(h=>`<tr class="click" onclick="location.hash='#/course/${h.course_id}'"><td>${fmtDT(h.submitted_at)}</td><td>${esc(h.tuition_courses.tuition_students.full_name)}</td><td>${esc(h.title)}</td></tr>`).join('')}</tbody></table></div></div>` : ''}
+    <p class="muted small">Saatler tarayıcınızın saat diliminde gösterilir.</p>`;
 }
 
 // ---------------------------------------------------------------------------
@@ -238,26 +238,26 @@ async function viewStudents(){
   $('view').innerHTML = `
     <div class="card">
       <div class="row between" style="margin-bottom:14px">
-        <h3 style="margin:0">Ogrenciler (${students.length})</h3>
-        <div class="row"><input class="form-inp" id="stSearch" placeholder="Ara: ad, e-posta, meslek" style="width:240px" oninput="filterStudents()"><button class="btn" onclick="newStudentModal()">+ Yeni ogrenci</button></div>
+        <h3 style="margin:0">Öğrenciler (${students.length})</h3>
+        <div class="row"><input class="form-inp" id="stSearch" placeholder="Ara: ad, e-posta, meslek" style="width:240px" oninput="filterStudents()"><button class="btn" onclick="newStudentModal()">+ Yeni öğrenci</button></div>
       </div>
-      <div class="tbl-wrap"><table><thead><tr><th>Ad</th><th>E-posta</th><th>Yas</th><th>Meslek</th><th>Seviye</th>${ME.is_admin?'<th>Ogretmen</th>':''}<th>Durum</th><th>Kayit</th></tr></thead>
+      <div class="tbl-wrap"><table><thead><tr><th>Ad</th><th>E-posta</th><th>Yaş</th><th>Meslek</th><th>Seviye</th>${ME.is_admin?'<th>Öğretmen</th>':''}<th>Durum</th><th>Kayıt</th></tr></thead>
       <tbody id="stBody">${students.map(s=>`<tr class="click" data-s="${esc((s.full_name+' '+(s.email||'')+' '+(s.occupation||'')).toLowerCase())}" onclick="location.hash='#/student/${s.id}'">
         <td><b>${esc(s.full_name)}</b></td><td>${esc(s.email||'-')}</td><td>${s.age??'-'}</td><td>${esc(s.occupation||'-')}</td><td>${esc(s.level||'-')}</td>
-        ${ME.is_admin?`<td>${esc(tutorName(s.tutor_id))}</td>`:''}<td>${badge(STUDENT_STATUS,s.status)}</td><td class="small">${fmtD(s.created_at)}</td></tr>`).join('') || `<tr><td colspan="8" class="empty">Henuz ogrenci yok</td></tr>`}</tbody></table></div>
+        ${ME.is_admin?`<td>${esc(tutorName(s.tutor_id))}</td>`:''}<td>${badge(STUDENT_STATUS,s.status)}</td><td class="small">${fmtD(s.created_at)}</td></tr>`).join('') || `<tr><td colspan="8" class="empty">Henüz öğrenci yok</td></tr>`}</tbody></table></div>
     </div>`;
 }
 function filterStudents(){ const s=$('stSearch').value.toLowerCase(); document.querySelectorAll('#stBody tr[data-s]').forEach(r=>r.style.display = r.dataset.s.includes(s) ? '' : 'none'); }
 
 function newStudentModal(){
-  openModal(`<h3>Yeni ogrenci</h3>
-    <p class="muted small" style="margin-bottom:12px">Ogrencinin LearnTurkish uygulama hesabi varsa e-postasiyla baglanir; ogrenci gelisimini uygulamada gorur. Hesabi yoksa profil elle acilir.</p>
+  openModal(`<h3>Yeni öğrenci</h3>
+    <p class="muted small" style="margin-bottom:12px">Öğrencinin LearnTurkish uygulama hesabı varsa e-postasıyla bağlanır; öğrenci gelişimini uygulamada görür. Hesabı yoksa profil elle açılır.</p>
     <div class="grid">
       <div class="fg"><label>Ad soyad *</label><input class="form-inp" id="ns_name"></div>
       <div class="fg"><label>E-posta</label><input class="form-inp" id="ns_email" type="email"></div>
-      ${ME.is_admin?`<div class="fg"><label>Ogretmen</label><select class="form-inp" id="ns_tutor">${tutorOptions(null)}</select></div>`:''}
+      ${ME.is_admin?`<div class="fg"><label>Öğretmen</label><select class="form-inp" id="ns_tutor">${tutorOptions(null)}</select></div>`:''}
     </div>
-    <div class="row" style="margin-top:16px"><button class="btn" onclick="createStudent()">Olustur</button><button class="btn ghost" onclick="closeModal()">Vazgec</button></div>`);
+    <div class="row" style="margin-top:16px"><button class="btn" onclick="createStudent()">Oluştur</button><button class="btn ghost" onclick="closeModal()">Vazgeç</button></div>`);
 }
 async function createStudent(){
   const name=val('ns_name'), email=val('ns_email');
@@ -273,7 +273,7 @@ async function createStudent(){
       id = row.id;
     }
     closeModal(); location.hash = '#/student/' + id;
-  }, 'Ogrenci olusturuldu');
+  }, 'Öğrenci oluşturuldu');
 }
 
 // ---------------------------------------------------------------------------
@@ -289,39 +289,39 @@ async function viewStudent(id){
     const paid = (c.tuition_payments||[]).reduce((a,p)=>a+Number(p.amount),0);
     const done = c.tuition_lessons.filter(l=>['attended','late'].includes(l.attendance)).length;
     return `<tr class="click" onclick="location.hash='#/course/${c.id}'">
-      <td><b>${esc(c.title)}</b><div class="small muted">${c.total_lessons} ders / ${c.duration_weeks} hafta${c.start_date?' - baslangic '+fmtD(c.start_date):''}</div></td>
+      <td><b>${esc(c.title)}</b><div class="small muted">${c.total_lessons} ders / ${c.duration_weeks} hafta${c.start_date?' - başlangıç '+fmtD(c.start_date):''}</div></td>
       <td>${esc(tutorName(c.tutor_id))}</td><td style="min-width:140px">${done}/${c.total_lessons} ders${attendanceBar(c.tuition_lessons)}</td>
-      <td>${paid>=total ? '<span class="badge b-green">Odendi</span>' : paid>0 ? `<span class="badge b-gold">Kismi ${money(paid)}</span>` : '<span class="badge b-red">Odenmedi</span>'}<div class="small muted">${money(total,c.currency)}</div></td>
+      <td>${paid>=total ? '<span class="badge b-green">Ödendi</span>' : paid>0 ? `<span class="badge b-gold">Kısmi ${money(paid)}</span>` : '<span class="badge b-red">Ödenmedi</span>'}<div class="small muted">${money(total,c.currency)}</div></td>
       <td>${badge(COURSE_STATUS,c.status)}</td></tr>`;
   };
   $('view').innerHTML = `
-    <span class="back" onclick="location.hash='#/students'">&larr; Ogrenciler</span>
+    <span class="back" onclick="location.hash='#/students'">&larr; Öğrenciler</span>
     <div class="card">
       <div class="row between" style="margin-bottom:14px"><h3 style="margin:0">${esc(s.full_name)} ${badge(STUDENT_STATUS,s.status)}</h3>
-        <span class="small muted">${s.user_id?'✅ Uygulama hesabina bagli':'Uygulama hesabi bagli degil'} - Kaynak: ${esc(s.source)}</span></div>
+        <span class="small muted">${s.user_id?'✅ Uygulama hesabına bağlı':'Uygulama hesabı bağlı değil'} - Kaynak: ${esc(s.source)}</span></div>
       <div class="grid">
         <div class="fg"><label>Ad soyad</label><input class="form-inp" id="sp_full_name" value="${esc(s.full_name)}"></div>
         <div class="fg"><label>E-posta</label><input class="form-inp" id="sp_email" value="${esc(s.email||'')}"></div>
         <div class="fg"><label>Telefon</label><input class="form-inp" id="sp_phone" value="${esc(s.phone||'')}"></div>
-        <div class="fg"><label>Yas</label><input class="form-inp" id="sp_age" type="number" min="5" max="100" value="${s.age??''}"></div>
+        <div class="fg"><label>Yaş</label><input class="form-inp" id="sp_age" type="number" min="5" max="100" value="${s.age??''}"></div>
         <div class="fg"><label>Meslek</label><input class="form-inp" id="sp_occupation" value="${esc(s.occupation||'')}"></div>
         <div class="fg"><label>Bizi nereden duydu</label><select class="form-inp" id="sp_heard_from"><option value="">-</option>${opt(HEARD, s.heard_from)}</select></div>
         <div class="fg"><label>Nereden duydu (detay)</label><input class="form-inp" id="sp_heard_from_detail" value="${esc(s.heard_from_detail||'')}"></div>
         <div class="fg"><label>Ana dili</label><input class="form-inp" id="sp_native_lang" value="${esc(s.native_lang||'')}"></div>
-        <div class="fg"><label>Ulke</label><input class="form-inp" id="sp_country" value="${esc(s.country||'')}"></div>
+        <div class="fg"><label>Ülke</label><input class="form-inp" id="sp_country" value="${esc(s.country||'')}"></div>
         <div class="fg"><label>Saat dilimi</label><input class="form-inp" id="sp_timezone" placeholder="Europe/Istanbul" value="${esc(s.timezone||'')}"></div>
         <div class="fg"><label>Seviye</label><select class="form-inp" id="sp_level"><option value="">-</option>${LEVELS.map(l=>`<option ${l===s.level?'selected':''}>${l}</option>`).join('')}</select></div>
         <div class="fg"><label>Durum</label><select class="form-inp" id="sp_status">${opt(STUDENT_STATUS, s.status)}</select></div>
-        ${ME.is_admin?`<div class="fg"><label>Ogretmen</label><select class="form-inp" id="sp_tutor_id">${tutorOptions(s.tutor_id)}</select></div>`:''}
-        <div class="fg full"><label>Ogrenme hedefi</label><textarea class="form-inp" id="sp_goal" rows="2">${esc(s.goal||'')}</textarea></div>
-        <div class="fg full"><label>Ic notlar (ogrenci gormez)</label><textarea class="form-inp" id="sp_internal_notes" rows="2">${esc(s.internal_notes||'')}</textarea></div>
+        ${ME.is_admin?`<div class="fg"><label>Öğretmen</label><select class="form-inp" id="sp_tutor_id">${tutorOptions(s.tutor_id)}</select></div>`:''}
+        <div class="fg full"><label>Öğrenme hedefi</label><textarea class="form-inp" id="sp_goal" rows="2">${esc(s.goal||'')}</textarea></div>
+        <div class="fg full"><label>İç notlar (öğrenci görmez)</label><textarea class="form-inp" id="sp_internal_notes" rows="2">${esc(s.internal_notes||'')}</textarea></div>
       </div>
       <div class="row" style="margin-top:14px"><button class="btn" onclick="saveStudent('${s.id}')">Profili kaydet</button>
-        ${!s.user_id && s.email ? `<button class="btn ghost" onclick="linkStudentApp('${s.id}')">Uygulama hesabina bagla</button>`:''}</div>
+        ${!s.user_id && s.email ? `<button class="btn ghost" onclick="linkStudentApp('${s.id}')">Uygulama hesabına bağla</button>`:''}</div>
     </div>
     <div class="card">
       <div class="row between" style="margin-bottom:14px"><h3 style="margin:0">Kurlar</h3><button class="btn" onclick="newCourseModal('${s.id}','${s.tutor_id||''}','${s.level||''}')">+ Yeni kur</button></div>
-      ${courses.length ? `<div class="tbl-wrap"><table><thead><tr><th>Kur</th><th>Ogretmen</th><th>Ilerleme / katilim</th><th>Odeme</th><th>Durum</th></tr></thead><tbody>${courses.map(courseCard).join('')}</tbody></table></div>` : '<div class="empty">Henuz kur yok. "Yeni kur" ile 16 derslik paketi tanimlayin.</div>'}
+      ${courses.length ? `<div class="tbl-wrap"><table><thead><tr><th>Kur</th><th>Öğretmen</th><th>İlerleme / katılım</th><th>Ödeme</th><th>Durum</th></tr></thead><tbody>${courses.map(courseCard).join('')}</tbody></table></div>` : '<div class="empty">Henüz kur yok. "Yeni kur" ile 16 derslik paketi tanımlayın.</div>'}
     </div>`;
 }
 async function saveStudent(id){
@@ -329,7 +329,7 @@ async function saveStudent(id){
   const row = {}; f.forEach(k=>row[k]=val('sp_'+k));
   row.age = val('sp_age') ? parseInt(val('sp_age')) : null;
   if (ME.is_admin) row.tutor_id = val('sp_tutor_id');
-  if (!row.full_name) { toast('Ad soyad bos olamaz', false); return; }
+  if (!row.full_name) { toast('Ad soyad boş olamaz', false); return; }
   if (!row.status) row.status = 'lead';
   await run(()=>q(db.from('tuition_students').update(row).eq('id', id)), 'Profil kaydedildi');
 }
@@ -337,45 +337,45 @@ async function linkStudentApp(id){
   const email = val('sp_email');
   await run(async()=>{
     const found = await q(db.rpc('tuition_student_from_email', { p_email: email, p_tutor_id: ME.is_admin ? val('sp_tutor_id') : ME.tutor_id }));
-    if (!found) throw new Error('Bu e-postayla bir uygulama hesabi bulunamadi');
-    if (found !== id) { toast('Bu hesap icin zaten ayri bir profil var, o aciliyor', true); location.hash='#/student/'+found; return; }
+    if (!found) throw new Error('Bu e-postayla bir uygulama hesabı bulunamadı');
+    if (found !== id) { toast('Bu hesap için zaten ayrı bir profil var, o açılıyor', true); location.hash='#/student/'+found; return; }
     route();
   });
 }
 
 function newCourseModal(studentId, tutorId, level){
   const today = new Date().toISOString().slice(0,10);
-  openModal(`<h3>Yeni kur (ogrenim paketi)</h3>
+  openModal(`<h3>Yeni kur (öğrenim paketi)</h3>
     <div class="grid">
-      <div class="fg full"><label>Kur adi</label><input class="form-inp" id="nc_title" value="Turkce Birebir Kur${level?' - '+level:''}"></div>
+      <div class="fg full"><label>Kur adı</label><input class="form-inp" id="nc_title" value="Türkçe Birebir Kur${level?' - '+level:''}"></div>
       <div class="fg"><label>Seviye</label><select class="form-inp" id="nc_level"><option value="">-</option>${LEVELS.map(l=>`<option ${l===level?'selected':''}>${l}</option>`).join('')}</select></div>
-      ${ME.is_admin?`<div class="fg"><label>Ogretmen *</label><select class="form-inp" id="nc_tutor">${tutorOptions(tutorId||null)}</select></div>`:''}
-      <div class="fg"><label>Ders sayisi</label><input class="form-inp" id="nc_total" type="number" value="16" oninput="ncTotal()"></div>
-      <div class="fg"><label>Sure (hafta)</label><input class="form-inp" id="nc_weeks" type="number" value="8"></div>
-      <div class="fg"><label>Ders suresi (dk)</label><input class="form-inp" id="nc_minutes" type="number" value="50"></div>
-      <div class="fg"><label>Ders ucreti (USD)</label><input class="form-inp" id="nc_price" type="number" step="0.5" value="10" oninput="ncTotal()"></div>
-      <div class="fg"><label>Baslangic tarihi</label><input class="form-inp" id="nc_start" type="date" value="${today}"></div>
+      ${ME.is_admin?`<div class="fg"><label>Öğretmen *</label><select class="form-inp" id="nc_tutor">${tutorOptions(tutorId||null)}</select></div>`:''}
+      <div class="fg"><label>Ders sayısı</label><input class="form-inp" id="nc_total" type="number" value="16" oninput="ncTotal()"></div>
+      <div class="fg"><label>Süre (hafta)</label><input class="form-inp" id="nc_weeks" type="number" value="8"></div>
+      <div class="fg"><label>Ders süresi (dk)</label><input class="form-inp" id="nc_minutes" type="number" value="50"></div>
+      <div class="fg"><label>Ders ücreti (USD)</label><input class="form-inp" id="nc_price" type="number" step="0.5" value="10" oninput="ncTotal()"></div>
+      <div class="fg"><label>Başlangıç tarihi</label><input class="form-inp" id="nc_start" type="date" value="${today}"></div>
       <div class="fg"><label>Toplam</label><div id="nc_sum" style="font-size:20px;font-weight:900;padding-top:6px">$160</div></div>
     </div>
-    <p class="muted small" style="margin-top:10px">Kur olusunca ${'<b>'}ders satirlari otomatik acilir${'</b>'}. Tarihleri kur ekranindaki "Otomatik planla" ile doldurabilirsiniz.</p>
-    <div class="row" style="margin-top:16px"><button class="btn" onclick="createCourse('${studentId}')">Kuru olustur</button><button class="btn ghost" onclick="closeModal()">Vazgec</button></div>`);
+    <p class="muted small" style="margin-top:10px">Kur olusunca ${'<b>'}ders satırları otomatik açılır${'</b>'}. Tarihleri kur ekranındaki "Otomatik planla" ile doldurabilirsiniz.</p>
+    <div class="row" style="margin-top:16px"><button class="btn" onclick="createCourse('${studentId}')">Kuru oluştur</button><button class="btn ghost" onclick="closeModal()">Vazgeç</button></div>`);
 }
 function ncTotal(){ const t=(parseFloat($('nc_total').value)||0)*(parseFloat($('nc_price').value)||0); $('nc_sum').textContent = money(t); }
 async function createCourse(studentId){
   const tutor = ME.is_admin ? val('nc_tutor') : ME.tutor_id;
-  if (!tutor) { toast('Ogretmen secin', false); return; }
-  const row = { student_id: studentId, tutor_id: tutor, title: val('nc_title') || 'Turkce Birebir Kur', level: val('nc_level'),
+  if (!tutor) { toast('Öğretmen seçin', false); return; }
+  const row = { student_id: studentId, tutor_id: tutor, title: val('nc_title') || 'Türkçe Birebir Kur', level: val('nc_level'),
     total_lessons: parseInt(val('nc_total'))||16, duration_weeks: parseInt(val('nc_weeks'))||8, lesson_minutes: parseInt(val('nc_minutes'))||50,
     price_per_lesson: parseFloat(val('nc_price'))||0, start_date: val('nc_start'), status:'planned' };
   await run(async()=>{
     const c = await q(db.from('tuition_courses').insert(row).select('id').single());
     await q(db.from('tuition_students').update({ status:'active' }).eq('id', studentId).eq('status','lead'));
     closeModal(); location.hash='#/course/'+c.id;
-  }, 'Kur olusturuldu');
+  }, 'Kur oluşturuldu');
 }
 
 // ---------------------------------------------------------------------------
-// KUR DETAY: ders plani + katilim + gozlem + odev + odeme
+// KUR DETAY: ders planı + katılım + gözlem + ödev + ödeme
 // ---------------------------------------------------------------------------
 let CUR = null;
 async function viewCourse(id){
@@ -399,47 +399,47 @@ async function viewCourse(id){
     <div class="card">
       <div class="row between"><h3 style="margin:0">${esc(c.title)} ${badge(COURSE_STATUS,c.status)}</h3>
         <div class="row"><select class="form-inp" style="width:auto" onchange="setCourseStatus(this.value)">${opt(COURSE_STATUS,c.status)}</select></div></div>
-      <p class="muted small" style="margin-top:6px">${esc(c.tuition_students.full_name)} - Ogretmen: ${esc(tutorName(c.tutor_id))} - ${c.total_lessons} ders / ${c.duration_weeks} hafta / ${c.lesson_minutes} dk - ${c.level||''}</p>
+      <p class="muted small" style="margin-top:6px">${esc(c.tuition_students.full_name)} - Öğretmen: ${esc(tutorName(c.tutor_id))} - ${c.total_lessons} ders / ${c.duration_weeks} hafta / ${c.lesson_minutes} dk - ${c.level||''}</p>
     </div>
     <div class="stats">
-      <div class="stat"><div class="num" style="color:var(--green)">${cnt('attended')+cnt('late')}</div><div class="lbl">Katildi (${cnt('late')} gec)</div></div>
+      <div class="stat"><div class="num" style="color:var(--green)">${cnt('attended')+cnt('late')}</div><div class="lbl">Katıldı (${cnt('late')} geç)</div></div>
       <div class="stat"><div class="num" style="color:#FF6B6B">${cnt('absent')}</div><div class="lbl">Gelmedi</div></div>
-      <div class="stat"><div class="num" style="color:var(--blue)">${cnt('excused')}</div><div class="lbl">Izinli</div></div>
+      <div class="stat"><div class="num" style="color:var(--blue)">${cnt('excused')}</div><div class="lbl">İzinli</div></div>
       <div class="stat"><div class="num">${cnt('scheduled')}</div><div class="lbl">Kalan ders</div></div>
-      <div class="stat"><div class="num">${hwSubmitted}/${hw.length}</div><div class="lbl">Odev teslim</div></div>
-      <div class="stat"><div class="num" style="color:${paid>=total?'var(--green)':'var(--gold)'}">${money(paid)}</div><div class="lbl">Odenen / ${money(total)}</div></div>
+      <div class="stat"><div class="num">${hwSubmitted}/${hw.length}</div><div class="lbl">Ödev teslim</div></div>
+      <div class="stat"><div class="num" style="color:${paid>=total?'var(--green)':'var(--gold)'}">${money(paid)}</div><div class="lbl">Ödenen / ${money(total)}</div></div>
     </div>
 
     <div class="card">
-      <div class="row between" style="margin-bottom:12px"><h3 style="margin:0">📚 Ders plani ve katilim</h3>
+      <div class="row between" style="margin-bottom:12px"><h3 style="margin:0">📚 Ders planı ve katılım</h3>
         <div class="row"><button class="btn ghost sm" onclick="autoPlanModal()">Otomatik planla</button>${tutor&&(tutor.meet_link)?`<button class="btn ghost sm" onclick="fillMeet()">Meet linkini doldur</button>`:''}</div></div>
-      <div class="tbl-wrap"><table><thead><tr><th>#</th><th>Tarih / saat</th><th>Konu</th><th>Katilim</th><th>Gozlem</th><th>Meet</th><th></th></tr></thead><tbody>
+      <div class="tbl-wrap"><table><thead><tr><th>#</th><th>Tarih / saat</th><th>Konu</th><th>Katılım</th><th>Gözlem</th><th>Meet</th><th></th></tr></thead><tbody>
       ${lessons.map(l=>`<tr>
         <td><b>${l.lesson_no}</b></td>
         <td><input class="form-inp" type="datetime-local" style="min-width:190px" value="${toLocalInput(l.scheduled_at)}" onchange="updLesson('${l.id}',{scheduled_at:fromLocalInput(this.value)})"></td>
         <td><input class="form-inp" style="min-width:180px" value="${esc(l.topic||'')}" placeholder="Ders konusu" onchange="updLesson('${l.id}',{topic:this.value.trim()||null})"></td>
         <td><select class="form-inp" style="min-width:130px" onchange="setAttendance('${l.id}',this.value)">${opt(ATT,l.attendance)}</select></td>
-        <td>${obsBy[l.id] ? `<button class="btn sm" style="background:rgba(0,200,83,0.2);color:var(--green)" onclick="obsModal('${l.id}')">Girildi</button>` : `<button class="btn ghost sm" onclick="obsModal('${l.id}')">+ Gozlem</button>`}</td>
-        <td>${l.meet_link?`<a href="${esc(l.meet_link)}" target="_blank" rel="noopener">Ac</a>`:'<span class="muted">-</span>'}</td>
+        <td>${obsBy[l.id] ? `<button class="btn sm" style="background:rgba(0,200,83,0.2);color:var(--green)" onclick="obsModal('${l.id}')">Girildi</button>` : `<button class="btn ghost sm" onclick="obsModal('${l.id}')">+ Gözlem</button>`}</td>
+        <td>${l.meet_link?`<a href="${esc(l.meet_link)}" target="_blank" rel="noopener">Aç</a>`:'<span class="muted">-</span>'}</td>
         <td><button class="btn ghost sm" onclick="lessonModal('${l.id}')">Detay</button></td></tr>`).join('')}
       </tbody></table></div>
-      <p class="muted small" style="margin-top:8px">Saatler tarayicinizin saat diliminde${c.tuition_students.timezone?' (ogrenci: '+esc(c.tuition_students.timezone)+')':''}. Katilim secildigi anda kaydedilir.</p>
+      <p class="muted small" style="margin-top:8px">Saatler tarayıcınızın saat diliminde${c.tuition_students.timezone?' (öğrenci: '+esc(c.tuition_students.timezone)+')':''}. Katılım seçildiği anda kaydedilir.</p>
     </div>
 
     <div class="card">
-      <div class="row between" style="margin-bottom:12px"><h3 style="margin:0">📝 Odevler</h3><button class="btn sm" onclick="hwModal()">+ Odev ver</button></div>
-      ${hw.length ? `<div class="tbl-wrap"><table><thead><tr><th>Odev</th><th>Ders</th><th>Son tarih</th><th>Durum</th><th>Puan</th><th></th></tr></thead><tbody>
+      <div class="row between" style="margin-bottom:12px"><h3 style="margin:0">📝 Ödevler</h3><button class="btn sm" onclick="hwModal()">+ Ödev ver</button></div>
+      ${hw.length ? `<div class="tbl-wrap"><table><thead><tr><th>Ödev</th><th>Ders</th><th>Son tarih</th><th>Durum</th><th>Puan</th><th></th></tr></thead><tbody>
         ${hw.map(h=>{ const l=lessons.find(x=>x.id===h.lesson_id); return `<tr><td><b>${esc(h.title)}</b></td><td>${l?'Ders '+l.lesson_no:'-'}</td><td>${fmtDT(h.due_at)}</td><td>${badge(HW,h.status)}</td><td>${h.score??'-'}</td>
-          <td><button class="btn ghost sm" onclick="hwModal('${h.id}')">${h.status==='submitted'?'Degerlendir':'Duzenle'}</button></td></tr>`; }).join('')}
-      </tbody></table></div>` : '<div class="empty">Henuz odev yok</div>'}
+          <td><button class="btn ghost sm" onclick="hwModal('${h.id}')">${h.status==='submitted'?'Değerlendir':'Düzenle'}</button></td></tr>`; }).join('')}
+      </tbody></table></div>` : '<div class="empty">Henüz ödev yok</div>'}
     </div>
 
     <div class="card">
-      <div class="row between" style="margin-bottom:12px"><h3 style="margin:0">💵 Odeme (ogrenci gormez)</h3><button class="btn sm" onclick="payModal()">+ Odeme gir</button></div>
-      <p class="small" style="margin-bottom:10px">Toplam: <b>${money(total,c.currency)}</b> (${c.total_lessons} x ${money(c.price_per_lesson,c.currency)}) - Odenen: <b>${money(paid,c.currency)}</b> - Kalan: <b style="color:${total-paid>0?'var(--gold)':'var(--green)'}">${money(Math.max(total-paid,0),c.currency)}</b></p>
-      ${pays.length ? `<div class="tbl-wrap"><table><thead><tr><th>Tarih</th><th>Tutar</th><th>Yontem</th><th>Not</th>${ME.is_admin?'<th></th>':''}</tr></thead><tbody>
+      <div class="row between" style="margin-bottom:12px"><h3 style="margin:0">💵 Ödeme (öğrenci görmez)</h3><button class="btn sm" onclick="payModal()">+ Ödeme gir</button></div>
+      <p class="small" style="margin-bottom:10px">Toplam: <b>${money(total,c.currency)}</b> (${c.total_lessons} x ${money(c.price_per_lesson,c.currency)}) - Ödenen: <b>${money(paid,c.currency)}</b> - Kalan: <b style="color:${total-paid>0?'var(--gold)':'var(--green)'}">${money(Math.max(total-paid,0),c.currency)}</b></p>
+      ${pays.length ? `<div class="tbl-wrap"><table><thead><tr><th>Tarih</th><th>Tutar</th><th>Yöntem</th><th>Not</th>${ME.is_admin?'<th></th>':''}</tr></thead><tbody>
         ${pays.map(p=>`<tr><td>${fmtD(p.paid_on)}</td><td><b>${money(p.amount,p.currency)}</b></td><td>${esc(p.method||'-')}</td><td>${esc(p.note||'')}</td>${ME.is_admin?`<td><button class="btn ghost sm" onclick="delPay('${p.id}')">Sil</button></td>`:''}</tr>`).join('')}
-      </tbody></table></div>` : '<div class="muted small">Henuz odeme girilmedi</div>'}
+      </tbody></table></div>` : '<div class="muted small">Henüz ödeme girilmedi</div>'}
     </div>`;
 }
 async function updLesson(id, patch){ await run(()=>q(db.from('tuition_lessons').update(patch).eq('id', id)), 'Kaydedildi'); }
@@ -449,7 +449,7 @@ async function setAttendance(id, v){
   if (['attended','late'].includes(v) && !CUR.obs.find(o=>o.lesson_id===id)) { await viewCourse(CUR.c.id); obsModal(id); return; }
   viewCourse(CUR.c.id);
 }
-async function setCourseStatus(v){ await run(()=>q(db.from('tuition_courses').update({status:v}).eq('id', CUR.c.id)), 'Kur durumu guncellendi'); viewCourse(CUR.c.id); }
+async function setCourseStatus(v){ await run(()=>q(db.from('tuition_courses').update({status:v}).eq('id', CUR.c.id)), 'Kur durumu güncellendi'); viewCourse(CUR.c.id); }
 async function fillMeet(){
   const tutor = TUTORS.find(t=>t.id===CUR.c.tutor_id);
   const targets = CUR.lessons.filter(l=>!l.meet_link && l.attendance==='scheduled');
@@ -462,20 +462,20 @@ function autoPlanModal(){
   const c = CUR.c;
   const perWeek = Math.max(1, Math.round(c.total_lessons / c.duration_weeks));
   openModal(`<h3>Otomatik planla</h3>
-    <p class="muted small" style="margin-bottom:12px">Tarihi bos olan planli dersleri, secilen gunlere ve saate gore sirayla doldurur. Tarihi girilmis derslere dokunmaz. (${c.total_lessons} ders / ${c.duration_weeks} hafta = haftada ${perWeek} ders)</p>
-    <div class="fg" style="margin-bottom:12px"><label>Gunler</label><div class="days">${WEEKDAYS.map(([d,l])=>`<label><input type="checkbox" class="ap_day" value="${d}" ${(perWeek>=2?[2,4]:[3]).includes(d)?'checked':''}> ${l}</label>`).join('')}</div></div>
+    <p class="muted small" style="margin-bottom:12px">Tarihi boş olan planlı dersleri, seçilen günlere ve saate göre sırayla doldurur. Tarihi girilmiş derslere dokunmaz. (${c.total_lessons} ders / ${c.duration_weeks} hafta = haftada ${perWeek} ders)</p>
+    <div class="fg" style="margin-bottom:12px"><label>Günler</label><div class="days">${WEEKDAYS.map(([d,l])=>`<label><input type="checkbox" class="ap_day" value="${d}" ${(perWeek>=2?[2,4]:[3]).includes(d)?'checked':''}> ${l}</label>`).join('')}</div></div>
     <div class="grid">
-      <div class="fg"><label>Baslangic</label><input class="form-inp" type="date" id="ap_start" value="${c.start_date || new Date().toISOString().slice(0,10)}"></div>
+      <div class="fg"><label>Başlangıç</label><input class="form-inp" type="date" id="ap_start" value="${c.start_date || new Date().toISOString().slice(0,10)}"></div>
       <div class="fg"><label>Saat</label><input class="form-inp" type="time" id="ap_time" value="18:00"></div>
     </div>
-    <div class="row" style="margin-top:16px"><button class="btn" onclick="autoPlan()">Planla</button><button class="btn ghost" onclick="closeModal()">Vazgec</button></div>`);
+    <div class="row" style="margin-top:16px"><button class="btn" onclick="autoPlan()">Planla</button><button class="btn ghost" onclick="closeModal()">Vazgeç</button></div>`);
 }
 async function autoPlan(){
   const days = [...document.querySelectorAll('.ap_day:checked')].map(e=>parseInt(e.value));
   const start = val('ap_start'), time = val('ap_time');
-  if (!days.length || !start || !time) { toast('Gun, baslangic ve saat secin', false); return; }
+  if (!days.length || !start || !time) { toast('Gun, başlangıç ve saat seçin', false); return; }
   const todo = CUR.lessons.filter(l=>!l.scheduled_at && l.attendance==='scheduled');
-  if (!todo.length) { toast('Tarihi bos ders yok'); closeModal(); return; }
+  if (!todo.length) { toast('Tarihi boş ders yok'); closeModal(); return; }
   const [hh, mm] = time.split(':').map(Number);
   const d = new Date(start + 'T00:00:00');
   const updates = [];
@@ -487,7 +487,7 @@ async function autoPlan(){
   await run(async()=>{
     await Promise.all(todo.map((l,i)=>q(db.from('tuition_lessons').update({ scheduled_at: updates[i] }).eq('id', l.id))));
     if (!CUR.c.start_date) await q(db.from('tuition_courses').update({ start_date: start }).eq('id', CUR.c.id));
-  }, todo.length+' ders planlandi');
+  }, todo.length+' ders planlandı');
   closeModal(); viewCourse(CUR.c.id);
 }
 
@@ -496,14 +496,14 @@ function lessonModal(id){
   openModal(`<h3>Ders ${l.lesson_no}</h3>
     <div class="grid">
       <div class="fg full"><label>Konu</label><input class="form-inp" id="lm_topic" value="${esc(l.topic||'')}"></div>
-      <div class="fg full"><label>Hedefler / ders plani</label><textarea class="form-inp" id="lm_objectives" rows="4">${esc(l.objectives||'')}</textarea></div>
+      <div class="fg full"><label>Hedefler / ders planı</label><textarea class="form-inp" id="lm_objectives" rows="4">${esc(l.objectives||'')}</textarea></div>
       <div class="fg"><label>Tarih / saat</label><input class="form-inp" type="datetime-local" id="lm_at" value="${toLocalInput(l.scheduled_at)}"></div>
-      <div class="fg"><label>Sure (dk)</label><input class="form-inp" type="number" id="lm_dur" value="${l.duration_min}"></div>
+      <div class="fg"><label>Süre (dk)</label><input class="form-inp" type="number" id="lm_dur" value="${l.duration_min}"></div>
       <div class="fg full"><label>Meet linki</label><input class="form-inp" id="lm_meet" placeholder="https://meet.google.com/..." value="${esc(l.meet_link||'')}"></div>
-      <div class="fg"><label>Katilim</label><select class="form-inp" id="lm_att">${opt(ATT,l.attendance)}</select></div>
-      <div class="fg full"><label>Katilim notu</label><input class="form-inp" id="lm_attnote" value="${esc(l.attendance_note||'')}" placeholder="Orn: 15 dk gec baglandi / hasta"></div>
+      <div class="fg"><label>Katılım</label><select class="form-inp" id="lm_att">${opt(ATT,l.attendance)}</select></div>
+      <div class="fg full"><label>Katılım notu</label><input class="form-inp" id="lm_attnote" value="${esc(l.attendance_note||'')}" placeholder="Örn: 15 dk geç bağlandı / hasta"></div>
     </div>
-    <div class="row" style="margin-top:16px"><button class="btn" onclick="saveLesson('${l.id}')">Kaydet</button><button class="btn ghost" onclick="closeModal()">Vazgec</button></div>`);
+    <div class="row" style="margin-top:16px"><button class="btn" onclick="saveLesson('${l.id}')">Kaydet</button><button class="btn ghost" onclick="closeModal()">Vazgeç</button></div>`);
 }
 async function saveLesson(id){
   const l = CUR.lessons.find(x=>x.id===id);
@@ -520,47 +520,47 @@ function obsModal(lessonId){
   const l = CUR.lessons.find(x=>x.id===lessonId);
   const o = CUR.obs.find(x=>x.lesson_id===lessonId) || {};
   const scoreSel = (k) => `<select class="form-inp" id="ob_${k}"><option value="">-</option>${[1,2,3,4,5].map(n=>`<option ${o[k]===n?'selected':''}>${n}</option>`).join('')}</select>`;
-  openModal(`<h3>Ogretmen gozlemi - Ders ${l.lesson_no}${l.topic?': '+esc(l.topic):''}</h3>
-    <p class="muted small" style="margin-bottom:12px">1 = cok zayif, 5 = cok iyi. Puanlar ve ilk uc metin alani ogrencinin gelisim raporunda gorunur; "ozel not" sadece ogretmen/yonetici ve AI degerlendirmesi icindir.</p>
+  openModal(`<h3>Öğretmen gözlemi - Ders ${l.lesson_no}${l.topic?': '+esc(l.topic):''}</h3>
+    <p class="muted small" style="margin-bottom:12px">1 = çok zayıf, 5 = çok iyi. Puanlar ve ilk üç metin alanı öğrencinin gelişim raporunda görünür; "özel not" sadece öğretmen/yönetici ve AI değerlendirmesi içindir.</p>
     <div class="scores">${SKILLS.map(([k,lbl])=>`<div class="fg"><label>${lbl}</label>${scoreSel(k)}</div>`).join('')}</div>
     <div class="grid" style="margin-top:12px">
-      <div class="fg full"><label>Derste islenenler</label><textarea class="form-inp" id="ob_covered" rows="2">${esc(o.covered||'')}</textarea></div>
-      <div class="fg full"><label>Guclu yonler</label><textarea class="form-inp" id="ob_strengths" rows="2">${esc(o.strengths||'')}</textarea></div>
-      <div class="fg full"><label>Gelistirilmesi gerekenler</label><textarea class="form-inp" id="ob_improvements" rows="2">${esc(o.improvements||'')}</textarea></div>
-      <div class="fg full"><label>Ozel not (ogrenci gormez)</label><textarea class="form-inp" id="ob_private_notes" rows="2">${esc(o.private_notes||'')}</textarea></div>
+      <div class="fg full"><label>Derste işlenenler</label><textarea class="form-inp" id="ob_covered" rows="2">${esc(o.covered||'')}</textarea></div>
+      <div class="fg full"><label>Güçlü yönler</label><textarea class="form-inp" id="ob_strengths" rows="2">${esc(o.strengths||'')}</textarea></div>
+      <div class="fg full"><label>Geliştirilmesi gerekenler</label><textarea class="form-inp" id="ob_improvements" rows="2">${esc(o.improvements||'')}</textarea></div>
+      <div class="fg full"><label>Özel not (öğrenci görmez)</label><textarea class="form-inp" id="ob_private_notes" rows="2">${esc(o.private_notes||'')}</textarea></div>
     </div>
-    <div class="row" style="margin-top:16px"><button class="btn" onclick="saveObs('${lessonId}')">Gozlemi kaydet</button><button class="btn ghost" onclick="closeModal()">Vazgec</button></div>`);
+    <div class="row" style="margin-top:16px"><button class="btn" onclick="saveObs('${lessonId}')">Gözlemi kaydet</button><button class="btn ghost" onclick="closeModal()">Vazgeç</button></div>`);
 }
 async function saveObs(lessonId){
   const row = { lesson_id: lessonId, tutor_id: CUR.c.tutor_id };
   SKILLS.forEach(([k])=>{ const v=val('ob_'+k); row[k]= v?parseInt(v):null; });
   ['covered','strengths','improvements','private_notes'].forEach(k=>row[k]=val('ob_'+k));
   if (SKILLS.every(([k])=>row[k]==null) && !row.covered && !row.strengths && !row.improvements) { toast('En az bir puan ya da not girin', false); return; }
-  await run(()=>q(db.from('tuition_observations').upsert(row, { onConflict:'lesson_id' })), 'Gozlem kaydedildi');
+  await run(()=>q(db.from('tuition_observations').upsert(row, { onConflict:'lesson_id' })), 'Gözlem kaydedildi');
   closeModal(); viewCourse(CUR.c.id);
 }
 
 function hwModal(id){
   const h = id ? CUR.hw.find(x=>x.id===id) : {};
   const due = h.due_at ? toLocalInput(h.due_at) : '';
-  openModal(`<h3>${id?'Odev':'Yeni odev'}</h3>
+  openModal(`<h3>${id?'Ödev':'Yeni ödev'}</h3>
     <div class="grid">
-      <div class="fg full"><label>Baslik *</label><input class="form-inp" id="hw_title" value="${esc(h.title||'')}"></div>
-      <div class="fg"><label>Ilgili ders</label><select class="form-inp" id="hw_lesson"><option value="">-</option>${CUR.lessons.map(l=>`<option value="${l.id}" ${l.id===h.lesson_id?'selected':''}>Ders ${l.lesson_no}${l.topic?' - '+esc(l.topic):''}</option>`).join('')}</select></div>
+      <div class="fg full"><label>Başlık *</label><input class="form-inp" id="hw_title" value="${esc(h.title||'')}"></div>
+      <div class="fg"><label>İlgili ders</label><select class="form-inp" id="hw_lesson"><option value="">-</option>${CUR.lessons.map(l=>`<option value="${l.id}" ${l.id===h.lesson_id?'selected':''}>Ders ${l.lesson_no}${l.topic?' - '+esc(l.topic):''}</option>`).join('')}</select></div>
       <div class="fg"><label>Son teslim</label><input class="form-inp" type="datetime-local" id="hw_due" value="${due}"></div>
-      <div class="fg full"><label>Yonerge</label><textarea class="form-inp" id="hw_instructions" rows="4">${esc(h.instructions||'')}</textarea></div>
+      <div class="fg full"><label>Yönerge</label><textarea class="form-inp" id="hw_instructions" rows="4">${esc(h.instructions||'')}</textarea></div>
       ${id ? `
-      <div class="fg full"><label>Ogrencinin teslimi ${h.submitted_at?'('+fmtDT(h.submitted_at)+')':''}</label><div class="card" style="margin:0;white-space:pre-wrap">${h.submission_text?esc(h.submission_text):'<span class="muted">Henuz teslim yok</span>'}</div></div>
+      <div class="fg full"><label>Öğrencinin teslimi ${h.submitted_at?'('+fmtDT(h.submitted_at)+')':''}</label><div class="card" style="margin:0;white-space:pre-wrap">${h.submission_text?esc(h.submission_text):'<span class="muted">Henüz teslim yok</span>'}</div></div>
       <div class="fg"><label>Durum</label><select class="form-inp" id="hw_status">${opt(HW,h.status)}</select></div>
       <div class="fg"><label>Puan (0-100)</label><input class="form-inp" type="number" min="0" max="100" id="hw_score" value="${h.score??''}"></div>
-      <div class="fg full"><label>Geri bildirim (ogrenci gorur)</label><textarea class="form-inp" id="hw_feedback" rows="3">${esc(h.feedback||'')}</textarea></div>` : ''}
+      <div class="fg full"><label>Geri bildirim (öğrenci görür)</label><textarea class="form-inp" id="hw_feedback" rows="3">${esc(h.feedback||'')}</textarea></div>` : ''}
     </div>
-    <div class="row" style="margin-top:16px"><button class="btn" onclick="saveHw(${id?`'${id}'`:'null'})">${id?'Kaydet':'Odevi ver'}</button><button class="btn ghost" onclick="closeModal()">Vazgec</button>
+    <div class="row" style="margin-top:16px"><button class="btn" onclick="saveHw(${id?`'${id}'`:'null'})">${id?'Kaydet':'Ödevi ver'}</button><button class="btn ghost" onclick="closeModal()">Vazgeç</button>
       ${id&&ME.is_admin?`<button class="btn ghost" style="margin-inline-start:auto" onclick="delHw('${id}')">Sil</button>`:''}</div>`);
 }
 async function saveHw(id){
   const title = val('hw_title');
-  if (!title) { toast('Baslik gerekli', false); return; }
+  if (!title) { toast('Başlık gerekli', false); return; }
   const row = { title, lesson_id: val('hw_lesson'), due_at: fromLocalInput(val('hw_due')), instructions: val('hw_instructions') };
   if (id) {
     const prev = CUR.hw.find(x=>x.id===id);
@@ -568,33 +568,33 @@ async function saveHw(id){
     row.score = val('hw_score')!=null ? Math.max(0, Math.min(100, parseInt(val('hw_score')))) : null;
     if ((row.score!=null || row.feedback) && row.status==='submitted') row.status = 'reviewed';
     if (row.status==='reviewed' && prev.status!=='reviewed') row.reviewed_at = new Date().toISOString();
-    await run(()=>q(db.from('tuition_homework').update(row).eq('id', id)), 'Odev kaydedildi');
+    await run(()=>q(db.from('tuition_homework').update(row).eq('id', id)), 'Ödev kaydedildi');
   } else {
     row.course_id = CUR.c.id;
-    await run(()=>q(db.from('tuition_homework').insert(row)), 'Odev verildi');
+    await run(()=>q(db.from('tuition_homework').insert(row)), 'Ödev verildi');
   }
   closeModal(); viewCourse(CUR.c.id);
 }
-async function delHw(id){ if(!confirm('Odev silinsin mi?')) return; await run(()=>q(db.from('tuition_homework').delete().eq('id', id)), 'Silindi'); closeModal(); viewCourse(CUR.c.id); }
+async function delHw(id){ if(!confirm('Ödev silinsin mi?')) return; await run(()=>q(db.from('tuition_homework').delete().eq('id', id)), 'Silindi'); closeModal(); viewCourse(CUR.c.id); }
 
 function payModal(){
-  openModal(`<h3>Odeme gir</h3>
+  openModal(`<h3>Ödeme gir</h3>
     <div class="grid">
       <div class="fg"><label>Tutar *</label><input class="form-inp" type="number" step="0.01" id="py_amount" value="${Math.max(CUR.c.total_lessons*CUR.c.price_per_lesson - CUR.pays.reduce((a,p)=>a+Number(p.amount),0),0)}"></div>
       <div class="fg"><label>Para birimi</label><input class="form-inp" id="py_cur" value="${esc(CUR.c.currency)}"></div>
       <div class="fg"><label>Tarih</label><input class="form-inp" type="date" id="py_on" value="${new Date().toISOString().slice(0,10)}"></div>
-      <div class="fg"><label>Yontem</label><select class="form-inp" id="py_method"><option value="bank">Havale / EFT</option><option value="card">Kart</option><option value="cash">Nakit</option><option value="paypal">PayPal</option><option value="other">Diger</option></select></div>
+      <div class="fg"><label>Yöntem</label><select class="form-inp" id="py_method"><option value="bank">Havale / EFT</option><option value="card">Kart</option><option value="cash">Nakit</option><option value="paypal">PayPal</option><option value="other">Diğer</option></select></div>
       <div class="fg full"><label>Not</label><input class="form-inp" id="py_note"></div>
     </div>
-    <div class="row" style="margin-top:16px"><button class="btn" onclick="savePay()">Kaydet</button><button class="btn ghost" onclick="closeModal()">Vazgec</button></div>`);
+    <div class="row" style="margin-top:16px"><button class="btn" onclick="savePay()">Kaydet</button><button class="btn ghost" onclick="closeModal()">Vazgeç</button></div>`);
 }
 async function savePay(){
   const amount = parseFloat(val('py_amount'));
-  if (!(amount>0)) { toast('Tutar sifirdan buyuk olmali', false); return; }
-  await run(()=>q(db.from('tuition_payments').insert({ course_id: CUR.c.id, amount, currency: val('py_cur')||'USD', paid_on: val('py_on'), method: val('py_method'), note: val('py_note') })), 'Odeme kaydedildi');
+  if (!(amount>0)) { toast('Tutar sıfırdan büyük olmalı', false); return; }
+  await run(()=>q(db.from('tuition_payments').insert({ course_id: CUR.c.id, amount, currency: val('py_cur')||'USD', paid_on: val('py_on'), method: val('py_method'), note: val('py_note') })), 'Ödeme kaydedildi');
   closeModal(); viewCourse(CUR.c.id);
 }
-async function delPay(id){ if(!confirm('Odeme kaydi silinsin mi?')) return; await run(()=>q(db.from('tuition_payments').delete().eq('id', id)), 'Silindi'); viewCourse(CUR.c.id); }
+async function delPay(id){ if(!confirm('Ödeme kaydı silinsin mi?')) return; await run(()=>q(db.from('tuition_payments').delete().eq('id', id)), 'Silindi'); viewCourse(CUR.c.id); }
 
 // ---------------------------------------------------------------------------
 // TALEPLER (admin): uygulamadan gelen demo talepleri + rezervasyonlar
@@ -606,36 +606,36 @@ async function viewRequests(){
   ]);
   const byUser = Object.fromEntries(students.filter(s=>s.user_id).map(s=>[s.user_id,s]));
   $('view').innerHTML = `<div class="card"><h3>Uygulamadan gelen ders talepleri (${demos.length})</h3>
-    <p class="muted small" style="margin-bottom:12px">Talep geldiginde ogrenci profili otomatik acilir. Profili acip yas, meslek, nereden duydugunu tamamlayin ve kur tanimlayin.</p>
-    <div class="tbl-wrap"><table><thead><tr><th>Tarih</th><th>Ogrenci</th><th>Tercih</th><th>Mesaj</th><th>Durum</th><th></th></tr></thead><tbody>
+    <p class="muted small" style="margin-bottom:12px">Talep geldiğinde öğrenci profili otomatik açılır. Profili açıp yaş, meslek, nereden duyduğunu tamamlayın ve kur tanımlayın.</p>
+    <div class="tbl-wrap"><table><thead><tr><th>Tarih</th><th>Öğrenci</th><th>Tercih</th><th>Mesaj</th><th>Durum</th><th></th></tr></thead><tbody>
     ${demos.map(d=>{ const s=byUser[d.student_id]; return `<tr><td class="small">${fmtDT(d.created_at)}</td><td>${s?`<b>${esc(s.full_name)}</b><div class="small muted">${esc(s.email||'')}</div>`:'<span class="muted">-</span>'}</td>
       <td class="small">${d.preferred_date?fmtD(d.preferred_date):''} ${d.preferred_time?esc(String(d.preferred_time).slice(0,5)):''}</td><td class="small">${esc(d.message||'')}</td>
       <td><select class="form-inp" style="width:auto" onchange="setDemo('${d.id}',this.value)">${['pending','confirmed','completed','rejected'].map(x=>`<option ${x===d.status?'selected':''}>${x}</option>`).join('')}</select></td>
       <td>${s?`<button class="btn sm" onclick="location.hash='#/student/${s.id}'">Profil</button>`:''}</td></tr>`; }).join('') || '<tr><td colspan="6" class="empty">Talep yok</td></tr>'}
     </tbody></table></div></div>`;
 }
-async function setDemo(id, status){ await run(()=>q(db.from('demo_requests').update({status}).eq('id', id)), 'Talep guncellendi'); }
+async function setDemo(id, status){ await run(()=>q(db.from('demo_requests').update({status}).eq('id', id)), 'Talep güncellendi'); }
 
 // ---------------------------------------------------------------------------
-// OGRETMENLER (admin): giris hesabi bagla, aktif/pasif, Meet odasi
+// OGRETMENLER (admin): giriş hesabı bağla, aktif/pasif, Meet odasi
 // ---------------------------------------------------------------------------
 async function viewTutors(){
   await loadTutors();
-  $('view').innerHTML = `<div class="card"><h3>Ogretmenler</h3>
-    <p class="muted small" style="margin-bottom:12px">Ogretmenin bu panele girebilmesi icin: (1) aktif olmali, (2) bir giris hesabina (e-posta) bagli olmali. Hesap yoksa once Supabase Authentication'da kullanici olusturun.</p>
-    <div class="tbl-wrap"><table><thead><tr><th>Ad</th><th>Giris hesabi</th><th>Kalici Meet linki</th><th>Durum</th><th></th></tr></thead><tbody>
+  $('view').innerHTML = `<div class="card"><h3>Öğretmenler</h3>
+    <p class="muted small" style="margin-bottom:12px">Öğretmenin bu panele girebilmesi için: (1) aktif olmalı, (2) bir giriş hesabına (e-posta) bağlı olmalı. Hesap yoksa önce Supabase Authentication'da kullanıcı olusturun.</p>
+    <div class="tbl-wrap"><table><thead><tr><th>Ad</th><th>Giriş hesabı</th><th>Kalıcı Meet linki</th><th>Durum</th><th></th></tr></thead><tbody>
     ${TUTORS.map(t=>`<tr><td><b>${esc(t.full_name)}</b></td>
-      <td>${t.user_id?'<span class="badge b-green">Bagli</span>':'<span class="badge b-red">Bagli degil</span>'} <button class="btn ghost sm" onclick="linkTutor('${t.id}')">${t.user_id?'Degistir':'Bagla'}</button></td>
+      <td>${t.user_id?'<span class="badge b-green">Bağlı</span>':'<span class="badge b-red">Bağlı değil</span>'} <button class="btn ghost sm" onclick="linkTutor('${t.id}')">${t.user_id?'Değiştir':'Bağla'}</button></td>
       <td><input class="form-inp" style="min-width:240px" placeholder="https://meet.google.com/xxx-xxxx-xxx" value="${esc(t.meet_link||'')}" onchange="updTutor('${t.id}',{meet_link:this.value.trim()||null})"></td>
       <td>${t.is_active?'<span class="badge b-green">Aktif</span>':'<span class="badge b-grey">Pasif</span>'}</td>
-      <td><button class="btn ghost sm" onclick="updTutor('${t.id}',{is_active:${!t.is_active}},true)">${t.is_active?'Pasif yap':'Aktif yap'}</button></td></tr>`).join('') || '<tr><td colspan="5" class="empty">Ogretmen yok. Yeni ogretmeni /admin panelinden ekleyin.</td></tr>'}
+      <td><button class="btn ghost sm" onclick="updTutor('${t.id}',{is_active:${!t.is_active}},true)">${t.is_active?'Pasif yap':'Aktif yap'}</button></td></tr>`).join('') || '<tr><td colspan="5" class="empty">Öğretmen yok. Yeni öğretmeni /admin panelinden ekleyin.</td></tr>'}
     </tbody></table></div></div>`;
 }
-async function updTutor(id, patch, reload){ await run(()=>q(db.from('tutors').update(patch).eq('id', id)), 'Ogretmen guncellendi'); await loadTutors(); if (reload) viewTutors(); }
+async function updTutor(id, patch, reload){ await run(()=>q(db.from('tutors').update(patch).eq('id', id)), 'Öğretmen güncellendi'); await loadTutors(); if (reload) viewTutors(); }
 async function linkTutor(id){
-  const email = prompt('Ogretmenin giris e-postasi:');
+  const email = prompt('Öğretmenin giriş e-postası:');
   if (!email) return;
-  await run(()=>q(db.rpc('tuition_link_tutor_user', { p_tutor_id: id, p_email: email })), 'Hesap baglandi');
+  await run(()=>q(db.rpc('tuition_link_tutor_user', { p_tutor_id: id, p_email: email })), 'Hesap bağlandı');
   viewTutors();
 }
 
