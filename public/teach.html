@@ -765,7 +765,7 @@ async function viewRequests(){
     <div class="tbl-wrap"><table><thead><tr><th>Tarih</th><th>Öğrenci</th><th>Tercih</th><th>Mesaj</th><th>Durum</th><th></th></tr></thead><tbody>
     ${demos.map(d=>{ const s=byUser[d.student_id]; return `<tr><td class="small">${fmtDT(d.created_at)}</td><td>${s?`<b>${esc(s.full_name)}</b><div class="small muted">${esc(s.email||'')}</div>`:'<span class="muted">-</span>'}</td>
       <td class="small">${d.preferred_date?fmtD(d.preferred_date):''} ${d.preferred_time?esc(String(d.preferred_time).slice(0,5)):''}</td><td class="small">${esc(d.message||'')}</td>
-      <td><select class="form-inp" style="width:auto" onchange="setDemo('${d.id}',this.value)">${['pending','confirmed','completed','rejected'].map(x=>`<option ${x===d.status?'selected':''}>${x}</option>`).join('')}</select></td>
+      <td><select class="form-inp" style="width:auto" onchange="setDemo('${d.id}',this.value)">${[['pending','Bekliyor'],['confirmed','Görüşüldü / onaylandı'],['completed','Kayıt oldu'],['rejected','Reddedildi / test']].concat([d.status].filter(x=>x&&!['pending','confirmed','completed','rejected'].includes(x)).map(x=>[x,x])).map(([v,l])=>`<option value="${esc(v)}" ${v===d.status?'selected':''}>${esc(l)}</option>`).join('')}</select></td>
       <td>${s?`<button class="btn sm" onclick="location.hash='#/student/${s.id}'">Profil</button>`:''}</td></tr>`; }).join('') || '<tr><td colspan="6" class="empty">Talep yok</td></tr>'}
     </tbody></table></div></div>
     <div class="card"><h3>Eski rezervasyon kayıtları (${bookings.length})</h3>
