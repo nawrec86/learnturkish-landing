@@ -1023,9 +1023,21 @@ async function viewOverview(silent){
     </div>
 
     <div class="card"><div class="row between" style="margin-bottom:12px"><h3 style="margin:0">🧾 Gider defteri</h3><button class="btn sm" onclick="expenseModal()">+ Gider ekle</button></div>
-      ${expenses.length?`<div class="tbl-wrap"><table><thead><tr><th>Tarih</th><th>Kategori</th><th>Tutar</th><th>Not</th><th></th></tr></thead><tbody>
-      ${expenses.map(e=>`<tr><td class="small">${fmtD(e.spent_on)}</td><td>${esc(EXP_CATS[e.category]||e.category)}${e.recurring?` <span class="badge b-grey">${e.recurring==='monthly'?'aylık':'yıllık'}</span>`:''}</td><td><b>${money(e.amount,e.currency)}</b></td><td class="small">${esc(e.note||'')}</td><td><button class="btn ghost sm" onclick="delExpense('${e.id}')">Sil</button></td></tr>`).join('')}
-      </tbody></table></div>`:'<div class="muted small">Henüz gider girilmedi. AI, sunucu, reklam, öğretmen ödemesi gibi harcamaları buraya girin; kâr/zarar buna göre hesaplanır.</div>'}
+      ${(()=>{
+        // Meta reklam/boost harcamasi otomatik gider satiri olarak (ay ay). Kar/zararda zaten
+        // "Reklam harcamasi (Meta)" satirinda sayiliyor; burada ayrica listelenir, cift sayilmaz.
+        const ml = ym=>{const [y,m]=ym.split('-');return new Date(Date.UTC(+y,+m-1,1)).toLocaleDateString('tr-TR',{month:'long',year:'numeric',timeZone:'UTC'});};
+        const auto = MA.has_data ? (LT.monthly||[]).filter(r=>r.ads>0).map(r=>({ auto:true, spent_on:r.month+'-01', ym:r.month, amount:r.ads })) : [];
+        const rows = [...expenses.map(e=>({...e, ym:String(e.spent_on).slice(0,7)})), ...auto].sort((a,b)=>String(b.spent_on).localeCompare(String(a.spent_on)));
+        const tot = rows.reduce((a,r)=>a+((r.auto||r.currency==='USD')?Number(r.amount):0),0);
+        if (!rows.length) return '<div class="muted small">Henüz gider girilmedi. AI, sunucu, reklam, öğretmen ödemesi gibi harcamaları buraya girin; kâr/zarar buna göre hesaplanır.</div>';
+        return `<div class="tbl-wrap"><table><thead><tr><th>Tarih</th><th>Kategori</th><th>Tutar</th><th>Not</th><th></th></tr></thead><tbody>
+        ${rows.map(e=>e.auto
+          ? `<tr class="clickrow" onclick="document.getElementById('meta-ads').scrollIntoView({behavior:'smooth'})"><td class="small">${ml(e.ym)}</td><td>📣 Reklam / boost (Meta) <span class="badge b-grey">otomatik</span></td><td><b>${money(e.amount)}</b></td><td class="small muted">Meta'dan saatlik çekilir · kampanya detayı ›</td><td></td></tr>`
+          : `<tr><td class="small">${fmtD(e.spent_on)}</td><td>${esc(EXP_CATS[e.category]||e.category)}${e.recurring?` <span class="badge b-grey">${e.recurring==='monthly'?'aylık':'yıllık'}</span>`:''}</td><td><b>${money(e.amount,e.currency)}</b></td><td class="small">${esc(e.note||'')}</td><td><button class="btn ghost sm" onclick="delExpense('${e.id}')">Sil</button></td></tr>`).join('')}
+        <tr style="border-top:2px solid var(--border,#ccc)"><td colspan="2"><b>Toplam gider (USD)</b></td><td><b style="color:#FF6B6B">${money(tot)}</b></td><td colspan="2" class="small muted">${otherCur(X.total)?'+ '+otherCur(X.total)+' (USD dışı)':''}</td></tr>
+        </tbody></table></div>`;
+      })()}
     </div>
 
     <div class="card"><h3>🎓 Özel ders</h3><div class="stats" style="margin:0">
