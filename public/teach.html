@@ -82,6 +82,7 @@
     <input type="password" class="inp" id="pwd" placeholder="Şifre" autocomplete="current-password" onkeydown="if(event.key==='Enter')doLogin()">
     <button class="btn block" id="loginBtn" onclick="doLogin()">Giriş Yap</button>
     <div class="error" id="loginError"></div>
+    <a href="javascript:void(0)" onclick="forgotPassword()" class="small" style="display:inline-block;margin-top:14px;color:var(--t3)">Şifremi unuttum / ilk kez giriş</a>
   </div>
 </div>
 
@@ -179,7 +180,7 @@ async function enter(){
   route();
 }
 async function logout(){ await db.auth.signOut(); location.hash=''; location.reload(); }
-async function loadTutors(){ TUTORS = await q(db.from('tutors').select('id,full_name,is_active,user_id,meet_link,zoom_link').order('full_name')); }
+async function loadTutors(){ TUTORS = await q(db.from('tutors').select('id,full_name,is_active,user_id,meet_link,zoom_link,bio,languages').order('full_name')); }
 
 // ---------------------------------------------------------------------------
 // Yonlendirme (#/home, #/students, #/student/<id>, #/course/<id>, #/tutors, #/requests)
@@ -189,7 +190,7 @@ function buildTabs(){
   if (ME.is_admin) tabs.push(['requests','Talepler'],['tutors','Öğretmenler']);
   $('tabs').innerHTML = tabs.map(([k,l])=>`<button class="tab" data-tab="${k}" onclick="location.hash='#/${k}'">${l}</button>`).join('');
 }
-window.addEventListener('hashchange', route);
+window.addEventListener('hashchange', () => { if (!/access_token=/.test(location.hash)) route(); });
 function route(){
   if ($('app').style.display!=='block') return;
   const [, page, id] = (location.hash || '#/home').split('/');
@@ -773,26 +774,101 @@ async function setDemo(id, status){ await run(()=>q(db.from('demo_requests').upd
 // ---------------------------------------------------------------------------
 async function viewTutors(){
   await loadTutors();
-  $('view').innerHTML = `<div class="card"><h3>Öğretmenler</h3>
-    <p class="muted small" style="margin-bottom:12px">Öğretmenin bu panele girebilmesi için: (1) aktif olmalı, (2) bir giriş hesabına (e-posta) bağlı olmalı. Hesap yoksa önce Supabase Authentication'da kullanıcı olusturun.</p>
+  $('view').innerHTML = `<div class="card">
+    <div class="row between" style="margin-bottom:12px"><h3 style="margin:0">Öğretmenler (${TUTORS.length})</h3><button class="btn" onclick="tutorModal()">+ Yeni öğretmen</button></div>
+    <p class="muted small" style="margin-bottom:12px">Öğretmeni e-postasıyla ekleyin: hesabı varsa otomatik bağlanır, yoksa "şifreni belirle" davet e-postası gider ve öğretmen linke tıklayıp doğrudan bu panele girer. Panele girebilmesi için öğretmen <b>aktif</b> olmalı. Google Meet davetleri de bu e-postaya gider.</p>
     <div class="tbl-wrap"><table><thead><tr><th>Ad</th><th>Giriş hesabı</th><th>Kalıcı Meet linki</th><th>Durum</th><th></th></tr></thead><tbody>
-    ${TUTORS.map(t=>`<tr><td><b>${esc(t.full_name)}</b></td>
-      <td>${t.user_id?'<span class="badge b-green">Bağlı</span>':'<span class="badge b-red">Bağlı değil</span>'} <button class="btn ghost sm" onclick="linkTutor('${t.id}')">${t.user_id?'Değiştir':'Bağla'}</button></td>
-      <td><input class="form-inp" style="min-width:240px" placeholder="https://meet.google.com/xxx-xxxx-xxx" value="${esc(t.meet_link||'')}" onchange="updTutor('${t.id}',{meet_link:this.value.trim()||null})"></td>
+    ${TUTORS.map(t=>`<tr><td><b>${esc(t.full_name)}</b>${t.languages&&t.languages.length?`<div class="small muted">${esc(t.languages.join(', '))}</div>`:''}</td>
+      <td>${t.user_id?'<span class="badge b-green">Bağlı</span>':'<span class="badge b-red">Hesap yok</span>'}</td>
+      <td class="small">${t.meet_link?`<a href="${esc(t.meet_link)}" target="_blank" rel="noopener">${esc(t.meet_link.replace(/^https?:\/\//,''))}</a>`:'<span class="muted">-</span>'}</td>
       <td>${t.is_active?'<span class="badge b-green">Aktif</span>':'<span class="badge b-grey">Pasif</span>'}</td>
-      <td><button class="btn ghost sm" onclick="updTutor('${t.id}',{is_active:${!t.is_active}},true)">${t.is_active?'Pasif yap':'Aktif yap'}</button></td></tr>`).join('') || '<tr><td colspan="5" class="empty">Öğretmen yok. Yeni öğretmeni /admin panelinden ekleyin.</td></tr>'}
+      <td style="white-space:nowrap"><button class="btn ghost sm" onclick="tutorModal('${t.id}')">Düzenle</button>
+        ${t.user_id?`<button class="btn ghost sm" onclick="sendTutorLink('${t.id}')">Giriş linki gönder</button>`:''}
+        <button class="btn ghost sm" onclick="updTutor('${t.id}',{is_active:${!t.is_active}},true)">${t.is_active?'Pasif yap':'Aktif yap'}</button></td></tr>`).join('') || '<tr><td colspan="5" class="empty">Henüz öğretmen yok. "+ Yeni öğretmen" ile ekleyin.</td></tr>'}
     </tbody></table></div></div>`;
 }
 async function updTutor(id, patch, reload){ await run(()=>q(db.from('tutors').update(patch).eq('id', id)), 'Öğretmen güncellendi'); await loadTutors(); if (reload) viewTutors(); }
-async function linkTutor(id){
-  const email = prompt('Öğretmenin giriş e-postası:');
-  if (!email) return;
-  await run(()=>q(db.rpc('tuition_link_tutor_user', { p_tutor_id: id, p_email: email })), 'Hesap bağlandı');
-  viewTutors();
+function tutorModal(id){
+  const t = id ? TUTORS.find(x=>x.id===id) : {};
+  openModal(`<h3>${id?'Öğretmeni düzenle':'Yeni öğretmen'}</h3>
+    <div class="grid">
+      <div class="fg"><label>Ad soyad *</label><input class="form-inp" id="tm_name" value="${esc(t.full_name||'')}"></div>
+      <div class="fg"><label>${id&&t.user_id?'Giriş e-postası (değiştirmek için yazın)':'Giriş e-postası'}</label><input class="form-inp" id="tm_email" type="email" placeholder="ogretmen@ornek.com"></div>
+      <div class="fg full"><label>Kalıcı Google Meet linki (opsiyonel)</label><input class="form-inp" id="tm_meet" placeholder="https://meet.google.com/xxx-xxxx-xxx" value="${esc(t.meet_link||'')}"></div>
+      <div class="fg"><label>Konuştuğu diller</label><input class="form-inp" id="tm_langs" placeholder="Türkçe, English, Русский" value="${esc((t.languages||[]).join(', '))}"></div>
+      <div class="fg"><label>Durum</label><select class="form-inp" id="tm_active"><option value="1" ${t.is_active!==false?'selected':''}>Aktif</option><option value="0" ${t.is_active===false?'selected':''}>Pasif</option></select></div>
+      <div class="fg full"><label>Kısa tanıtım</label><textarea class="form-inp" id="tm_bio" rows="3">${esc(t.bio||'')}</textarea></div>
+    </div>
+    <p class="muted small" style="margin-top:10px">${id&&t.user_id?'Bu öğretmen bir hesaba bağlı. E-postayı boş bırakırsanız bağlantı değişmez.':'E-posta girerseniz: hesabı varsa bağlanır, yoksa davet e-postası gönderilir.'}</p>
+    <div class="row" style="margin-top:16px"><button class="btn" id="tm_save" onclick="saveTutor(${id?`'${id}'`:'null'})">Kaydet</button><button class="btn ghost" onclick="closeModal()">Vazgeç</button></div>`);
+}
+async function saveTutor(id){
+  const name = val('tm_name');
+  if (!name) { toast('Ad soyad gerekli', false); return; }
+  const b = $('tm_save'); b.disabled = true;
+  try {
+    const r = await run(()=>invokeFn('tuition-admin', { action:'save_tutor', tutor_id: id || undefined, full_name: name, email: val('tm_email') || undefined,
+      meet_link: val('tm_meet'), bio: val('tm_bio'), languages: (val('tm_langs')||'').split(',').map(x=>x.trim()).filter(Boolean), is_active: val('tm_active')==='1' }));
+    toast(r.account==='invited' ? 'Öğretmen eklendi, davet e-postası gönderildi' : r.account==='linked' ? 'Öğretmen kaydedildi ve hesaba bağlandı' : 'Öğretmen kaydedildi');
+    closeModal(); viewTutors();
+  } catch(_) { b.disabled = false; }
+}
+async function sendTutorLink(id){
+  if (!confirm('Öğretmene şifre belirleme / giriş linki e-postayla gönderilsin mi?')) return;
+  const r = await run(()=>invokeFn('tuition-admin', { action:'send_login_link', tutor_id: id }));
+  toast('Link gönderildi: ' + r.sent_to);
+}
+
+// ---------------------------------------------------------------------------
+// Şifremi unuttum + davet / şifre sıfırlama linkinden dönüş
+// ---------------------------------------------------------------------------
+async function forgotPassword(){
+  const email = $('email').value.trim();
+  if (!email) { showLoginError('Önce e-posta adresinizi yazın'); return; }
+  const { error } = await db.auth.resetPasswordForEmail(email, { redirectTo: location.origin + '/teach' });
+  if (error) { showLoginError('Gönderilemedi: ' + error.message); return; }
+  const e = $('loginError'); e.style.display='block'; e.style.color='var(--green)';
+  e.textContent = 'Şifre belirleme linki gönderildi. E-postanızı kontrol edin.';
+}
+function showSetPassword(kind){
+  $('login').innerHTML = `<div class="login-box">
+    <div style="font-size:44px;margin-bottom:14px">🔑</div>
+    <h1>${kind==='invite'?'Hoş geldiniz':'Yeni şifre'}</h1>
+    <p>${kind==='invite'?'LearnTurkish AI Özel Ders Paneli için şifrenizi belirleyin.':'Hesabınız için yeni bir şifre belirleyin.'}</p>
+    <input type="password" class="inp" id="np1" placeholder="Yeni şifre (en az 8 karakter)" autocomplete="new-password">
+    <input type="password" class="inp" id="np2" placeholder="Yeni şifre (tekrar)" autocomplete="new-password" onkeydown="if(event.key==='Enter')setNewPassword()">
+    <button class="btn block" id="npBtn" onclick="setNewPassword()">Şifreyi kaydet ve giriş yap</button>
+    <div class="error" id="loginError"></div></div>`;
+  $('login').style.display='flex';
+  $('np1').focus();
+}
+async function setNewPassword(){
+  const p1 = $('np1').value, p2 = $('np2').value;
+  if (p1.length < 8) { showLoginError('Şifre en az 8 karakter olmalı'); return; }
+  if (p1 !== p2) { showLoginError('Şifreler aynı değil'); return; }
+  $('npBtn').disabled = true;
+  const { error } = await db.auth.updateUser({ password: p1 });
+  $('npBtn').disabled = false;
+  if (error) { showLoginError('Kaydedilemedi: ' + error.message); return; }
+  location.hash = '#/home';
+  await enter();
+}
+async function consumeAuthRedirect(){
+  // Davet / sifre sifirlama linki: #access_token=...&refresh_token=...&type=invite|recovery
+  const h = location.hash.replace(/^#/, '');
+  if (!/access_token=|error_description=/.test(h)) return false;
+  const p = new URLSearchParams(h);
+  history.replaceState(null, '', location.pathname);
+  if (p.get('error_description')) { showLoginError('Link geçersiz ya da süresi dolmuş: ' + p.get('error_description').replace(/\+/g,' ') + '. "Şifremi unuttum" ile yeni link isteyin.'); return true; }
+  const { error } = await db.auth.setSession({ access_token: p.get('access_token'), refresh_token: p.get('refresh_token') });
+  if (error) { showLoginError('Link geçersiz ya da süresi dolmuş. "Şifremi unuttum" ile yeni link isteyin.'); return true; }
+  showSetPassword(p.get('type') === 'invite' ? 'invite' : 'recovery');
+  return true;
 }
 
 // ---------------------------------------------------------------------------
 window.addEventListener('load', async () => {
+  if (await consumeAuthRedirect()) return;
   const { data: { session } } = await db.auth.getSession();
   if (session) await enter(); else $('email').focus();
 });
