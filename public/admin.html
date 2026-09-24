@@ -106,6 +106,7 @@
   <nav>
     <div class="nav-brand">LearnTurkish <span>Admin</span></div>
     <div class="nav-right">
+      <a class="nav-btn" href="/teach" style="text-decoration:none;color:#fff;background:var(--r);border-color:var(--r)">🎓 Ozel Ders Paneli</a>
       <span style="color:var(--t3);font-size:13px" id="lastUpdate"></span>
       <button class="nav-btn" onclick="logout()">Logout</button>
     </div>
@@ -316,19 +317,35 @@ async function loadAll() {
   await Promise.all([loadStats(), loadTutors(), loadDemos(), loadBookings(), loadSettings()]);
 }
 
+// Satir cekip .length saymak PostgREST'in 1000 satir tavanina takilir ve hata
+// durumunda sessizce 0 gosterir. Sunucu tarafi exact count kullan; hata "!" gosterir.
+async function countOf(table, filter = q => q) {
+  const { count, error } = await filter(sbClient.from(table).select('*', { count: 'exact', head: true }));
+  if (error) { console.error(error); return '!'; }
+  return count ?? 0;
+}
+
 async function loadStats() {
+  const nowIso = new Date().toISOString();
   const [users, prems, tutors, demos, bookings] = await Promise.all([
-    sb('profiles?select=id'),
-    sb('subscriptions?select=user_id&status=eq.active'),
-    sb('tutors?select=id,is_active&is_active=eq.true'),
-    sb('demo_requests?select=id'),
-    sb('tutor_bookings?select=id'),
+    countOf('profiles'),
+    // Premium = aktif VE suresi dolmamis (expires_at bos ya da gelecekte).
+    // Ayni kullanicinin birden fazla satiri olabilir -> tekil user_id say.
+    (async () => {
+      const { data, error } = await sbClient.from('subscriptions').select('user_id,expires_at')
+        .eq('status', 'active').or('expires_at.is.null,expires_at.gt.' + nowIso).range(0, 9999);
+      if (error) { console.error(error); return '!'; }
+      return new Set(data.map(r => r.user_id)).size;
+    })(),
+    countOf('tutors', q => q.eq('is_active', true)),
+    countOf('demo_requests'),
+    countOf('tutor_bookings'),
   ]);
-  document.getElementById('statUsers').textContent = users.length || 0;
-  document.getElementById('statPrem').textContent = prems.length || 0;
-  document.getElementById('statTutors').textContent = tutors.length || 0;
-  document.getElementById('statDemos').textContent = demos.length || 0;
-  document.getElementById('statBookings').textContent = bookings.length || 0;
+  document.getElementById('statUsers').textContent = users;
+  document.getElementById('statPrem').textContent = prems;
+  document.getElementById('statTutors').textContent = tutors;
+  document.getElementById('statDemos').textContent = demos;
+  document.getElementById('statBookings').textContent = bookings;
 }
 
 async function loadTutors() {

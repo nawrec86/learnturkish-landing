@@ -1,0 +1,649 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="robots" content="noindex,nofollow">
+<title>Ozel Ders Paneli | LearnTurkish AI</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800;900&display=swap');
+  :root{--r:#E30A17;--bg:#0A0A0B;--t1:#F5F5F7;--t2:rgba(255,255,255,0.72);--t3:rgba(255,255,255,0.42);--card:rgba(255,255,255,0.04);--border:rgba(255,255,255,0.09);--green:#00C853;--gold:#F5C518;--blue:#60A5FA;--orange:#FF9F43;--font:'Inter','Segoe UI',Roboto,Arial,sans-serif}
+  *{margin:0;padding:0;box-sizing:border-box}
+  body{background:var(--bg);color:var(--t1);font-family:var(--font);min-height:100vh;font-size:14px}
+  a{color:var(--blue)}
+  button{font-family:var(--font)}
+  #login{display:flex;align-items:center;justify-content:center;min-height:100vh;padding:16px}
+  .login-box{background:var(--card);border:1px solid var(--border);border-radius:24px;padding:40px;width:100%;max-width:400px;text-align:center}
+  .login-box h1{font-size:24px;font-weight:900;margin-bottom:6px}
+  .login-box p{color:var(--t3);margin-bottom:28px}
+  .inp,.form-inp{width:100%;background:rgba(255,255,255,0.05);border:1px solid var(--border);border-radius:10px;padding:10px 14px;color:var(--t1);font-size:14px;font-family:var(--font);outline:none}
+  .inp{padding:14px 18px;margin-bottom:12px;font-size:15px}
+  .inp:focus,.form-inp:focus{border-color:rgba(227,10,23,0.6)}
+  select.form-inp option{background:#1a1a1c}
+  .btn{background:var(--r);color:#fff;border:none;padding:10px 18px;border-radius:10px;font-size:14px;font-weight:800;cursor:pointer;white-space:nowrap}
+  .btn.block{width:100%;padding:14px}
+  .btn.ghost{background:rgba(255,255,255,0.06);border:1px solid var(--border);color:var(--t2);font-weight:700}
+  .btn.sm{padding:6px 12px;font-size:12px;border-radius:8px}
+  .btn:disabled{opacity:.5;cursor:default}
+  .error{color:#FF6B6B;font-size:13px;margin-top:8px;display:none}
+  #app{display:none}
+  nav{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:14px 24px;border-bottom:1px solid var(--border);background:rgba(10,10,11,0.95);position:sticky;top:0;z-index:50;flex-wrap:wrap}
+  .brand{font-weight:900;font-size:17px}.brand span{color:var(--r)}
+  .tabs{display:flex;gap:6px;flex-wrap:wrap}
+  .tab{padding:8px 14px;border-radius:10px;font-size:13px;font-weight:700;cursor:pointer;border:1px solid var(--border);background:transparent;color:var(--t3)}
+  .tab.active{background:var(--r);color:#fff;border-color:var(--r)}
+  .who{color:var(--t3);font-size:12px;display:flex;gap:10px;align-items:center}
+  .main{padding:24px;max-width:1200px;margin:0 auto}
+  .card{background:var(--card);border:1px solid var(--border);border-radius:18px;padding:20px;margin-bottom:16px}
+  .card h3{font-size:15px;font-weight:800;margin-bottom:14px}
+  .row{display:flex;gap:12px;align-items:center;flex-wrap:wrap}
+  .between{justify-content:space-between}
+  .grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:12px}
+  .stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:12px;margin-bottom:16px}
+  .stat{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:16px;text-align:center}
+  .stat .num{font-size:26px;font-weight:900}.stat .lbl{font-size:12px;color:var(--t3);margin-top:2px}
+  .fg{display:flex;flex-direction:column;gap:6px}.fg label{font-size:12px;font-weight:700;color:var(--t3)}
+  .full{grid-column:1/-1}
+  .tbl-wrap{overflow-x:auto}
+  table{width:100%;border-collapse:collapse}
+  th{text-align:start;font-size:11px;font-weight:700;color:var(--t3);text-transform:uppercase;letter-spacing:.8px;padding:8px 10px;border-bottom:1px solid var(--border);white-space:nowrap}
+  td{padding:10px;border-bottom:1px solid rgba(255,255,255,0.04);color:var(--t2);vertical-align:middle}
+  tr.click{cursor:pointer}tr.click:hover td{background:rgba(255,255,255,0.03)}
+  .badge{display:inline-block;padding:3px 10px;border-radius:100px;font-size:11px;font-weight:700;white-space:nowrap}
+  .b-green{background:rgba(0,200,83,0.15);color:var(--green)}
+  .b-gold{background:rgba(245,197,24,0.15);color:var(--gold)}
+  .b-red{background:rgba(255,80,80,0.15);color:#FF6B6B}
+  .b-blue{background:rgba(96,165,250,0.15);color:var(--blue)}
+  .b-grey{background:rgba(255,255,255,0.08);color:var(--t3)}
+  .b-orange{background:rgba(255,159,67,0.15);color:var(--orange)}
+  .muted{color:var(--t3)}.small{font-size:12px}
+  .bar{height:8px;border-radius:4px;background:rgba(255,255,255,0.08);overflow:hidden;display:flex}
+  .bar>div{height:100%}
+  .back{color:var(--t3);cursor:pointer;margin-bottom:12px;display:inline-block}
+  .modal-bg{position:fixed;inset:0;background:rgba(0,0,0,0.7);display:none;align-items:flex-start;justify-content:center;z-index:100;overflow-y:auto;padding:40px 16px}
+  .modal{background:#141416;border:1px solid var(--border);border-radius:18px;padding:24px;width:100%;max-width:640px}
+  .modal h3{font-size:17px;font-weight:900;margin-bottom:16px}
+  .scores{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:10px}
+  .days label{display:inline-flex;align-items:center;gap:4px;margin-inline-end:10px;color:var(--t2)}
+  #toast{position:fixed;bottom:24px;inset-inline-end:24px;padding:12px 20px;border-radius:12px;font-weight:700;display:none;z-index:200;max-width:420px}
+  .empty{text-align:center;color:var(--t3);padding:20px}
+  textarea.form-inp{resize:vertical}
+  @media (max-width:640px){.main{padding:16px}nav{padding:12px 16px}}
+</style>
+</head>
+<body>
+
+<div id="login">
+  <div class="login-box">
+    <div style="font-size:44px;margin-bottom:14px">🎓</div>
+    <h1>LearnTurkish AI</h1>
+    <p>Ozel Ders Paneli - Ogretmen / Yonetici</p>
+    <input type="email" class="inp" id="email" placeholder="E-posta" autocomplete="email" onkeydown="if(event.key==='Enter')document.getElementById('pwd').focus()">
+    <input type="password" class="inp" id="pwd" placeholder="Sifre" autocomplete="current-password" onkeydown="if(event.key==='Enter')doLogin()">
+    <button class="btn block" id="loginBtn" onclick="doLogin()">Giris Yap</button>
+    <div class="error" id="loginError"></div>
+  </div>
+</div>
+
+<div id="app">
+  <nav>
+    <div class="brand">LearnTurkish <span>Ozel Ders</span></div>
+    <div class="tabs" id="tabs"></div>
+    <div class="who"><span id="whoLbl"></span><button class="btn ghost sm" onclick="logout()">Cikis</button></div>
+  </nav>
+  <div class="main" id="view"></div>
+</div>
+
+<div class="modal-bg" id="modalBg" onclick="if(event.target===this)closeModal()"><div class="modal" id="modal"></div></div>
+<div id="toast"></div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script>
+const SUPABASE_URL = 'https://ilxahosomxpgokyilpco.supabase.co';
+const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImlseGFob3NvbXhwZ29reWlscGNvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzM2NjA2MTcsImV4cCI6MjA4OTIzNjYxN30.p7LB1qmOZ7_Nq1udQVU-BHMF8VRHjP9QmJtu6ZLTVU8';
+const db = supabase.createClient(SUPABASE_URL, SUPABASE_KEY, {
+  auth: { autoRefreshToken: true, persistSession: true, detectSessionInUrl: false, storageKey: 'lt_teach_auth' },
+  global: { headers: { apikey: SUPABASE_KEY } },
+});
+
+// ---------------------------------------------------------------------------
+// Sabitler
+// ---------------------------------------------------------------------------
+const LEVELS = ['A0','A1','A2','B1','B2','C1','C2'];
+const HEARD = { instagram:'Instagram', tiktok:'TikTok', youtube:'YouTube', google:'Google', app_store:'App Store / Google Play', friend:'Arkadas tavsiyesi', other:'Diger' };
+const STUDENT_STATUS = { lead:['Aday','b-gold'], active:['Aktif','b-green'], paused:['Beklemede','b-orange'], completed:['Tamamladi','b-blue'], archived:['Arsiv','b-grey'] };
+const COURSE_STATUS = { planned:['Planlandi','b-gold'], active:['Devam ediyor','b-green'], paused:['Durduruldu','b-orange'], completed:['Tamamlandi','b-blue'], cancelled:['Iptal','b-grey'] };
+const ATT = { scheduled:['Planli','b-grey'], attended:['Katildi','b-green'], late:['Gec katildi','b-gold'], absent:['Gelmedi','b-red'], excused:['Izinli','b-blue'], cancelled:['Iptal','b-grey'] };
+const HW = { assigned:['Verildi','b-gold'], submitted:['Teslim edildi','b-blue'], reviewed:['Degerlendirildi','b-green'], missing:['Teslim yok','b-red'] };
+const SKILLS = [['speaking','Konusma'],['listening','Dinleme'],['reading','Okuma'],['writing','Yazma'],['grammar','Dilbilgisi'],['vocabulary','Kelime'],['pronunciation','Telaffuz'],['participation','Derse katilim']];
+const WEEKDAYS = [[1,'Pzt'],[2,'Sal'],[3,'Car'],[4,'Per'],[5,'Cum'],[6,'Cmt'],[0,'Paz']];
+
+let ME = { is_admin:false, tutor_id:null, tutor_name:null };
+let TUTORS = [];
+
+// ---------------------------------------------------------------------------
+// Yardimcilar
+// ---------------------------------------------------------------------------
+const $ = (id) => document.getElementById(id);
+function esc(v){ return v==null ? '' : String(v).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
+function badge(map, key){ const m = map[key] || [key,'b-grey']; return `<span class="badge ${m[1]}">${esc(m[0])}</span>`; }
+function toast(msg, ok=true){ const t=$('toast'); t.textContent=msg; t.style.background= ok ? '#00A844' : '#C62828'; t.style.display='block'; clearTimeout(t._h); t._h=setTimeout(()=>t.style.display='none', ok?2500:6000); }
+// Supabase yazma hatalari throw etmez, { error } doner -> her cagriyi bundan gecir.
+async function q(p){ const { data, error } = await p; if (error) { console.error(error); throw new Error(error.message || 'Islem basarisiz'); } return data; }
+async function run(fn, okMsg){ try { const r = await fn(); if (okMsg) toast(okMsg); return r; } catch(e){ toast('Hata: ' + e.message, false); throw e; } }
+function fmtDT(v){ if(!v) return '<span class="muted">-</span>'; const d=new Date(v); return d.toLocaleDateString('tr-TR',{day:'2-digit',month:'short',year:'numeric'})+' '+d.toLocaleTimeString('tr-TR',{hour:'2-digit',minute:'2-digit'}); }
+function fmtD(v){ if(!v) return '-'; return new Date(v).toLocaleDateString('tr-TR',{day:'2-digit',month:'short',year:'numeric'}); }
+function toLocalInput(v){ if(!v) return ''; const d=new Date(v); const p=n=>String(n).padStart(2,'0'); return `${d.getFullYear()}-${p(d.getMonth()+1)}-${p(d.getDate())}T${p(d.getHours())}:${p(d.getMinutes())}`; }
+function fromLocalInput(v){ return v ? new Date(v).toISOString() : null; }
+function money(n, cur='USD'){ return (cur==='USD'?'$':'') + Number(n||0).toLocaleString('en-US',{maximumFractionDigits:2}) + (cur==='USD'?'':' '+cur); }
+function opt(map, sel){ return Object.entries(map).map(([k,v])=>`<option value="${k}" ${k===sel?'selected':''}>${esc(Array.isArray(v)?v[0]:v)}</option>`).join(''); }
+function tutorName(id){ const t=TUTORS.find(x=>x.id===id); return t ? t.full_name : '-'; }
+function tutorOptions(sel, allowEmpty=true){ return (allowEmpty?'<option value="">- Atanmadi -</option>':'') + TUTORS.map(t=>`<option value="${t.id}" ${t.id===sel?'selected':''}>${esc(t.full_name)}${t.is_active?'':' (pasif)'}</option>`).join(''); }
+function val(id){ const e=$(id); if(!e) return null; const v=e.value.trim(); return v===''?null:v; }
+function openModal(html){ $('modal').innerHTML=html; $('modalBg').style.display='flex'; }
+function closeModal(){ $('modalBg').style.display='none'; $('modal').innerHTML=''; }
+function attendanceBar(lessons){
+  const n = lessons.length || 1;
+  const c = k => lessons.filter(l=>l.attendance===k).length;
+  const seg = (k,color) => c(k) ? `<div style="width:${c(k)/n*100}%;background:${color}" title="${ATT[k][0]}: ${c(k)}"></div>` : '';
+  return `<div class="bar">${seg('attended','var(--green)')}${seg('late','var(--gold)')}${seg('excused','var(--blue)')}${seg('absent','#FF6B6B')}${seg('cancelled','#555')}</div>`;
+}
+
+// ---------------------------------------------------------------------------
+// Giris
+// ---------------------------------------------------------------------------
+function showLoginError(m){ const e=$('loginError'); e.textContent=m; e.style.display='block'; }
+async function doLogin(){
+  $('loginError').style.display='none';
+  const email=$('email').value.trim(), password=$('pwd').value;
+  if(!email||!password){ showLoginError('E-posta ve sifre gerekli'); return; }
+  $('loginBtn').disabled=true;
+  const { data, error } = await db.auth.signInWithPassword({ email, password });
+  $('loginBtn').disabled=false;
+  if(error||!data.session){ showLoginError('Gecersiz e-posta veya sifre'); return; }
+  await enter();
+}
+async function enter(){
+  const { data, error } = await db.rpc('tuition_whoami');
+  if (error) { await db.auth.signOut(); showLoginError('Ozel ders modulu henuz kurulmamis (tuition_whoami yok). Yoneticiye bildirin.'); return; }
+  ME = data || {};
+  if (!ME.is_admin && !ME.tutor_id) {
+    await db.auth.signOut();
+    showLoginError('Bu hesap bir ogretmen kaydina bagli degil ya da ogretmen pasif. Yonetici "Ogretmenler" sekmesinden baglamali.');
+    return;
+  }
+  $('login').style.display='none'; $('app').style.display='block';
+  $('whoLbl').textContent = ME.is_admin ? 'Yonetici' : ('Ogretmen: ' + (ME.tutor_name||''));
+  await loadTutors();
+  buildTabs();
+  route();
+}
+async function logout(){ await db.auth.signOut(); location.hash=''; location.reload(); }
+async function loadTutors(){ TUTORS = await q(db.from('tutors').select('id,full_name,is_active,user_id,meet_link,zoom_link').order('full_name')); }
+
+// ---------------------------------------------------------------------------
+// Yonlendirme (#/home, #/students, #/student/<id>, #/course/<id>, #/tutors, #/requests)
+// ---------------------------------------------------------------------------
+function buildTabs(){
+  const tabs = [['home','Bugun'],['students','Ogrenciler']];
+  if (ME.is_admin) tabs.push(['requests','Talepler'],['tutors','Ogretmenler']);
+  $('tabs').innerHTML = tabs.map(([k,l])=>`<button class="tab" data-tab="${k}" onclick="location.hash='#/${k}'">${l}</button>`).join('');
+}
+window.addEventListener('hashchange', route);
+function route(){
+  if ($('app').style.display!=='block') return;
+  const [, page, id] = (location.hash || '#/home').split('/');
+  document.querySelectorAll('.tab').forEach(t=>t.classList.toggle('active', t.dataset.tab===page || (page==='student'&&t.dataset.tab==='students') || (page==='course'&&t.dataset.tab==='students')));
+  $('view').innerHTML = '<div class="empty">Yukleniyor...</div>';
+  const pages = { home:viewHome, students:viewStudents, student:viewStudent, course:viewCourse, tutors:viewTutors, requests:viewRequests };
+  (pages[page] || viewHome)(id).catch(e => { $('view').innerHTML = `<div class="card"><b>Hata:</b> ${esc(e.message)}</div>`; });
+}
+
+// ---------------------------------------------------------------------------
+// BUGUN: yaklasan dersler, katilim girilmemis dersler, degerlendirme bekleyen odevler
+// ---------------------------------------------------------------------------
+async function viewHome(){
+  const now = new Date();
+  const weekLater = new Date(now.getTime()+7*864e5).toISOString();
+  const [upcoming, unmarked, toReview, courses] = await Promise.all([
+    q(db.from('tuition_lessons').select('id,lesson_no,topic,scheduled_at,meet_link,course_id,tuition_courses!inner(id,title,tutor_id,status,tuition_students!inner(id,full_name))')
+      .eq('attendance','scheduled').gte('scheduled_at', now.toISOString()).lte('scheduled_at', weekLater).order('scheduled_at')),
+    q(db.from('tuition_lessons').select('id,lesson_no,topic,scheduled_at,course_id,tuition_courses!inner(id,title,tuition_students!inner(id,full_name))')
+      .eq('attendance','scheduled').lt('scheduled_at', now.toISOString()).order('scheduled_at')),
+    q(db.from('tuition_homework').select('id,title,submitted_at,course_id,tuition_courses!inner(id,tuition_students!inner(full_name))').eq('status','submitted').order('submitted_at')),
+    q(db.from('tuition_courses').select('id,status').in('status',['planned','active'])),
+  ]);
+  const lessonRow = (l, showJoin) => `<tr class="click" onclick="location.hash='#/course/${l.course_id}'">
+      <td>${fmtDT(l.scheduled_at)}</td><td><b>${esc(l.tuition_courses.tuition_students.full_name)}</b></td>
+      <td>Ders ${l.lesson_no}${l.topic?' - '+esc(l.topic):''}</td>
+      <td>${showJoin && l.meet_link ? `<a href="${esc(l.meet_link)}" target="_blank" rel="noopener" onclick="event.stopPropagation()">Meet</a>` : ''}</td></tr>`;
+  $('view').innerHTML = `
+    <div class="stats">
+      <div class="stat"><div class="num">${courses.length}</div><div class="lbl">Aktif / planli kur</div></div>
+      <div class="stat"><div class="num">${upcoming.length}</div><div class="lbl">7 gun icinde ders</div></div>
+      <div class="stat"><div class="num" style="color:${unmarked.length?'#FF6B6B':'inherit'}">${unmarked.length}</div><div class="lbl">Katilimi girilmemis</div></div>
+      <div class="stat"><div class="num" style="color:${toReview.length?'var(--gold)':'inherit'}">${toReview.length}</div><div class="lbl">Degerlendirilecek odev</div></div>
+    </div>
+    ${unmarked.length ? `<div class="card"><h3>⚠️ Katilim ve gozlem bekleyen dersler</h3><div class="tbl-wrap"><table><thead><tr><th>Tarih</th><th>Ogrenci</th><th>Ders</th><th></th></tr></thead><tbody>${unmarked.map(l=>lessonRow(l,false)).join('')}</tbody></table></div></div>` : ''}
+    <div class="card"><h3>📅 Onumuzdeki 7 gun</h3>${upcoming.length ? `<div class="tbl-wrap"><table><thead><tr><th>Tarih</th><th>Ogrenci</th><th>Ders</th><th></th></tr></thead><tbody>${upcoming.map(l=>lessonRow(l,true)).join('')}</tbody></table></div>` : '<div class="empty">Planli ders yok</div>'}</div>
+    ${toReview.length ? `<div class="card"><h3>📝 Teslim edilen odevler</h3><div class="tbl-wrap"><table><thead><tr><th>Teslim</th><th>Ogrenci</th><th>Odev</th></tr></thead><tbody>${toReview.map(h=>`<tr class="click" onclick="location.hash='#/course/${h.course_id}'"><td>${fmtDT(h.submitted_at)}</td><td>${esc(h.tuition_courses.tuition_students.full_name)}</td><td>${esc(h.title)}</td></tr>`).join('')}</tbody></table></div></div>` : ''}
+    <p class="muted small">Saatler tarayicinizin saat diliminde gosterilir.</p>`;
+}
+
+// ---------------------------------------------------------------------------
+// OGRENCILER
+// ---------------------------------------------------------------------------
+async function viewStudents(){
+  const students = await q(db.from('tuition_students').select('id,full_name,email,age,occupation,level,status,tutor_id,source,created_at').order('created_at',{ascending:false}));
+  $('view').innerHTML = `
+    <div class="card">
+      <div class="row between" style="margin-bottom:14px">
+        <h3 style="margin:0">Ogrenciler (${students.length})</h3>
+        <div class="row"><input class="form-inp" id="stSearch" placeholder="Ara: ad, e-posta, meslek" style="width:240px" oninput="filterStudents()"><button class="btn" onclick="newStudentModal()">+ Yeni ogrenci</button></div>
+      </div>
+      <div class="tbl-wrap"><table><thead><tr><th>Ad</th><th>E-posta</th><th>Yas</th><th>Meslek</th><th>Seviye</th>${ME.is_admin?'<th>Ogretmen</th>':''}<th>Durum</th><th>Kayit</th></tr></thead>
+      <tbody id="stBody">${students.map(s=>`<tr class="click" data-s="${esc((s.full_name+' '+(s.email||'')+' '+(s.occupation||'')).toLowerCase())}" onclick="location.hash='#/student/${s.id}'">
+        <td><b>${esc(s.full_name)}</b></td><td>${esc(s.email||'-')}</td><td>${s.age??'-'}</td><td>${esc(s.occupation||'-')}</td><td>${esc(s.level||'-')}</td>
+        ${ME.is_admin?`<td>${esc(tutorName(s.tutor_id))}</td>`:''}<td>${badge(STUDENT_STATUS,s.status)}</td><td class="small">${fmtD(s.created_at)}</td></tr>`).join('') || `<tr><td colspan="8" class="empty">Henuz ogrenci yok</td></tr>`}</tbody></table></div>
+    </div>`;
+}
+function filterStudents(){ const s=$('stSearch').value.toLowerCase(); document.querySelectorAll('#stBody tr[data-s]').forEach(r=>r.style.display = r.dataset.s.includes(s) ? '' : 'none'); }
+
+function newStudentModal(){
+  openModal(`<h3>Yeni ogrenci</h3>
+    <p class="muted small" style="margin-bottom:12px">Ogrencinin LearnTurkish uygulama hesabi varsa e-postasiyla baglanir; ogrenci gelisimini uygulamada gorur. Hesabi yoksa profil elle acilir.</p>
+    <div class="grid">
+      <div class="fg"><label>Ad soyad *</label><input class="form-inp" id="ns_name"></div>
+      <div class="fg"><label>E-posta</label><input class="form-inp" id="ns_email" type="email"></div>
+      ${ME.is_admin?`<div class="fg"><label>Ogretmen</label><select class="form-inp" id="ns_tutor">${tutorOptions(null)}</select></div>`:''}
+    </div>
+    <div class="row" style="margin-top:16px"><button class="btn" onclick="createStudent()">Olustur</button><button class="btn ghost" onclick="closeModal()">Vazgec</button></div>`);
+}
+async function createStudent(){
+  const name=val('ns_name'), email=val('ns_email');
+  const tutor = ME.is_admin ? val('ns_tutor') : ME.tutor_id;
+  if(!name){ toast('Ad soyad gerekli', false); return; }
+  await run(async()=>{
+    let id = null;
+    if (email) id = await q(db.rpc('tuition_student_from_email', { p_email: email, p_tutor_id: tutor }));
+    if (id) {
+      await q(db.from('tuition_students').update({ full_name:name, tutor_id: tutor }).eq('id', id));
+    } else {
+      const row = await q(db.from('tuition_students').insert({ full_name:name, email, tutor_id: tutor, source:'manual' }).select('id').single());
+      id = row.id;
+    }
+    closeModal(); location.hash = '#/student/' + id;
+  }, 'Ogrenci olusturuldu');
+}
+
+// ---------------------------------------------------------------------------
+// OGRENCI DETAY: profil + kurlar
+// ---------------------------------------------------------------------------
+async function viewStudent(id){
+  const [s, courses] = await Promise.all([
+    q(db.from('tuition_students').select('*').eq('id', id).single()),
+    q(db.from('tuition_courses').select('*, tuition_lessons(attendance), tuition_payments(amount)').eq('student_id', id).order('created_at',{ascending:false})),
+  ]);
+  const courseCard = c => {
+    const total = c.total_lessons * c.price_per_lesson;
+    const paid = (c.tuition_payments||[]).reduce((a,p)=>a+Number(p.amount),0);
+    const done = c.tuition_lessons.filter(l=>['attended','late'].includes(l.attendance)).length;
+    return `<tr class="click" onclick="location.hash='#/course/${c.id}'">
+      <td><b>${esc(c.title)}</b><div class="small muted">${c.total_lessons} ders / ${c.duration_weeks} hafta${c.start_date?' - baslangic '+fmtD(c.start_date):''}</div></td>
+      <td>${esc(tutorName(c.tutor_id))}</td><td style="min-width:140px">${done}/${c.total_lessons} ders${attendanceBar(c.tuition_lessons)}</td>
+      <td>${paid>=total ? '<span class="badge b-green">Odendi</span>' : paid>0 ? `<span class="badge b-gold">Kismi ${money(paid)}</span>` : '<span class="badge b-red">Odenmedi</span>'}<div class="small muted">${money(total,c.currency)}</div></td>
+      <td>${badge(COURSE_STATUS,c.status)}</td></tr>`;
+  };
+  $('view').innerHTML = `
+    <span class="back" onclick="location.hash='#/students'">&larr; Ogrenciler</span>
+    <div class="card">
+      <div class="row between" style="margin-bottom:14px"><h3 style="margin:0">${esc(s.full_name)} ${badge(STUDENT_STATUS,s.status)}</h3>
+        <span class="small muted">${s.user_id?'✅ Uygulama hesabina bagli':'Uygulama hesabi bagli degil'} - Kaynak: ${esc(s.source)}</span></div>
+      <div class="grid">
+        <div class="fg"><label>Ad soyad</label><input class="form-inp" id="sp_full_name" value="${esc(s.full_name)}"></div>
+        <div class="fg"><label>E-posta</label><input class="form-inp" id="sp_email" value="${esc(s.email||'')}"></div>
+        <div class="fg"><label>Telefon</label><input class="form-inp" id="sp_phone" value="${esc(s.phone||'')}"></div>
+        <div class="fg"><label>Yas</label><input class="form-inp" id="sp_age" type="number" min="5" max="100" value="${s.age??''}"></div>
+        <div class="fg"><label>Meslek</label><input class="form-inp" id="sp_occupation" value="${esc(s.occupation||'')}"></div>
+        <div class="fg"><label>Bizi nereden duydu</label><select class="form-inp" id="sp_heard_from"><option value="">-</option>${opt(HEARD, s.heard_from)}</select></div>
+        <div class="fg"><label>Nereden duydu (detay)</label><input class="form-inp" id="sp_heard_from_detail" value="${esc(s.heard_from_detail||'')}"></div>
+        <div class="fg"><label>Ana dili</label><input class="form-inp" id="sp_native_lang" value="${esc(s.native_lang||'')}"></div>
+        <div class="fg"><label>Ulke</label><input class="form-inp" id="sp_country" value="${esc(s.country||'')}"></div>
+        <div class="fg"><label>Saat dilimi</label><input class="form-inp" id="sp_timezone" placeholder="Europe/Istanbul" value="${esc(s.timezone||'')}"></div>
+        <div class="fg"><label>Seviye</label><select class="form-inp" id="sp_level"><option value="">-</option>${LEVELS.map(l=>`<option ${l===s.level?'selected':''}>${l}</option>`).join('')}</select></div>
+        <div class="fg"><label>Durum</label><select class="form-inp" id="sp_status">${opt(STUDENT_STATUS, s.status)}</select></div>
+        ${ME.is_admin?`<div class="fg"><label>Ogretmen</label><select class="form-inp" id="sp_tutor_id">${tutorOptions(s.tutor_id)}</select></div>`:''}
+        <div class="fg full"><label>Ogrenme hedefi</label><textarea class="form-inp" id="sp_goal" rows="2">${esc(s.goal||'')}</textarea></div>
+        <div class="fg full"><label>Ic notlar (ogrenci gormez)</label><textarea class="form-inp" id="sp_internal_notes" rows="2">${esc(s.internal_notes||'')}</textarea></div>
+      </div>
+      <div class="row" style="margin-top:14px"><button class="btn" onclick="saveStudent('${s.id}')">Profili kaydet</button>
+        ${!s.user_id && s.email ? `<button class="btn ghost" onclick="linkStudentApp('${s.id}')">Uygulama hesabina bagla</button>`:''}</div>
+    </div>
+    <div class="card">
+      <div class="row between" style="margin-bottom:14px"><h3 style="margin:0">Kurlar</h3><button class="btn" onclick="newCourseModal('${s.id}','${s.tutor_id||''}','${s.level||''}')">+ Yeni kur</button></div>
+      ${courses.length ? `<div class="tbl-wrap"><table><thead><tr><th>Kur</th><th>Ogretmen</th><th>Ilerleme / katilim</th><th>Odeme</th><th>Durum</th></tr></thead><tbody>${courses.map(courseCard).join('')}</tbody></table></div>` : '<div class="empty">Henuz kur yok. "Yeni kur" ile 16 derslik paketi tanimlayin.</div>'}
+    </div>`;
+}
+async function saveStudent(id){
+  const f = ['full_name','email','phone','occupation','heard_from','heard_from_detail','native_lang','country','timezone','level','status','goal','internal_notes'];
+  const row = {}; f.forEach(k=>row[k]=val('sp_'+k));
+  row.age = val('sp_age') ? parseInt(val('sp_age')) : null;
+  if (ME.is_admin) row.tutor_id = val('sp_tutor_id');
+  if (!row.full_name) { toast('Ad soyad bos olamaz', false); return; }
+  if (!row.status) row.status = 'lead';
+  await run(()=>q(db.from('tuition_students').update(row).eq('id', id)), 'Profil kaydedildi');
+}
+async function linkStudentApp(id){
+  const email = val('sp_email');
+  await run(async()=>{
+    const found = await q(db.rpc('tuition_student_from_email', { p_email: email, p_tutor_id: ME.is_admin ? val('sp_tutor_id') : ME.tutor_id }));
+    if (!found) throw new Error('Bu e-postayla bir uygulama hesabi bulunamadi');
+    if (found !== id) { toast('Bu hesap icin zaten ayri bir profil var, o aciliyor', true); location.hash='#/student/'+found; return; }
+    route();
+  });
+}
+
+function newCourseModal(studentId, tutorId, level){
+  const today = new Date().toISOString().slice(0,10);
+  openModal(`<h3>Yeni kur (ogrenim paketi)</h3>
+    <div class="grid">
+      <div class="fg full"><label>Kur adi</label><input class="form-inp" id="nc_title" value="Turkce Birebir Kur${level?' - '+level:''}"></div>
+      <div class="fg"><label>Seviye</label><select class="form-inp" id="nc_level"><option value="">-</option>${LEVELS.map(l=>`<option ${l===level?'selected':''}>${l}</option>`).join('')}</select></div>
+      ${ME.is_admin?`<div class="fg"><label>Ogretmen *</label><select class="form-inp" id="nc_tutor">${tutorOptions(tutorId||null)}</select></div>`:''}
+      <div class="fg"><label>Ders sayisi</label><input class="form-inp" id="nc_total" type="number" value="16" oninput="ncTotal()"></div>
+      <div class="fg"><label>Sure (hafta)</label><input class="form-inp" id="nc_weeks" type="number" value="8"></div>
+      <div class="fg"><label>Ders suresi (dk)</label><input class="form-inp" id="nc_minutes" type="number" value="50"></div>
+      <div class="fg"><label>Ders ucreti (USD)</label><input class="form-inp" id="nc_price" type="number" step="0.5" value="10" oninput="ncTotal()"></div>
+      <div class="fg"><label>Baslangic tarihi</label><input class="form-inp" id="nc_start" type="date" value="${today}"></div>
+      <div class="fg"><label>Toplam</label><div id="nc_sum" style="font-size:20px;font-weight:900;padding-top:6px">$160</div></div>
+    </div>
+    <p class="muted small" style="margin-top:10px">Kur olusunca ${'<b>'}ders satirlari otomatik acilir${'</b>'}. Tarihleri kur ekranindaki "Otomatik planla" ile doldurabilirsiniz.</p>
+    <div class="row" style="margin-top:16px"><button class="btn" onclick="createCourse('${studentId}')">Kuru olustur</button><button class="btn ghost" onclick="closeModal()">Vazgec</button></div>`);
+}
+function ncTotal(){ const t=(parseFloat($('nc_total').value)||0)*(parseFloat($('nc_price').value)||0); $('nc_sum').textContent = money(t); }
+async function createCourse(studentId){
+  const tutor = ME.is_admin ? val('nc_tutor') : ME.tutor_id;
+  if (!tutor) { toast('Ogretmen secin', false); return; }
+  const row = { student_id: studentId, tutor_id: tutor, title: val('nc_title') || 'Turkce Birebir Kur', level: val('nc_level'),
+    total_lessons: parseInt(val('nc_total'))||16, duration_weeks: parseInt(val('nc_weeks'))||8, lesson_minutes: parseInt(val('nc_minutes'))||50,
+    price_per_lesson: parseFloat(val('nc_price'))||0, start_date: val('nc_start'), status:'planned' };
+  await run(async()=>{
+    const c = await q(db.from('tuition_courses').insert(row).select('id').single());
+    await q(db.from('tuition_students').update({ status:'active' }).eq('id', studentId).eq('status','lead'));
+    closeModal(); location.hash='#/course/'+c.id;
+  }, 'Kur olusturuldu');
+}
+
+// ---------------------------------------------------------------------------
+// KUR DETAY: ders plani + katilim + gozlem + odev + odeme
+// ---------------------------------------------------------------------------
+let CUR = null;
+async function viewCourse(id){
+  const [c, lessons, obs, hw, pays] = await Promise.all([
+    q(db.from('tuition_courses').select('*, tuition_students(id,full_name,email,timezone)').eq('id', id).single()),
+    q(db.from('tuition_lessons').select('*').eq('course_id', id).order('lesson_no')),
+    q(db.from('tuition_observations').select('*, tuition_lessons!inner(course_id)').eq('tuition_lessons.course_id', id)),
+    q(db.from('tuition_homework').select('*').eq('course_id', id).order('created_at')),
+    q(db.from('tuition_payments').select('*').eq('course_id', id).order('paid_on')),
+  ]);
+  CUR = { c, lessons, obs, hw, pays };
+  const obsBy = Object.fromEntries(obs.map(o=>[o.lesson_id,o]));
+  const cnt = k => lessons.filter(l=>l.attendance===k).length;
+  const total = c.total_lessons * c.price_per_lesson;
+  const paid = pays.reduce((a,p)=>a+Number(p.amount),0);
+  const tutor = TUTORS.find(t=>t.id===c.tutor_id);
+  const hwSubmitted = hw.filter(h=>['submitted','reviewed'].includes(h.status)).length;
+
+  $('view').innerHTML = `
+    <span class="back" onclick="location.hash='#/student/${c.student_id}'">&larr; ${esc(c.tuition_students.full_name)}</span>
+    <div class="card">
+      <div class="row between"><h3 style="margin:0">${esc(c.title)} ${badge(COURSE_STATUS,c.status)}</h3>
+        <div class="row"><select class="form-inp" style="width:auto" onchange="setCourseStatus(this.value)">${opt(COURSE_STATUS,c.status)}</select></div></div>
+      <p class="muted small" style="margin-top:6px">${esc(c.tuition_students.full_name)} - Ogretmen: ${esc(tutorName(c.tutor_id))} - ${c.total_lessons} ders / ${c.duration_weeks} hafta / ${c.lesson_minutes} dk - ${c.level||''}</p>
+    </div>
+    <div class="stats">
+      <div class="stat"><div class="num" style="color:var(--green)">${cnt('attended')+cnt('late')}</div><div class="lbl">Katildi (${cnt('late')} gec)</div></div>
+      <div class="stat"><div class="num" style="color:#FF6B6B">${cnt('absent')}</div><div class="lbl">Gelmedi</div></div>
+      <div class="stat"><div class="num" style="color:var(--blue)">${cnt('excused')}</div><div class="lbl">Izinli</div></div>
+      <div class="stat"><div class="num">${cnt('scheduled')}</div><div class="lbl">Kalan ders</div></div>
+      <div class="stat"><div class="num">${hwSubmitted}/${hw.length}</div><div class="lbl">Odev teslim</div></div>
+      <div class="stat"><div class="num" style="color:${paid>=total?'var(--green)':'var(--gold)'}">${money(paid)}</div><div class="lbl">Odenen / ${money(total)}</div></div>
+    </div>
+
+    <div class="card">
+      <div class="row between" style="margin-bottom:12px"><h3 style="margin:0">📚 Ders plani ve katilim</h3>
+        <div class="row"><button class="btn ghost sm" onclick="autoPlanModal()">Otomatik planla</button>${tutor&&(tutor.meet_link)?`<button class="btn ghost sm" onclick="fillMeet()">Meet linkini doldur</button>`:''}</div></div>
+      <div class="tbl-wrap"><table><thead><tr><th>#</th><th>Tarih / saat</th><th>Konu</th><th>Katilim</th><th>Gozlem</th><th>Meet</th><th></th></tr></thead><tbody>
+      ${lessons.map(l=>`<tr>
+        <td><b>${l.lesson_no}</b></td>
+        <td><input class="form-inp" type="datetime-local" style="min-width:190px" value="${toLocalInput(l.scheduled_at)}" onchange="updLesson('${l.id}',{scheduled_at:fromLocalInput(this.value)})"></td>
+        <td><input class="form-inp" style="min-width:180px" value="${esc(l.topic||'')}" placeholder="Ders konusu" onchange="updLesson('${l.id}',{topic:this.value.trim()||null})"></td>
+        <td><select class="form-inp" style="min-width:130px" onchange="setAttendance('${l.id}',this.value)">${opt(ATT,l.attendance)}</select></td>
+        <td>${obsBy[l.id] ? `<button class="btn sm" style="background:rgba(0,200,83,0.2);color:var(--green)" onclick="obsModal('${l.id}')">Girildi</button>` : `<button class="btn ghost sm" onclick="obsModal('${l.id}')">+ Gozlem</button>`}</td>
+        <td>${l.meet_link?`<a href="${esc(l.meet_link)}" target="_blank" rel="noopener">Ac</a>`:'<span class="muted">-</span>'}</td>
+        <td><button class="btn ghost sm" onclick="lessonModal('${l.id}')">Detay</button></td></tr>`).join('')}
+      </tbody></table></div>
+      <p class="muted small" style="margin-top:8px">Saatler tarayicinizin saat diliminde${c.tuition_students.timezone?' (ogrenci: '+esc(c.tuition_students.timezone)+')':''}. Katilim secildigi anda kaydedilir.</p>
+    </div>
+
+    <div class="card">
+      <div class="row between" style="margin-bottom:12px"><h3 style="margin:0">📝 Odevler</h3><button class="btn sm" onclick="hwModal()">+ Odev ver</button></div>
+      ${hw.length ? `<div class="tbl-wrap"><table><thead><tr><th>Odev</th><th>Ders</th><th>Son tarih</th><th>Durum</th><th>Puan</th><th></th></tr></thead><tbody>
+        ${hw.map(h=>{ const l=lessons.find(x=>x.id===h.lesson_id); return `<tr><td><b>${esc(h.title)}</b></td><td>${l?'Ders '+l.lesson_no:'-'}</td><td>${fmtDT(h.due_at)}</td><td>${badge(HW,h.status)}</td><td>${h.score??'-'}</td>
+          <td><button class="btn ghost sm" onclick="hwModal('${h.id}')">${h.status==='submitted'?'Degerlendir':'Duzenle'}</button></td></tr>`; }).join('')}
+      </tbody></table></div>` : '<div class="empty">Henuz odev yok</div>'}
+    </div>
+
+    <div class="card">
+      <div class="row between" style="margin-bottom:12px"><h3 style="margin:0">💵 Odeme (ogrenci gormez)</h3><button class="btn sm" onclick="payModal()">+ Odeme gir</button></div>
+      <p class="small" style="margin-bottom:10px">Toplam: <b>${money(total,c.currency)}</b> (${c.total_lessons} x ${money(c.price_per_lesson,c.currency)}) - Odenen: <b>${money(paid,c.currency)}</b> - Kalan: <b style="color:${total-paid>0?'var(--gold)':'var(--green)'}">${money(Math.max(total-paid,0),c.currency)}</b></p>
+      ${pays.length ? `<div class="tbl-wrap"><table><thead><tr><th>Tarih</th><th>Tutar</th><th>Yontem</th><th>Not</th>${ME.is_admin?'<th></th>':''}</tr></thead><tbody>
+        ${pays.map(p=>`<tr><td>${fmtD(p.paid_on)}</td><td><b>${money(p.amount,p.currency)}</b></td><td>${esc(p.method||'-')}</td><td>${esc(p.note||'')}</td>${ME.is_admin?`<td><button class="btn ghost sm" onclick="delPay('${p.id}')">Sil</button></td>`:''}</tr>`).join('')}
+      </tbody></table></div>` : '<div class="muted small">Henuz odeme girilmedi</div>'}
+    </div>`;
+}
+async function updLesson(id, patch){ await run(()=>q(db.from('tuition_lessons').update(patch).eq('id', id)), 'Kaydedildi'); }
+async function setAttendance(id, v){
+  const { data: { user } } = await db.auth.getUser();
+  await updLesson(id, { attendance: v, attendance_marked_at: v==='scheduled'?null:new Date().toISOString(), attendance_marked_by: v==='scheduled'?null:user.id });
+  if (['attended','late'].includes(v) && !CUR.obs.find(o=>o.lesson_id===id)) { await viewCourse(CUR.c.id); obsModal(id); return; }
+  viewCourse(CUR.c.id);
+}
+async function setCourseStatus(v){ await run(()=>q(db.from('tuition_courses').update({status:v}).eq('id', CUR.c.id)), 'Kur durumu guncellendi'); viewCourse(CUR.c.id); }
+async function fillMeet(){
+  const tutor = TUTORS.find(t=>t.id===CUR.c.tutor_id);
+  const targets = CUR.lessons.filter(l=>!l.meet_link && l.attendance==='scheduled');
+  if (!targets.length) { toast('Doldurulacak ders yok'); return; }
+  await run(()=>Promise.all(targets.map(l=>q(db.from('tuition_lessons').update({meet_link: tutor.meet_link}).eq('id', l.id)))), targets.length+' derse Meet linki eklendi');
+  viewCourse(CUR.c.id);
+}
+
+function autoPlanModal(){
+  const c = CUR.c;
+  const perWeek = Math.max(1, Math.round(c.total_lessons / c.duration_weeks));
+  openModal(`<h3>Otomatik planla</h3>
+    <p class="muted small" style="margin-bottom:12px">Tarihi bos olan planli dersleri, secilen gunlere ve saate gore sirayla doldurur. Tarihi girilmis derslere dokunmaz. (${c.total_lessons} ders / ${c.duration_weeks} hafta = haftada ${perWeek} ders)</p>
+    <div class="fg" style="margin-bottom:12px"><label>Gunler</label><div class="days">${WEEKDAYS.map(([d,l])=>`<label><input type="checkbox" class="ap_day" value="${d}" ${(perWeek>=2?[2,4]:[3]).includes(d)?'checked':''}> ${l}</label>`).join('')}</div></div>
+    <div class="grid">
+      <div class="fg"><label>Baslangic</label><input class="form-inp" type="date" id="ap_start" value="${c.start_date || new Date().toISOString().slice(0,10)}"></div>
+      <div class="fg"><label>Saat</label><input class="form-inp" type="time" id="ap_time" value="18:00"></div>
+    </div>
+    <div class="row" style="margin-top:16px"><button class="btn" onclick="autoPlan()">Planla</button><button class="btn ghost" onclick="closeModal()">Vazgec</button></div>`);
+}
+async function autoPlan(){
+  const days = [...document.querySelectorAll('.ap_day:checked')].map(e=>parseInt(e.value));
+  const start = val('ap_start'), time = val('ap_time');
+  if (!days.length || !start || !time) { toast('Gun, baslangic ve saat secin', false); return; }
+  const todo = CUR.lessons.filter(l=>!l.scheduled_at && l.attendance==='scheduled');
+  if (!todo.length) { toast('Tarihi bos ders yok'); closeModal(); return; }
+  const [hh, mm] = time.split(':').map(Number);
+  const d = new Date(start + 'T00:00:00');
+  const updates = [];
+  let guard = 0;
+  while (updates.length < todo.length && guard++ < 800) {
+    if (days.includes(d.getDay())) { const x = new Date(d); x.setHours(hh, mm, 0, 0); updates.push(x.toISOString()); }
+    d.setDate(d.getDate()+1);
+  }
+  await run(async()=>{
+    await Promise.all(todo.map((l,i)=>q(db.from('tuition_lessons').update({ scheduled_at: updates[i] }).eq('id', l.id))));
+    if (!CUR.c.start_date) await q(db.from('tuition_courses').update({ start_date: start }).eq('id', CUR.c.id));
+  }, todo.length+' ders planlandi');
+  closeModal(); viewCourse(CUR.c.id);
+}
+
+function lessonModal(id){
+  const l = CUR.lessons.find(x=>x.id===id);
+  openModal(`<h3>Ders ${l.lesson_no}</h3>
+    <div class="grid">
+      <div class="fg full"><label>Konu</label><input class="form-inp" id="lm_topic" value="${esc(l.topic||'')}"></div>
+      <div class="fg full"><label>Hedefler / ders plani</label><textarea class="form-inp" id="lm_objectives" rows="4">${esc(l.objectives||'')}</textarea></div>
+      <div class="fg"><label>Tarih / saat</label><input class="form-inp" type="datetime-local" id="lm_at" value="${toLocalInput(l.scheduled_at)}"></div>
+      <div class="fg"><label>Sure (dk)</label><input class="form-inp" type="number" id="lm_dur" value="${l.duration_min}"></div>
+      <div class="fg full"><label>Meet linki</label><input class="form-inp" id="lm_meet" placeholder="https://meet.google.com/..." value="${esc(l.meet_link||'')}"></div>
+      <div class="fg"><label>Katilim</label><select class="form-inp" id="lm_att">${opt(ATT,l.attendance)}</select></div>
+      <div class="fg full"><label>Katilim notu</label><input class="form-inp" id="lm_attnote" value="${esc(l.attendance_note||'')}" placeholder="Orn: 15 dk gec baglandi / hasta"></div>
+    </div>
+    <div class="row" style="margin-top:16px"><button class="btn" onclick="saveLesson('${l.id}')">Kaydet</button><button class="btn ghost" onclick="closeModal()">Vazgec</button></div>`);
+}
+async function saveLesson(id){
+  const l = CUR.lessons.find(x=>x.id===id);
+  const att = val('lm_att');
+  const { data: { user } } = await db.auth.getUser();
+  const patch = { topic: val('lm_topic'), objectives: val('lm_objectives'), scheduled_at: fromLocalInput(val('lm_at')),
+    duration_min: parseInt(val('lm_dur'))||50, meet_link: val('lm_meet'), attendance: att, attendance_note: val('lm_attnote') };
+  if (att !== l.attendance) { patch.attendance_marked_at = att==='scheduled'?null:new Date().toISOString(); patch.attendance_marked_by = att==='scheduled'?null:user.id; }
+  await run(()=>q(db.from('tuition_lessons').update(patch).eq('id', id)), 'Ders kaydedildi');
+  closeModal(); viewCourse(CUR.c.id);
+}
+
+function obsModal(lessonId){
+  const l = CUR.lessons.find(x=>x.id===lessonId);
+  const o = CUR.obs.find(x=>x.lesson_id===lessonId) || {};
+  const scoreSel = (k) => `<select class="form-inp" id="ob_${k}"><option value="">-</option>${[1,2,3,4,5].map(n=>`<option ${o[k]===n?'selected':''}>${n}</option>`).join('')}</select>`;
+  openModal(`<h3>Ogretmen gozlemi - Ders ${l.lesson_no}${l.topic?': '+esc(l.topic):''}</h3>
+    <p class="muted small" style="margin-bottom:12px">1 = cok zayif, 5 = cok iyi. Puanlar ve ilk uc metin alani ogrencinin gelisim raporunda gorunur; "ozel not" sadece ogretmen/yonetici ve AI degerlendirmesi icindir.</p>
+    <div class="scores">${SKILLS.map(([k,lbl])=>`<div class="fg"><label>${lbl}</label>${scoreSel(k)}</div>`).join('')}</div>
+    <div class="grid" style="margin-top:12px">
+      <div class="fg full"><label>Derste islenenler</label><textarea class="form-inp" id="ob_covered" rows="2">${esc(o.covered||'')}</textarea></div>
+      <div class="fg full"><label>Guclu yonler</label><textarea class="form-inp" id="ob_strengths" rows="2">${esc(o.strengths||'')}</textarea></div>
+      <div class="fg full"><label>Gelistirilmesi gerekenler</label><textarea class="form-inp" id="ob_improvements" rows="2">${esc(o.improvements||'')}</textarea></div>
+      <div class="fg full"><label>Ozel not (ogrenci gormez)</label><textarea class="form-inp" id="ob_private_notes" rows="2">${esc(o.private_notes||'')}</textarea></div>
+    </div>
+    <div class="row" style="margin-top:16px"><button class="btn" onclick="saveObs('${lessonId}')">Gozlemi kaydet</button><button class="btn ghost" onclick="closeModal()">Vazgec</button></div>`);
+}
+async function saveObs(lessonId){
+  const row = { lesson_id: lessonId, tutor_id: CUR.c.tutor_id };
+  SKILLS.forEach(([k])=>{ const v=val('ob_'+k); row[k]= v?parseInt(v):null; });
+  ['covered','strengths','improvements','private_notes'].forEach(k=>row[k]=val('ob_'+k));
+  if (SKILLS.every(([k])=>row[k]==null) && !row.covered && !row.strengths && !row.improvements) { toast('En az bir puan ya da not girin', false); return; }
+  await run(()=>q(db.from('tuition_observations').upsert(row, { onConflict:'lesson_id' })), 'Gozlem kaydedildi');
+  closeModal(); viewCourse(CUR.c.id);
+}
+
+function hwModal(id){
+  const h = id ? CUR.hw.find(x=>x.id===id) : {};
+  const due = h.due_at ? toLocalInput(h.due_at) : '';
+  openModal(`<h3>${id?'Odev':'Yeni odev'}</h3>
+    <div class="grid">
+      <div class="fg full"><label>Baslik *</label><input class="form-inp" id="hw_title" value="${esc(h.title||'')}"></div>
+      <div class="fg"><label>Ilgili ders</label><select class="form-inp" id="hw_lesson"><option value="">-</option>${CUR.lessons.map(l=>`<option value="${l.id}" ${l.id===h.lesson_id?'selected':''}>Ders ${l.lesson_no}${l.topic?' - '+esc(l.topic):''}</option>`).join('')}</select></div>
+      <div class="fg"><label>Son teslim</label><input class="form-inp" type="datetime-local" id="hw_due" value="${due}"></div>
+      <div class="fg full"><label>Yonerge</label><textarea class="form-inp" id="hw_instructions" rows="4">${esc(h.instructions||'')}</textarea></div>
+      ${id ? `
+      <div class="fg full"><label>Ogrencinin teslimi ${h.submitted_at?'('+fmtDT(h.submitted_at)+')':''}</label><div class="card" style="margin:0;white-space:pre-wrap">${h.submission_text?esc(h.submission_text):'<span class="muted">Henuz teslim yok</span>'}</div></div>
+      <div class="fg"><label>Durum</label><select class="form-inp" id="hw_status">${opt(HW,h.status)}</select></div>
+      <div class="fg"><label>Puan (0-100)</label><input class="form-inp" type="number" min="0" max="100" id="hw_score" value="${h.score??''}"></div>
+      <div class="fg full"><label>Geri bildirim (ogrenci gorur)</label><textarea class="form-inp" id="hw_feedback" rows="3">${esc(h.feedback||'')}</textarea></div>` : ''}
+    </div>
+    <div class="row" style="margin-top:16px"><button class="btn" onclick="saveHw(${id?`'${id}'`:'null'})">${id?'Kaydet':'Odevi ver'}</button><button class="btn ghost" onclick="closeModal()">Vazgec</button>
+      ${id&&ME.is_admin?`<button class="btn ghost" style="margin-inline-start:auto" onclick="delHw('${id}')">Sil</button>`:''}</div>`);
+}
+async function saveHw(id){
+  const title = val('hw_title');
+  if (!title) { toast('Baslik gerekli', false); return; }
+  const row = { title, lesson_id: val('hw_lesson'), due_at: fromLocalInput(val('hw_due')), instructions: val('hw_instructions') };
+  if (id) {
+    const prev = CUR.hw.find(x=>x.id===id);
+    row.status = val('hw_status'); row.feedback = val('hw_feedback');
+    row.score = val('hw_score')!=null ? Math.max(0, Math.min(100, parseInt(val('hw_score')))) : null;
+    if ((row.score!=null || row.feedback) && row.status==='submitted') row.status = 'reviewed';
+    if (row.status==='reviewed' && prev.status!=='reviewed') row.reviewed_at = new Date().toISOString();
+    await run(()=>q(db.from('tuition_homework').update(row).eq('id', id)), 'Odev kaydedildi');
+  } else {
+    row.course_id = CUR.c.id;
+    await run(()=>q(db.from('tuition_homework').insert(row)), 'Odev verildi');
+  }
+  closeModal(); viewCourse(CUR.c.id);
+}
+async function delHw(id){ if(!confirm('Odev silinsin mi?')) return; await run(()=>q(db.from('tuition_homework').delete().eq('id', id)), 'Silindi'); closeModal(); viewCourse(CUR.c.id); }
+
+function payModal(){
+  openModal(`<h3>Odeme gir</h3>
+    <div class="grid">
+      <div class="fg"><label>Tutar *</label><input class="form-inp" type="number" step="0.01" id="py_amount" value="${Math.max(CUR.c.total_lessons*CUR.c.price_per_lesson - CUR.pays.reduce((a,p)=>a+Number(p.amount),0),0)}"></div>
+      <div class="fg"><label>Para birimi</label><input class="form-inp" id="py_cur" value="${esc(CUR.c.currency)}"></div>
+      <div class="fg"><label>Tarih</label><input class="form-inp" type="date" id="py_on" value="${new Date().toISOString().slice(0,10)}"></div>
+      <div class="fg"><label>Yontem</label><select class="form-inp" id="py_method"><option value="bank">Havale / EFT</option><option value="card">Kart</option><option value="cash">Nakit</option><option value="paypal">PayPal</option><option value="other">Diger</option></select></div>
+      <div class="fg full"><label>Not</label><input class="form-inp" id="py_note"></div>
+    </div>
+    <div class="row" style="margin-top:16px"><button class="btn" onclick="savePay()">Kaydet</button><button class="btn ghost" onclick="closeModal()">Vazgec</button></div>`);
+}
+async function savePay(){
+  const amount = parseFloat(val('py_amount'));
+  if (!(amount>0)) { toast('Tutar sifirdan buyuk olmali', false); return; }
+  await run(()=>q(db.from('tuition_payments').insert({ course_id: CUR.c.id, amount, currency: val('py_cur')||'USD', paid_on: val('py_on'), method: val('py_method'), note: val('py_note') })), 'Odeme kaydedildi');
+  closeModal(); viewCourse(CUR.c.id);
+}
+async function delPay(id){ if(!confirm('Odeme kaydi silinsin mi?')) return; await run(()=>q(db.from('tuition_payments').delete().eq('id', id)), 'Silindi'); viewCourse(CUR.c.id); }
+
+// ---------------------------------------------------------------------------
+// TALEPLER (admin): uygulamadan gelen demo talepleri + rezervasyonlar
+// ---------------------------------------------------------------------------
+async function viewRequests(){
+  const [demos, students] = await Promise.all([
+    q(db.from('demo_requests').select('*').order('created_at',{ascending:false}).limit(200)),
+    q(db.from('tuition_students').select('id,user_id,full_name,email')),
+  ]);
+  const byUser = Object.fromEntries(students.filter(s=>s.user_id).map(s=>[s.user_id,s]));
+  $('view').innerHTML = `<div class="card"><h3>Uygulamadan gelen ders talepleri (${demos.length})</h3>
+    <p class="muted small" style="margin-bottom:12px">Talep geldiginde ogrenci profili otomatik acilir. Profili acip yas, meslek, nereden duydugunu tamamlayin ve kur tanimlayin.</p>
+    <div class="tbl-wrap"><table><thead><tr><th>Tarih</th><th>Ogrenci</th><th>Tercih</th><th>Mesaj</th><th>Durum</th><th></th></tr></thead><tbody>
+    ${demos.map(d=>{ const s=byUser[d.student_id]; return `<tr><td class="small">${fmtDT(d.created_at)}</td><td>${s?`<b>${esc(s.full_name)}</b><div class="small muted">${esc(s.email||'')}</div>`:'<span class="muted">-</span>'}</td>
+      <td class="small">${d.preferred_date?fmtD(d.preferred_date):''} ${d.preferred_time?esc(String(d.preferred_time).slice(0,5)):''}</td><td class="small">${esc(d.message||'')}</td>
+      <td><select class="form-inp" style="width:auto" onchange="setDemo('${d.id}',this.value)">${['pending','confirmed','completed','rejected'].map(x=>`<option ${x===d.status?'selected':''}>${x}</option>`).join('')}</select></td>
+      <td>${s?`<button class="btn sm" onclick="location.hash='#/student/${s.id}'">Profil</button>`:''}</td></tr>`; }).join('') || '<tr><td colspan="6" class="empty">Talep yok</td></tr>'}
+    </tbody></table></div></div>`;
+}
+async function setDemo(id, status){ await run(()=>q(db.from('demo_requests').update({status}).eq('id', id)), 'Talep guncellendi'); }
+
+// ---------------------------------------------------------------------------
+// OGRETMENLER (admin): giris hesabi bagla, aktif/pasif, Meet odasi
+// ---------------------------------------------------------------------------
+async function viewTutors(){
+  await loadTutors();
+  $('view').innerHTML = `<div class="card"><h3>Ogretmenler</h3>
+    <p class="muted small" style="margin-bottom:12px">Ogretmenin bu panele girebilmesi icin: (1) aktif olmali, (2) bir giris hesabina (e-posta) bagli olmali. Hesap yoksa once Supabase Authentication'da kullanici olusturun.</p>
+    <div class="tbl-wrap"><table><thead><tr><th>Ad</th><th>Giris hesabi</th><th>Kalici Meet linki</th><th>Durum</th><th></th></tr></thead><tbody>
+    ${TUTORS.map(t=>`<tr><td><b>${esc(t.full_name)}</b></td>
+      <td>${t.user_id?'<span class="badge b-green">Bagli</span>':'<span class="badge b-red">Bagli degil</span>'} <button class="btn ghost sm" onclick="linkTutor('${t.id}')">${t.user_id?'Degistir':'Bagla'}</button></td>
+      <td><input class="form-inp" style="min-width:240px" placeholder="https://meet.google.com/xxx-xxxx-xxx" value="${esc(t.meet_link||'')}" onchange="updTutor('${t.id}',{meet_link:this.value.trim()||null})"></td>
+      <td>${t.is_active?'<span class="badge b-green">Aktif</span>':'<span class="badge b-grey">Pasif</span>'}</td>
+      <td><button class="btn ghost sm" onclick="updTutor('${t.id}',{is_active:${!t.is_active}},true)">${t.is_active?'Pasif yap':'Aktif yap'}</button></td></tr>`).join('') || '<tr><td colspan="5" class="empty">Ogretmen yok. Yeni ogretmeni /admin panelinden ekleyin.</td></tr>'}
+    </tbody></table></div></div>`;
+}
+async function updTutor(id, patch, reload){ await run(()=>q(db.from('tutors').update(patch).eq('id', id)), 'Ogretmen guncellendi'); await loadTutors(); if (reload) viewTutors(); }
+async function linkTutor(id){
+  const email = prompt('Ogretmenin giris e-postasi:');
+  if (!email) return;
+  await run(()=>q(db.rpc('tuition_link_tutor_user', { p_tutor_id: id, p_email: email })), 'Hesap baglandi');
+  viewTutors();
+}
+
+// ---------------------------------------------------------------------------
+window.addEventListener('load', async () => {
+  const { data: { session } } = await db.auth.getSession();
+  if (session) await enter(); else $('email').focus();
+});
+</script>
+</body>
+</html>
