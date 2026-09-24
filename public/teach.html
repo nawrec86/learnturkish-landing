@@ -891,7 +891,7 @@ async function viewOverview(silent){
         <table><tbody>
           <tr class="clickrow" onclick="subsModal()"><td>Aktif premium (toplam) ›</td><td><b>${nf(S.active)}</b></td></tr>
           <tr><td>Ödeyen (mağaza işlemi olan)</td><td><b style="color:var(--gold)">${nf(S.paid)}</b></td></tr>
-          <tr><td>Hediye / elle verilen</td><td>${nf(S.gifted)}</td></tr>
+          <tr><td>Hediye / elle verilen</td><td>${nf(S.gifted)}${S.gifted_by_source&&Object.keys(S.gifted_by_source).length?`<div class="small muted">${Object.entries(S.gifted_by_source).map(([k,v])=>`${esc(k)}: ${v}`).join(' · ')}</div>`:''}</td></tr>
           <tr><td>Son 30 gün yeni ödeyen</td><td><b>${nf(S.new_paid_30d)}</b></td></tr>
           <tr><td>Paket dağılımı</td><td class="small">${Object.entries(S.by_tier||{}).map(([k,v])=>`${esc(k)}: ${v}`).join(' · ')||'-'}</td></tr>
           <tr><td>Platform (ödeyen)</td><td class="small">${Object.entries(S.paid_by_platform||{}).map(([k,v])=>`${esc(k)}: ${v}`).join(' · ')||'-'}</td></tr>
