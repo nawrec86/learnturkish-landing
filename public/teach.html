@@ -379,14 +379,17 @@ async function createCourse(studentId){
 // ---------------------------------------------------------------------------
 let CUR = null;
 async function viewCourse(id){
-  const [c, lessons, obs, hw, pays] = await Promise.all([
+  const [c, lessons, obs, hw, pays, quizzes, reports] = await Promise.all([
     q(db.from('tuition_courses').select('*, tuition_students(id,full_name,email,timezone)').eq('id', id).single()),
     q(db.from('tuition_lessons').select('*').eq('course_id', id).order('lesson_no')),
     q(db.from('tuition_observations').select('*, tuition_lessons!inner(course_id)').eq('tuition_lessons.course_id', id)),
     q(db.from('tuition_homework').select('*').eq('course_id', id).order('created_at')),
     q(db.from('tuition_payments').select('*').eq('course_id', id).order('paid_on')),
+    q(db.from('tuition_quizzes').select('id,lesson_id,status,title,questions,tuition_quiz_attempts(score,total,submitted_at)').eq('course_id', id)),
+    q(db.from('tuition_reports').select('id,status,created_at,published_at,lessons_covered,report').eq('course_id', id).order('created_at',{ascending:false})),
   ]);
-  CUR = { c, lessons, obs, hw, pays };
+  CUR = { c, lessons, obs, hw, pays, quizzes, reports };
+  const quizBy = Object.fromEntries(quizzes.map(z=>[z.lesson_id,z]));
   const obsBy = Object.fromEntries(obs.map(o=>[o.lesson_id,o]));
   const cnt = k => lessons.filter(l=>l.attendance===k).length;
   const total = c.total_lessons * c.price_per_lesson;
@@ -412,15 +415,16 @@ async function viewCourse(id){
 
     <div class="card">
       <div class="row between" style="margin-bottom:12px"><h3 style="margin:0">📚 Ders planı ve katılım</h3>
-        <div class="row"><button class="btn ghost sm" onclick="autoPlanModal()">Otomatik planla</button>${tutor&&(tutor.meet_link)?`<button class="btn ghost sm" onclick="fillMeet()">Meet linkini doldur</button>`:''}</div></div>
-      <div class="tbl-wrap"><table><thead><tr><th>#</th><th>Tarih / saat</th><th>Konu</th><th>Katılım</th><th>Gözlem</th><th>Meet</th><th></th></tr></thead><tbody>
+        <div class="row"><button class="btn ghost sm" onclick="autoPlanModal()">Otomatik planla</button><button class="btn ghost sm" onclick="meetSyncCourse()">📹 Google Meet daveti gönder</button>${tutor&&(tutor.meet_link)?`<button class="btn ghost sm" onclick="fillMeet()">Meet linkini doldur</button>`:''}</div></div>
+      <div class="tbl-wrap"><table><thead><tr><th>#</th><th>Tarih / saat</th><th>Konu</th><th>Katılım</th><th>Gözlem</th><th>AI Quiz</th><th>Meet</th><th></th></tr></thead><tbody>
       ${lessons.map(l=>`<tr>
         <td><b>${l.lesson_no}</b></td>
-        <td><input class="form-inp" type="datetime-local" style="min-width:190px" value="${toLocalInput(l.scheduled_at)}" onchange="updLesson('${l.id}',{scheduled_at:fromLocalInput(this.value)})"></td>
+        <td><input class="form-inp" type="datetime-local" style="min-width:190px" value="${toLocalInput(l.scheduled_at)}" onchange="updLesson('${l.id}',{scheduled_at:fromLocalInput(this.value)}).then(()=>meetResync('${l.id}'))"></td>
         <td><input class="form-inp" style="min-width:180px" value="${esc(l.topic||'')}" placeholder="Ders konusu" onchange="updLesson('${l.id}',{topic:this.value.trim()||null})"></td>
         <td><select class="form-inp" style="min-width:130px" onchange="setAttendance('${l.id}',this.value)">${opt(ATT,l.attendance)}</select></td>
         <td>${obsBy[l.id] ? `<button class="btn sm" style="background:rgba(0,200,83,0.2);color:var(--green)" onclick="obsModal('${l.id}')">Girildi</button>` : `<button class="btn ghost sm" onclick="obsModal('${l.id}')">+ Gözlem</button>`}</td>
-        <td>${l.meet_link?`<a href="${esc(l.meet_link)}" target="_blank" rel="noopener">Aç</a>`:'<span class="muted">-</span>'}</td>
+        <td>${quizCell(quizBy[l.id], l)}</td>
+        <td>${l.meet_link?`<a href="${esc(l.meet_link)}" target="_blank" rel="noopener">Aç</a>${l.calendar_event_id?' <span class="small muted" title="Takvim daveti gönderildi">📅</span>':''}`:'<span class="muted">-</span>'}</td>
         <td><button class="btn ghost sm" onclick="lessonModal('${l.id}')">Detay</button></td></tr>`).join('')}
       </tbody></table></div>
       <p class="muted small" style="margin-top:8px">Saatler tarayıcınızın saat diliminde${c.tuition_students.timezone?' (öğrenci: '+esc(c.tuition_students.timezone)+')':''}. Katılım seçildiği anda kaydedilir.</p>
@@ -435,6 +439,16 @@ async function viewCourse(id){
     </div>
 
     <div class="card">
+      <div class="row between" style="margin-bottom:12px"><h3 style="margin:0">🧭 AI Gelişim Raporu</h3>
+        <div class="row"><select class="form-inp" id="rp_lang" style="width:auto">${REPORT_LANGS.map(([k,v])=>`<option value="${k}">${v}</option>`).join('')}</select><button class="btn sm" id="rp_btn" onclick="genReport()">✨ Rapor oluştur</button></div></div>
+      <p class="muted small" style="margin-bottom:10px">AI; öğretmen gözlemlerini, katılımı, ödevleri ve quiz sonuçlarını birlikte değerlendirir, güçlü yönleri, çalışılacak alanları ve 2 haftalık çalışma planını yazar. Taslağı inceleyip yayınladığınızda öğrenci uygulamada görür.</p>
+      ${reports.length ? `<div class="tbl-wrap"><table><thead><tr><th>Oluşturma</th><th>Kapsanan ders</th><th>Durum</th><th></th></tr></thead><tbody>
+        ${reports.map(r=>`<tr><td>${fmtDT(r.created_at)}</td><td>${r.lessons_covered??'-'}</td><td>${r.status==='published'?'<span class="badge b-green">Yayında</span>':'<span class="badge b-gold">Taslak</span>'}</td>
+          <td><button class="btn ghost sm" onclick="reportModal('${r.id}')">Aç</button></td></tr>`).join('')}
+      </tbody></table></div>` : '<div class="muted small">Henüz rapor yok. En az bir ders gözlemi girildikten sonra oluşturabilirsiniz.</div>'}
+    </div>
+
+    <div class="card">
       <div class="row between" style="margin-bottom:12px"><h3 style="margin:0">💵 Ödeme (öğrenci görmez)</h3><button class="btn sm" onclick="payModal()">+ Ödeme gir</button></div>
       <p class="small" style="margin-bottom:10px">Toplam: <b>${money(total,c.currency)}</b> (${c.total_lessons} x ${money(c.price_per_lesson,c.currency)}) - Ödenen: <b>${money(paid,c.currency)}</b> - Kalan: <b style="color:${total-paid>0?'var(--gold)':'var(--green)'}">${money(Math.max(total-paid,0),c.currency)}</b></p>
       ${pays.length ? `<div class="tbl-wrap"><table><thead><tr><th>Tarih</th><th>Tutar</th><th>Yöntem</th><th>Not</th>${ME.is_admin?'<th></th>':''}</tr></thead><tbody>
@@ -446,6 +460,8 @@ async function updLesson(id, patch){ await run(()=>q(db.from('tuition_lessons').
 async function setAttendance(id, v){
   const { data: { user } } = await db.auth.getUser();
   await updLesson(id, { attendance: v, attendance_marked_at: v==='scheduled'?null:new Date().toISOString(), attendance_marked_by: v==='scheduled'?null:user.id });
+  const prev = CUR.lessons.find(x=>x.id===id);
+  if (v === 'cancelled' && prev && prev.calendar_event_id) { try { await invokeFn('tuition-meet', { action:'cancel_lesson', lesson_id: id }); toast('Takvim daveti iptal edildi'); } catch(e) { toast('Takvim iptal edilemedi: '+e.message, false); } }
   if (['attended','late'].includes(v) && !CUR.obs.find(o=>o.lesson_id===id)) { await viewCourse(CUR.c.id); obsModal(id); return; }
   viewCourse(CUR.c.id);
 }
@@ -513,6 +529,10 @@ async function saveLesson(id){
     duration_min: parseInt(val('lm_dur'))||50, meet_link: val('lm_meet'), attendance: att, attendance_note: val('lm_attnote') };
   if (att !== l.attendance) { patch.attendance_marked_at = att==='scheduled'?null:new Date().toISOString(); patch.attendance_marked_by = att==='scheduled'?null:user.id; }
   await run(()=>q(db.from('tuition_lessons').update(patch).eq('id', id)), 'Ders kaydedildi');
+  if (l.calendar_event_id) {
+    if (att === 'cancelled' && l.attendance !== 'cancelled') { try { await invokeFn('tuition-meet', { action:'cancel_lesson', lesson_id: id }); toast('Takvim daveti iptal edildi'); } catch(e) { toast('Takvim iptal edilemedi: '+e.message, false); } }
+    else if (patch.scheduled_at !== l.scheduled_at && new Date(patch.scheduled_at||0).getTime() !== new Date(l.scheduled_at||0).getTime()) await meetResync(id);
+  }
   closeModal(); viewCourse(CUR.c.id);
 }
 
@@ -595,6 +615,138 @@ async function savePay(){
   closeModal(); viewCourse(CUR.c.id);
 }
 async function delPay(id){ if(!confirm('Ödeme kaydı silinsin mi?')) return; await run(()=>q(db.from('tuition_payments').delete().eq('id', id)), 'Silindi'); viewCourse(CUR.c.id); }
+
+// ---------------------------------------------------------------------------
+// AI QUIZ / AI RAPOR / GOOGLE MEET (Edge Functions: tuition-ai, tuition-meet)
+// ---------------------------------------------------------------------------
+const REPORT_LANGS = [['','Öğrencinin ana dili'],['en','English'],['tr','Türkçe'],['ru','Русский'],['ar','العربية'],['uz','Oʻzbek'],['ky','Кыргызча'],['kk','Қазақша'],['az','Azərbaycan'],['fr','Français']];
+async function invokeFn(name, body){
+  const { data, error } = await db.functions.invoke(name, { body });
+  if (error) {
+    let msg = error.message;
+    try { const j = await error.context.json(); msg = j.error || msg; } catch(_) {}
+    throw new Error(msg);
+  }
+  if (data && data.error) throw new Error(data.error);
+  return data;
+}
+function quizCell(z, l){
+  if (!z) return `<button class="btn ghost sm" onclick="quizModal('${l.id}')">✨ Oluştur</button>`;
+  const a = (z.tuition_quiz_attempts||[])[0];
+  if (a) return `<button class="btn sm" style="background:rgba(96,165,250,0.2);color:var(--blue)" onclick="quizModal('${l.id}')">Çözdü ${a.score}/${a.total}</button>`;
+  return z.status==='published'
+    ? `<button class="btn sm" style="background:rgba(0,200,83,0.2);color:var(--green)" onclick="quizModal('${l.id}')">Yayında</button>`
+    : `<button class="btn sm" style="background:rgba(245,197,24,0.2);color:var(--gold)" onclick="quizModal('${l.id}')">Taslak</button>`;
+}
+let QZ = null;
+function quizModal(lessonId){
+  const l = CUR.lessons.find(x=>x.id===lessonId);
+  const z = CUR.quizzes.find(x=>x.lesson_id===lessonId);
+  QZ = z ? JSON.parse(JSON.stringify(z)) : null;
+  const attempt = z && (z.tuition_quiz_attempts||[])[0];
+  const hasObs = !!CUR.obs.find(o=>o.lesson_id===lessonId);
+  const body = !QZ ? `<p class="muted small" style="margin-bottom:12px">AI, bu dersin konusu, hedefleri ve öğretmen gözleminden (özellikle "geliştirilmesi gerekenler") öğrencinin seviyesine uygun 8 soruluk bir quiz hazırlar. Siz inceleyip yayınlayana kadar öğrenci görmez.${hasObs?'':' <b>Bu ders için henüz gözlem girilmedi; quiz sadece konu ve hedeflere göre hazırlanır.</b>'}</p>
+      <div class="row"><select class="form-inp" id="qz_lang" style="width:auto">${REPORT_LANGS.map(([k,v])=>`<option value="${k}">${v}</option>`).join('')}</select><button class="btn" id="qz_gen" onclick="genQuiz('${lessonId}')">✨ AI ile quiz oluştur</button></div>`
+    : `${attempt?`<div class="card" style="margin-bottom:12px">Öğrenci çözdü: <b>${attempt.score}/${attempt.total}</b> - ${fmtDT(attempt.submitted_at)}. Çözülmüş quiz değiştirilemez.</div>`:''}
+      <div class="fg" style="margin-bottom:12px"><label>Başlık</label><input class="form-inp" id="qz_title" value="${esc(QZ.title||'')}" ${attempt?'disabled':''}></div>
+      <div id="qz_list">${QZ.questions.map((qq,i)=>quizQuestionHtml(qq,i,!!attempt)).join('')}</div>`;
+  openModal(`<h3>AI Quiz - Ders ${l.lesson_no}${l.topic?': '+esc(l.topic):''} ${QZ?(QZ.status==='published'?'<span class="badge b-green">Yayında</span>':'<span class="badge b-gold">Taslak</span>'):''}</h3>
+    ${body}
+    <div class="row" style="margin-top:16px">
+      ${QZ && !attempt ? `<button class="btn" onclick="saveQuiz(true)">${QZ.status==='published'?'Kaydet':'Kaydet ve yayınla'}</button><button class="btn ghost" onclick="saveQuiz(false)">${QZ.status==='published'?'Yayından kaldır':'Taslak olarak kaydet'}</button><button class="btn ghost" id="qz_gen" onclick="genQuiz('${lessonId}')">↻ Yeniden oluştur</button>`:''}
+      <button class="btn ghost" onclick="closeModal()">Kapat</button></div>`);
+}
+function quizQuestionHtml(qq, i, ro){
+  const dis = ro ? 'disabled' : '';
+  return `<div class="card" style="margin-bottom:10px;padding:14px">
+    <div class="fg"><label>Soru ${i+1} (${esc(qq.skill||'')})</label><textarea class="form-inp" rows="2" id="qz_q_${i}" ${dis}>${esc(qq.q)}</textarea></div>
+    <div class="grid" style="margin-top:8px">${qq.options.map((o,j)=>`<div class="fg"><label><input type="radio" name="qz_a_${i}" value="${j}" ${qq.answer===j?'checked':''} ${dis}> Şık ${'ABCD'[j]||j+1}${qq.answer===j?' (doğru)':''}</label><input class="form-inp" id="qz_o_${i}_${j}" value="${esc(o)}" ${dis}></div>`).join('')}</div>
+    <div class="fg" style="margin-top:8px"><label>Açıklama (öğrenci çözdükten sonra görür)</label><input class="form-inp" id="qz_e_${i}" value="${esc(qq.explanation||'')}" ${dis}></div>
+  </div>`;
+}
+async function genQuiz(lessonId){
+  const b = $('qz_gen'); if (b) { b.disabled = true; b.textContent = 'AI hazırlıyor... (20-40 sn)'; }
+  try {
+    await run(()=>invokeFn('tuition-ai', { action:'generate_quiz', lesson_id: lessonId, lang: val('qz_lang') || undefined }), 'Quiz taslağı hazır');
+    await viewCourse(CUR.c.id); quizModal(lessonId);
+  } catch(_) { if (b) { b.disabled = false; b.textContent = '✨ AI ile quiz oluştur'; } }
+}
+async function saveQuiz(publish){
+  const questions = QZ.questions.map((qq,i)=>({
+    ...qq,
+    q: $('qz_q_'+i).value.trim(),
+    options: qq.options.map((_,j)=>$('qz_o_'+i+'_'+j).value.trim()),
+    answer: parseInt((document.querySelector(`input[name="qz_a_${i}"]:checked`)||{}).value ?? qq.answer),
+    explanation: $('qz_e_'+i).value.trim(),
+  }));
+  if (questions.some(x=>!x.q || x.options.some(o=>!o))) { toast('Boş soru veya şık bırakmayın', false); return; }
+  const status = publish ? 'published' : 'draft';
+  await run(()=>q(db.from('tuition_quizzes').update({ title: val('qz_title'), questions, status }).eq('id', QZ.id)), publish ? 'Quiz yayınlandı, öğrenciye bildirim gitti' : 'Kaydedildi');
+  closeModal(); viewCourse(CUR.c.id);
+}
+
+async function genReport(){
+  const b = $('rp_btn'); b.disabled = true; b.textContent = 'AI analiz ediyor... (30-60 sn)';
+  try {
+    const r = await run(()=>invokeFn('tuition-ai', { action:'generate_report', course_id: CUR.c.id, lang: val('rp_lang') || undefined }), 'Rapor taslağı hazır');
+    await viewCourse(CUR.c.id); reportModal(r.report.id);
+  } catch(_) { b.disabled = false; b.textContent = '✨ Rapor oluştur'; }
+}
+const SKILL_TR = Object.fromEntries(SKILLS);
+function reportHtml(rep){
+  const st = rep.stats || {};
+  const a = st.attendance || {};
+  const sk = st.skills || {};
+  const list = xs => (xs||[]).map(x=>`<li>${esc(x)}</li>`).join('');
+  const bar = v => v==null ? '<span class="muted">-</span>' : `<div class="bar" style="width:120px;display:inline-flex;vertical-align:middle"><div style="width:${v/5*100}%;background:var(--green)"></div></div> <b>${v}</b>`;
+  const arrow = (f,l) => (f==null||l==null) ? '' : l>f ? ' <span style="color:var(--green)">▲</span>' : l<f ? ' <span style="color:#FF6B6B">▼</span>' : ' <span class="muted">=</span>';
+  return `
+    <div class="stats">
+      <div class="stat"><div class="num">${esc(rep.level_estimate||'-')}</div><div class="lbl">Tahmini seviye</div></div>
+      <div class="stat"><div class="num" style="color:var(--green)">${a.rate!=null?a.rate+'%':'-'}</div><div class="lbl">Katılım (${(a.attended||0)+(a.late||0)} katıldı / ${a.absent||0} gelmedi / ${a.excused||0} izinli)</div></div>
+      <div class="stat"><div class="num">${st.homework?st.homework.submitted+'/'+st.homework.assigned:'-'}</div><div class="lbl">Ödev teslimi${st.homework&&st.homework.avg_score!=null?' - ort. '+st.homework.avg_score:''}</div></div>
+      <div class="stat"><div class="num">${st.quizzes&&st.quizzes.avg_pct!=null?st.quizzes.avg_pct+'%':'-'}</div><div class="lbl">Quiz başarısı (${st.quizzes?st.quizzes.taken+'/'+st.quizzes.published:'-'})</div></div>
+    </div>
+    <div class="card"><h3>Özet</h3><p>${esc(rep.summary||'')}</p>${rep.attendance_comment?`<p class="muted" style="margin-top:8px">${esc(rep.attendance_comment)}</p>`:''}</div>
+    <div class="card"><h3>Beceriler (1-5, ilk yarı → son yarı)</h3><table><tbody>${SKILLS.map(([k,lbl])=>{ const v=sk[k]||{}; return `<tr><td>${lbl}</td><td>${bar(v.avg)}${arrow(v.first,v.last)}</td><td class="small">${esc((rep.skill_comments||{})[k]||'')}</td></tr>`; }).join('')}</tbody></table></div>
+    <div class="grid"><div class="card"><h3>💪 Güçlü yönler</h3><ul style="padding-inline-start:18px">${list(rep.strengths)}</ul></div>
+      <div class="card"><h3>🎯 Çalışılacak alanlar</h3><ul style="padding-inline-start:18px">${list(rep.focus_areas)}</ul></div></div>
+    <div class="card"><h3>🗓️ Çalışma planı</h3>${(rep.study_plan||[]).map(w=>`<p style="margin-top:8px"><b>Hafta ${esc(w.week)}: ${esc(w.focus||'')}</b></p><ul style="padding-inline-start:18px">${list(w.tasks)}</ul>`).join('')}
+      ${rep.practice&&rep.practice.length?`<p style="margin-top:10px"><b>Günlük pratik</b></p><ul style="padding-inline-start:18px">${list(rep.practice)}</ul>`:''}
+      ${rep.next_goal?`<p style="margin-top:10px"><b>Sonraki hedef:</b> ${esc(rep.next_goal)}</p>`:''}</div>`;
+}
+function reportModal(id){
+  const r = CUR.reports.find(x=>x.id===id);
+  openModal(`<h3>AI Gelişim Raporu ${r.status==='published'?'<span class="badge b-green">Yayında</span>':'<span class="badge b-gold">Taslak</span>'}</h3>
+    <p class="muted small" style="margin-bottom:12px">${fmtDT(r.created_at)} - ${r.lessons_covered??'-'} ders gözlemine dayanıyor${r.report.lang?' - dil: '+esc(r.report.lang):''}</p>
+    ${reportHtml(r.report)}
+    <div class="row" style="margin-top:16px">
+      ${r.status==='published' ? `<button class="btn ghost" onclick="setReport('${id}','draft')">Yayından kaldır</button>` : `<button class="btn" onclick="setReport('${id}','published')">Yayınla (öğrenci görsün)</button>`}
+      ${ME.is_admin && r.status!=='published' ? `<button class="btn ghost" onclick="delReport('${id}')">Taslağı sil</button>`:''}
+      <button class="btn ghost" onclick="closeModal()">Kapat</button></div>`);
+}
+async function setReport(id, status){ await run(()=>q(db.from('tuition_reports').update({ status }).eq('id', id)), status==='published'?'Rapor yayınlandı, öğrenciye bildirim gitti':'Yayından kaldırıldı'); closeModal(); viewCourse(CUR.c.id); }
+async function delReport(id){ if(!confirm('Taslak rapor silinsin mi?')) return; await run(()=>q(db.from('tuition_reports').delete().eq('id', id)), 'Silindi'); closeModal(); viewCourse(CUR.c.id); }
+
+async function meetSyncCourse(){
+  const withDate = CUR.lessons.filter(l=>l.scheduled_at && l.attendance==='scheduled').length;
+  if (!withDate) { toast('Önce ders tarihlerini girin (Otomatik planla)', false); return; }
+  if (!CUR.c.tuition_students.email) { toast('Öğrencinin e-postası yok; profilden ekleyin', false); return; }
+  if (!confirm(`${withDate} ders için Google Takvim daveti ve Meet linki oluşturulacak / güncellenecek. Öğrenciye ve öğretmene davet e-postası gider. Devam?`)) return;
+  try {
+    const r = await run(()=>invokeFn('tuition-meet', { action:'sync_course', course_id: CUR.c.id }));
+    toast(`${r.synced} ders Google Meet ile planlandı${r.failed?' - '+r.failed+' hata':''}`, !r.failed);
+  } catch(e) {
+    if (String(e.message).includes('google_not_configured')) toast('Google bağlantısı henüz kurulmadı (yönetici kurulumu gerekli)', false);
+  }
+  viewCourse(CUR.c.id);
+}
+// Takvim daveti gonderilmis bir dersin saati degisince davet de guncellensin
+async function meetResync(lessonId){
+  const l = CUR && CUR.lessons.find(x=>x.id===lessonId);
+  if (!l || !l.calendar_event_id) return;
+  try { await invokeFn('tuition-meet', { action:'sync_lesson', lesson_id: lessonId }); toast('Takvim daveti güncellendi'); } catch(e) { toast('Takvim güncellenemedi: '+e.message, false); }
+}
 
 // ---------------------------------------------------------------------------
 // TALEPLER (admin): uygulamadan gelen demo talepleri + rezervasyonlar
