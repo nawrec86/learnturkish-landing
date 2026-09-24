@@ -197,6 +197,7 @@ function buildTabs(){
 window.addEventListener('hashchange', () => { if (!/access_token=/.test(location.hash)) route(); });
 function route(){
   if ($('app').style.display!=='block') return;
+  if (typeof OV_TIMER !== 'undefined') clearTimeout(OV_TIMER);
   const [, page, id] = (location.hash || '#/home').split('/');
   document.querySelectorAll('.tab').forEach(t=>t.classList.toggle('active', t.dataset.tab===page || (page==='student'&&t.dataset.tab==='students') || (page==='course'&&t.dataset.tab==='students')));
   $('view').innerHTML = '<div class="empty">Yükleniyor...</div>';
@@ -797,8 +798,11 @@ function otherCur(obj){ return Object.entries(obj||{}).filter(([c])=>c!=='USD').
 function hbar(v, max, color){ return `<div class="bar" style="width:100%;min-width:80px"><div style="width:${max?Math.max(2,v/max*100):0}%;background:${color||'var(--green)'}"></div></div>`; }
 function delta(now, before){ if (now==null||before==null) return ''; const d=now-before; return d===0?'<span class="muted small">=</span>':`<span class="small" style="color:${d>0?'var(--green)':'#FF6B6B'}">${d>0?'+':''}${nf(d)}</span>`; }
 
-async function viewOverview(){
-  $('view').innerHTML = '<div class="empty">Veriler toplanıyor (uygulama, mağazalar, sosyal medya)...</div>';
+let OV_TIMER = null;
+async function viewOverview(silent){
+  clearTimeout(OV_TIMER);
+  const keepY = window.scrollY;
+  if (!silent) $('view').innerHTML = '<div class="empty">Veriler toplanıyor (uygulama, mağazalar, sosyal medya)...</div>';
   let B;
   try { B = await invokeFn('business-stats', {}); }
   catch(e){ $('view').innerHTML = `<div class="card"><b>İş paneli verisi alınamadı:</b> ${esc(e.message)}<p class="muted small" style="margin-top:8px">business-stats servisi ya da 202611250000 migration'ı henüz kurulmamış olabilir.</p></div>`; return; }
@@ -809,7 +813,9 @@ async function viewOverview(){
     countOf('tuition_courses', x => x.in('status',['planned','active'])),
   ]);
   const A = B.app || {}, S = A.subscriptions || {}, R = B.revenue || {}, X = B.expenses || {}, SO = B.social || {};
-  const ads = SO.ads || { spend_total:0, spend_30d:0, spend_month:0, results_30d:0 };
+  const MA = B.meta_ads || {};
+  // Meta Marketing API verisi varsa gercek reklam gideri odur; yoksa nawrec.social ad_metrics
+  const ads = MA.has_data ? MA : (SO.ads || { spend_total:0, spend_30d:0, spend_month:0, results_30d:0 });
   const SR = B.store_revenue || {};
   const sumObj = o => Object.values(o||{}).reduce((a,b)=>a+Number(b||0),0);
   const storeMonth = sumObj(SR.month);
@@ -889,6 +895,18 @@ async function viewOverview(){
       </div>
     </div>
 
+    <div class="card" id="meta-ads"><div class="row between" style="margin-bottom:12px"><h3 style="margin:0">📣 Meta reklamları (Facebook / Instagram, boost dahil)</h3>
+      ${MA.configured?`<button class="btn ghost sm" id="ma_sync" onclick="metaSync()">↻ Şimdi çek (90 gün)</button>`:''}</div>
+      ${MA.has_data ? `<div class="stats" style="margin:0 0 12px">
+          ${stat(money(MA.spend_month),'Bu ay harcama','#FF6B6B')}${stat(money(MA.spend_30d),'Son 30 gün')}${stat(money(MA.spend_total),'Toplam (400 gün)')}
+          ${stat(nf(MA.results_30d),'Sonuç (30 gün)',null, MA.results_30d?`${money(MA.spend_30d/MA.results_30d)} / sonuç`:'')}</div>
+        <div class="tbl-wrap"><table><thead><tr><th>Kampanya / boost</th><th>Amaç</th><th>Harcama</th><th>30 gün</th><th>Erişim</th><th>Gösterim</th><th>Tık</th><th>Sonuç</th><th>Sonuç başı</th><th>Son gün</th></tr></thead><tbody>
+        ${(MA.campaigns||[]).map(c=>`<tr><td><b>${esc(c.name||c.id)}</b></td><td class="small">${esc(c.objective||'')}</td><td><b>${money(c.spend)}</b></td><td>${money(c.spend30)}</td><td>${nf(c.reach)}</td><td>${nf(c.impressions)}</td><td>${nf(c.clicks)}</td><td>${nf(c.results)}</td><td>${c.results?money(c.spend/c.results):'-'}</td><td class="small">${fmtD(c.last_day)}</td></tr>`).join('')}
+        </tbody></table></div>`
+      : `<p class="small">${MA.configured?'Meta bağlı, henüz veri çekilmedi. "Şimdi çek" ile son 90 günü alın.':'<b>Meta reklam hesabı bağlı değil.</b> Bağlanınca tüm kampanya ve boost harcamaları saatlik otomatik gelir ve gider olarak kâr/zarara yansır. Kurulum adımları sohbette.'}</p>`}
+      ${MA.error?`<p class="small" style="color:#FF6B6B">${esc(MA.error)}</p>`:''}
+    </div>
+
     <div class="card" id="store-rev"><div class="row between" style="margin-bottom:12px"><h3 style="margin:0">🏪 Mağaza kazançları (App Store + Google Play)</h3>
       ${(SR.configured||{}).app_store||(SR.configured||{}).google_play?`<button class="btn ghost sm" id="sr_sync" onclick="storeSync()">↻ Şimdi çek (30 gün)</button>`:''}</div>
       ${realRev ? (()=>{ const daily = Object.entries(SR.daily||{}).sort(); const mx = Math.max(1,...daily.map(d=>d[1])); const byC = Object.entries(SR.by_country||{}).sort((a,b)=>b[1]-a[1]).slice(0,10); const mxC = Math.max(1,...byC.map(c=>c[1]));
@@ -933,7 +951,7 @@ async function viewOverview(){
       <div class="tbl-wrap"><table><thead><tr><th></th><th>Bu ay</th><th>Toplam (kayıtlı)</th></tr></thead><tbody>
         ${realRev ? `<tr><td>Mağaza kazancı (net, komisyon düşülmüş)</td><td>${money(storeMonth)}</td><td>${money(sumObj(SR.total))} <span class="muted small">(son 400 gün)</span></td></tr>` : `<tr><td>Abonelik geliri (tahmini)</td><td>${money(R.mrr_estimate||0)}</td><td class="muted small">mağaza raporu bağlanınca gerçek</td></tr>`}
         <tr><td>Özel ders tahsilatı</td><td>${money(usd(A.tuition_paid_month))}${otherCur(A.tuition_paid_month)?' + '+otherCur(A.tuition_paid_month):''}</td><td>${money(usd(A.tuition_paid_total))}${otherCur(A.tuition_paid_total)?' + '+otherCur(A.tuition_paid_total):''}</td></tr>
-        <tr><td>Reklam harcaması (nawrec)</td><td style="color:#FF6B6B">-${money(ads.spend_month)}</td><td style="color:#FF6B6B">-${money(ads.spend_total)}</td></tr>
+        <tr><td>Reklam harcaması (${MA.has_data?'Meta':'nawrec.social'})</td><td style="color:#FF6B6B">-${money(ads.spend_month)}</td><td style="color:#FF6B6B">-${money(ads.spend_total)}</td></tr>
         <tr><td>Diğer giderler (defter)</td><td style="color:#FF6B6B">-${money(usd(X.month))}${otherCur(X.month)?' + '+otherCur(X.month):''}</td><td style="color:#FF6B6B">-${money(usd(X.total))}${otherCur(X.total)?' + '+otherCur(X.total):''}</td></tr>
         <tr><td><b>Net</b></td><td><b style="color:${netMonth>=0?'var(--green)':'#FF6B6B'}">${money(netMonth)}</b></td><td>${realRev ? (()=>{ const t = sumObj(SR.total) + usd(A.tuition_paid_total) - (ads.spend_total||0) - usd(X.total); return `<b style="color:${t>=0?'var(--green)':'#FF6B6B'}">${money(t)}</b>`; })() : '<span class="muted small">mağaza raporu bağlanınca hesaplanır</span>'}</td></tr>
       </tbody></table></div>
@@ -949,7 +967,14 @@ async function viewOverview(){
     <div class="card"><h3>🎓 Özel ders</h3><div class="stats" style="margin:0">
       ${stat(nf(tutors),'Aktif öğretmen',null,null,"location.hash='#/tutors'")}${stat(nf(students),'Öğrenci profili',null,null,"location.hash='#/students'")}${stat(nf(courses),'Aktif / planlı kur',null,null,"location.hash='#/students'")}
     </div></div>
-    <p class="muted small">Veri zamanı: ${fmtDT(B.generated_at)} · Sayfayı yenileyince güncellenir.</p>`;
+    <p class="muted small"><span style="color:var(--green)">●</span> Canlı: her dakika kendini yeniler · son güncelleme ${new Date(B.generated_at).toLocaleTimeString('tr-TR')} · Meta harcaması saatlik, mağaza kazancı günlük otomatik çekilir.</p>`;
+  if (silent) window.scrollTo(0, keepY);
+  // Canli: sadece Genel Bakis acikken ve bir detay penceresi acik degilken yenile
+  OV_TIMER = setTimeout(() => {
+    if (!location.hash.startsWith('#/overview')) return;
+    if ($('modalBg').style.display === 'flex') { OV_TIMER = setTimeout(() => viewOverview(true), 30000); return; }
+    viewOverview(true);
+  }, 60000);
 }
 // ---- Detay pencereleri (kartlara tiklayinca) ----
 let UM = null;
@@ -998,6 +1023,12 @@ async function subsModal(){
     </tbody></table></div>`;
 }
 
+async function metaSync(){
+  const b = $('ma_sync'); if (b) { b.disabled = true; b.textContent = 'Çekiliyor...'; }
+  try { const r = await invokeFn('meta-ads', { action:'sync', days:90 }); toast(`Meta: ${r.rows} kampanya-gün`, r.ok); }
+  catch(e) { toast('Meta verisi çekilemedi: '+e.message, false); }
+  viewOverview();
+}
 async function storeSync(){
   const b = $('sr_sync'); if (b) { b.disabled = true; b.textContent = 'Çekiliyor...'; }
   try { const r = await invokeFn('store-revenue', { action:'sync', days:30 }); toast(Object.entries(r.results||{}).map(([k,v])=>`${k}: ${v.rows} satır`).join(' · ')); }
