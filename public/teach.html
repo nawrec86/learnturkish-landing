@@ -1070,7 +1070,7 @@ async function subsModal(){
 
 async function metaSync(){
   const b = $('ma_sync'); if (b) { b.disabled = true; b.textContent = 'Çekiliyor...'; }
-  try { const r = await invokeFn('meta-ads', { action:'sync', days:90 }); toast(`Meta: ${r.rows} kampanya-gün`, r.ok); }
+  try { const r = await invokeFn('meta-ads', { action:'sync', days:800 }); toast(`Meta: ${r.rows} kampanya-gün`, r.ok); }
   catch(e) { toast('Meta verisi çekilemedi: '+e.message, false); }
   viewOverview();
 }
