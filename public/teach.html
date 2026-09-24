@@ -776,7 +776,7 @@ async function viewTutors(){
   await loadTutors();
   $('view').innerHTML = `<div class="card">
     <div class="row between" style="margin-bottom:12px"><h3 style="margin:0">Öğretmenler (${TUTORS.length})</h3><button class="btn" onclick="tutorModal()">+ Yeni öğretmen</button></div>
-    <p class="muted small" style="margin-bottom:12px">Öğretmeni e-postasıyla ekleyin: hesabı varsa otomatik bağlanır, yoksa "şifreni belirle" davet e-postası gider ve öğretmen linke tıklayıp doğrudan bu panele girer. Panele girebilmesi için öğretmen <b>aktif</b> olmalı. Google Meet davetleri de bu e-postaya gider.</p>
+    <p class="muted small" style="margin-bottom:12px">Öğretmeni e-postasıyla ekleyin: hesabı varsa otomatik bağlanır, yoksa hesap açılır ve size bir "şifreni belirle" linki gösterilir (e-posta servisi kuruluysa öğretmene e-postayla da gider). Öğretmen linke tıklayıp doğrudan bu panele girer. Panele girebilmesi için öğretmen <b>aktif</b> olmalı. Google Meet davetleri de bu e-postaya gider.</p>
     <div class="tbl-wrap"><table><thead><tr><th>Ad</th><th>Giriş hesabı</th><th>Kalıcı Meet linki</th><th>Durum</th><th></th></tr></thead><tbody>
     ${TUTORS.map(t=>`<tr><td><b>${esc(t.full_name)}</b>${t.languages&&t.languages.length?`<div class="small muted">${esc(t.languages.join(', '))}</div>`:''}</td>
       <td>${t.user_id?'<span class="badge b-green">Bağlı</span>':'<span class="badge b-red">Hesap yok</span>'}</td>
@@ -809,14 +809,30 @@ async function saveTutor(id){
   try {
     const r = await run(()=>invokeFn('tuition-admin', { action:'save_tutor', tutor_id: id || undefined, full_name: name, email: val('tm_email') || undefined,
       meet_link: val('tm_meet'), bio: val('tm_bio'), languages: (val('tm_langs')||'').split(',').map(x=>x.trim()).filter(Boolean), is_active: val('tm_active')==='1' }));
-    toast(r.account==='invited' ? 'Öğretmen eklendi, davet e-postası gönderildi' : r.account==='linked' ? 'Öğretmen kaydedildi ve hesaba bağlandı' : 'Öğretmen kaydedildi');
+    closeModal(); await viewTutors();
+    if (r.account==='invited' && r.link) showLinkModal(name, r.email, r.link, r.mailed, 'invite');
+    else toast(r.account==='linked' ? 'Öğretmen kaydedildi ve mevcut hesaba bağlandı' : 'Öğretmen kaydedildi');
+  } catch(_) {
+    // Kayit olusmus olabilir: listeyi yenile ki tekrar "Kaydet" ile kopya acilmasin
     closeModal(); viewTutors();
-  } catch(_) { b.disabled = false; }
+  }
+}
+function showLinkModal(name, email, link, mailed, kind){
+  const msg = `Merhaba ${name}, LearnTurkish AI Özel Ders Paneli için şifreni belirleyip giriş yapabileceğin link: ${link}`;
+  openModal(`<h3>${kind==='invite'?'Öğretmen eklendi':'Giriş linki hazır'}</h3>
+    <p class="small" style="margin-bottom:12px">${mailed ? `✅ Link <b>${esc(email||'')}</b> adresine e-postayla gönderildi. İsterseniz aşağıdan WhatsApp ile de iletebilirsiniz.` : `E-posta otomatik gönderilmedi (e-posta servisi henüz kurulmadı). Aşağıdaki linki öğretmene <b>WhatsApp veya e-postayla</b> iletin; öğretmen linke tıklayınca şifresini belirleyip panele girer.`}</p>
+    <textarea class="form-inp" id="lk_link" rows="3" readonly onclick="this.select()">${esc(link)}</textarea>
+    <p class="muted small" style="margin-top:8px">Link tek kullanımlıktır ve kısa süre (varsayılan 24 saat) geçerlidir. Süresi dolarsa "Giriş linki gönder" ile yenisini üretin.</p>
+    <div class="row" style="margin-top:14px">
+      <button class="btn" onclick="navigator.clipboard.writeText($('lk_link').value).then(()=>toast('Link kopyalandı'))">Linki kopyala</button>
+      <a class="btn ghost" style="text-decoration:none" target="_blank" rel="noopener" href="https://wa.me/?text=${encodeURIComponent(msg)}">WhatsApp ile gönder</a>
+      ${email?`<a class="btn ghost" style="text-decoration:none" href="mailto:${esc(email)}?subject=${encodeURIComponent('LearnTurkish AI - Öğretmen paneli')}&body=${encodeURIComponent(msg)}">E-postayla gönder</a>`:''}
+      <button class="btn ghost" onclick="closeModal()">Kapat</button></div>`);
 }
 async function sendTutorLink(id){
-  if (!confirm('Öğretmene şifre belirleme / giriş linki e-postayla gönderilsin mi?')) return;
+  const t = TUTORS.find(x=>x.id===id);
   const r = await run(()=>invokeFn('tuition-admin', { action:'send_login_link', tutor_id: id }));
-  toast('Link gönderildi: ' + r.sent_to);
+  if (r.link) showLinkModal(t ? t.full_name : '', r.email, r.link, r.mailed, 'login');
 }
 
 // ---------------------------------------------------------------------------
