@@ -995,6 +995,14 @@ async function viewOverview(silent){
       <p class="small muted" style="margin-top:8px">USD dışı tutarlar ayrı gösterilir, net hesaba katılmaz. Gider kategorileri (USD): ${Object.entries(X.by_category_usd||{}).map(([k,v])=>`${esc(EXP_CATS[k]||k)} ${money(v)}`).join(' · ')||'-'}</p>
     </div>
 
+    <div class="card" id="monthly-card"><h3>📅 Ay ay gelir / gider (başladığımızdan beri)</h3>
+      ${(LT.monthly||[]).length?(()=>{ const M=LT.monthly, T=k=>M.reduce((a,r)=>a+(r[k]||0),0), col=v=>`<b style="color:${v>=0?'var(--green)':'#FF6B6B'}">${money(v)}</b>`, ml=ym=>{const [y,m]=ym.split('-');return new Date(Date.UTC(+y,+m-1,1)).toLocaleDateString('tr-TR',{month:'long',year:'numeric',timeZone:'UTC'});}; return `<div class="tbl-wrap"><table><thead><tr><th>Ay</th><th>Uygulama geliri${LT.app_revenue_is_estimate?' (tahmini)':' (net)'}</th><th>Özel ders</th><th>Toplam gelir</th><th>Reklam</th><th>Diğer gider</th><th>Kâr / zarar</th></tr></thead><tbody>
+        ${M.map(r=>`<tr><td><b>${ml(r.month)}</b></td><td>${money(r.app_revenue)}</td><td>${money(r.tuition)}</td><td><b>${money(r.revenue)}</b></td><td style="color:#FF6B6B">${r.ads?'-'+money(r.ads):'-'}</td><td style="color:#FF6B6B">${r.expenses?'-'+money(r.expenses):'-'}</td><td>${col(r.net)}</td></tr>`).join('')}
+        <tr style="border-top:2px solid var(--border,#ccc)"><td><b>TOPLAM</b></td><td><b>${money(T('app_revenue'))}</b></td><td><b>${money(T('tuition'))}</b></td><td><b>${money(T('revenue'))}</b></td><td style="color:#FF6B6B"><b>-${money(T('ads'))}</b></td><td style="color:#FF6B6B"><b>-${money(T('expenses'))}</b></td><td>${col(T('net'))}</td></tr>
+      </tbody></table></div>
+      <p class="small muted" style="margin-top:8px">${LT.app_revenue_is_estimate?'Uygulama geliri mağaza bağlanana kadar abonelik kayıtlarından tahmindir (liste fiyatı, komisyon öncesi; aylık abonelik her ay, yıllık abonelik alındığı ay yazılır).':'Uygulama geliri App Store + Google Play gerçek net kazançtır.'} Özel ders ve giderler yalnızca USD.</p>`; })():'<div class="muted small">Veri yok.</div>'}
+    </div>
+
     <div class="card"><div class="row between" style="margin-bottom:12px"><h3 style="margin:0">🧾 Gider defteri</h3><button class="btn sm" onclick="expenseModal()">+ Gider ekle</button></div>
       ${expenses.length?`<div class="tbl-wrap"><table><thead><tr><th>Tarih</th><th>Kategori</th><th>Tutar</th><th>Not</th><th></th></tr></thead><tbody>
       ${expenses.map(e=>`<tr><td class="small">${fmtD(e.spent_on)}</td><td>${esc(EXP_CATS[e.category]||e.category)}${e.recurring?` <span class="badge b-grey">${e.recurring==='monthly'?'aylık':'yıllık'}</span>`:''}</td><td><b>${money(e.amount,e.currency)}</b></td><td class="small">${esc(e.note||'')}</td><td><button class="btn ghost sm" onclick="delExpense('${e.id}')">Sil</button></td></tr>`).join('')}
@@ -1098,7 +1106,7 @@ function lifetimeModal(){
     </tbody></table></div>
     ${months.length?`<h4 style="margin-top:14px">Mağaza net, ay ay</h4><div class="tbl-wrap"><table><tbody>${months.map(([m,v])=>`<tr><td>${m}</td><td>${money(v)}</td></tr>`).join('')}</tbody></table></div>`:''}
     <p class="small muted" style="margin-top:10px">${esc(LT.note||'')}</p>
-    <div class="row" style="margin-top:12px"><button class="btn ghost" onclick="closeModal()">Kapat</button></div>`);
+    <div class="row" style="margin-top:12px"><button class="btn" onclick="closeModal();document.getElementById('monthly-card').scrollIntoView({behavior:'smooth'})">Ay ay tabloyu gör</button><button class="btn ghost" onclick="closeModal()">Kapat</button></div>`);
 }
 function expenseModal(){
   openModal(`<h3>Gider ekle</h3><div class="grid">
