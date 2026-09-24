@@ -1147,11 +1147,21 @@ function showSetPassword(kind){
   $('login').style.display='flex';
   $('np1').focus();
 }
+let PENDING_OTP = null;   // { token_hash, type } - ?th=&tt= linkinden; Kaydet'e basinca kullanilir
 async function setNewPassword(){
   const p1 = $('np1').value, p2 = $('np2').value;
   if (p1.length < 8) { showLoginError('Şifre en az 8 karakter olmalı'); return; }
   if (p1 !== p2) { showLoginError('Şifreler aynı değil'); return; }
   $('npBtn').disabled = true;
+  if (PENDING_OTP) {
+    const { error: vErr } = await db.auth.verifyOtp({ token_hash: PENDING_OTP.token_hash, type: PENDING_OTP.type });
+    if (vErr) {
+      $('npBtn').disabled = false;
+      showLoginError('Bu link kullanılmış ya da süresi dolmuş. Yöneticinizden yeni bir link isteyin (Öğretmenler > Giriş linki gönder).');
+      return;
+    }
+    PENDING_OTP = null;
+  }
   const { error } = await db.auth.updateUser({ password: p1 });
   $('npBtn').disabled = false;
   if (error) { showLoginError('Kaydedilemedi: ' + error.message); return; }
@@ -1159,6 +1169,15 @@ async function setNewPassword(){
   await enter();
 }
 async function consumeAuthRedirect(){
+  // Onizleme-guvenli davet linki: ?th=<hashed_token>&tt=invite|recovery (token Kaydet'te kullanilir)
+  const sp = new URLSearchParams(location.search);
+  if (sp.get('th')) {
+    PENDING_OTP = { token_hash: sp.get('th'), type: sp.get('tt') === 'invite' ? 'invite' : 'recovery' };
+    history.replaceState(null, '', location.pathname);
+    await db.auth.signOut().catch(()=>{});   // baska bir oturum aciksa karismasin
+    showSetPassword(PENDING_OTP.type);
+    return true;
+  }
   // Davet / sifre sifirlama linki: #access_token=...&refresh_token=...&type=invite|recovery
   const h = location.hash.replace(/^#/, '');
   if (!/access_token=|error_description=/.test(h)) return false;
