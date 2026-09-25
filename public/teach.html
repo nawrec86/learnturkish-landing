@@ -145,6 +145,9 @@ function money(n, cur='USD'){ return (cur==='USD'?'$':'') + Number(n||0).toLocal
 function opt(map, sel){ return Object.entries(map).map(([k,v])=>`<option value="${k}" ${k===sel?'selected':''}>${esc(Array.isArray(v)?v[0]:v)}</option>`).join(''); }
 function tutorName(id){ const t=TUTORS.find(x=>x.id===id); return t ? t.full_name : '-'; }
 function tutorOptions(sel, allowEmpty=true){ return (allowEmpty?'<option value="">- Atanmadı -</option>':'') + TUTORS.map(t=>`<option value="${t.id}" ${t.id===sel?'selected':''}>${esc(t.full_name)}${t.is_active?'':' (pasif)'}</option>`).join(''); }
+// Telefon -> WhatsApp linki (ulke koduyla; basta 0 ya da + olabilir)
+function waLink(phone){ const d = String(phone||'').replace(/\D/g,''); return d.length >= 8 ? 'https://wa.me/' + d.replace(/^00/,'') : null; }
+function waBtn(phone, small){ const u = waLink(phone); return u ? `<a class="btn ${small?'sm ':''}ghost" style="color:#25D366;border-color:#25D36655" href="${u}" target="_blank" rel="noopener" onclick="event.stopPropagation()">WhatsApp</a>` : ''; }
 function val(id){ const e=$(id); if(!e) return null; const v=e.value.trim(); return v===''?null:v; }
 function openModal(html){ $('modal').innerHTML=html; $('modalBg').style.display='flex'; }
 function closeModal(){ $('modalBg').style.display='none'; $('modal').innerHTML=''; $('modal').classList.remove('wide'); }
@@ -245,7 +248,7 @@ async function viewHome(){
 // OGRENCILER
 // ---------------------------------------------------------------------------
 async function viewStudents(tutorFilter){
-  let sq = db.from('tuition_students').select('id,full_name,email,age,occupation,level,status,tutor_id,source,created_at').order('created_at',{ascending:false});
+  let sq = db.from('tuition_students').select('id,full_name,email,phone,age,occupation,level,status,tutor_id,source,created_at').order('created_at',{ascending:false});
   if (ME.is_admin && tutorFilter) sq = sq.eq('tutor_id', tutorFilter);
   const students = await q(sq);
   $('view').innerHTML = `
@@ -255,8 +258,8 @@ async function viewStudents(tutorFilter){
         <div class="row">${ME.is_admin?`<select class="form-inp" style="width:190px" onchange="location.hash='#/students/'+this.value"><option value="">Tüm öğretmenler</option>${TUTORS.map(t=>`<option value="${t.id}" ${t.id===tutorFilter?'selected':''}>${esc(t.full_name)}</option>`).join('')}</select>`:''}<input class="form-inp" id="stSearch" placeholder="Ara: ad, e-posta, meslek" style="width:220px" oninput="filterStudents()">${ME.is_admin?`<button class="btn" onclick="assignModal('${tutorFilter||''}')">+ Ders ekle</button>`:''}<button class="btn ghost" onclick="newStudentModal()">+ Yeni öğrenci</button></div>
       </div>
       <div class="tbl-wrap"><table><thead><tr><th>Ad</th><th>E-posta</th><th>Yaş</th><th>Meslek</th><th>Seviye</th>${ME.is_admin?'<th>Öğretmen</th>':''}<th>Durum</th><th>Kayıt</th></tr></thead>
-      <tbody id="stBody">${students.map(s=>`<tr class="click" data-s="${esc((s.full_name+' '+(s.email||'')+' '+(s.occupation||'')).toLowerCase())}" onclick="location.hash='#/student/${s.id}'">
-        <td><b>${esc(s.full_name)}</b></td><td>${esc(s.email||'-')}</td><td>${s.age??'-'}</td><td>${esc(s.occupation||'-')}</td><td>${esc(s.level||'-')}</td>
+      <tbody id="stBody">${students.map(s=>`<tr class="click" data-s="${esc((s.full_name+' '+(s.email||'')+' '+(s.phone||'')+' '+(s.occupation||'')).toLowerCase())}" onclick="location.hash='#/student/${s.id}'">
+        <td><b>${esc(s.full_name)}</b></td><td>${esc(s.email||'-')}${s.phone?`<div class="small muted">${esc(s.phone)} ${waBtn(s.phone,true)}</div>`:''}</td><td>${s.age??'-'}</td><td>${esc(s.occupation||'-')}</td><td>${esc(s.level||'-')}</td>
         ${ME.is_admin?`<td>${esc(tutorName(s.tutor_id))}</td>`:''}<td>${badge(STUDENT_STATUS,s.status)}</td><td class="small">${fmtD(s.created_at)}</td></tr>`).join('') || `<tr><td colspan="8" class="empty">Henüz öğrenci yok</td></tr>`}</tbody></table></div>
     </div>`;
 }
@@ -268,21 +271,22 @@ function newStudentModal(){
     <div class="grid">
       <div class="fg"><label>Ad soyad *</label><input class="form-inp" id="ns_name"></div>
       <div class="fg"><label>E-posta</label><input class="form-inp" id="ns_email" type="email"></div>
+      <div class="fg"><label>Telefon / WhatsApp (ülke koduyla)</label><input class="form-inp" id="ns_phone" type="tel" placeholder="+90 5xx xxx xx xx"></div>
       ${ME.is_admin?`<div class="fg"><label>Öğretmen</label><select class="form-inp" id="ns_tutor">${tutorOptions(null)}</select></div>`:''}
     </div>
     <div class="row" style="margin-top:16px"><button class="btn" onclick="createStudent()">Oluştur</button><button class="btn ghost" onclick="closeModal()">Vazgeç</button></div>`);
 }
 async function createStudent(){
-  const name=val('ns_name'), email=val('ns_email');
+  const name=val('ns_name'), email=val('ns_email'), phone=val('ns_phone');
   const tutor = ME.is_admin ? val('ns_tutor') : ME.tutor_id;
   if(!name){ toast('Ad soyad gerekli', false); return; }
   await run(async()=>{
     let id = null;
     if (email) id = await q(db.rpc('tuition_student_from_email', { p_email: email, p_tutor_id: tutor }));
     if (id) {
-      await q(db.from('tuition_students').update({ full_name:name, tutor_id: tutor }).eq('id', id));
+      await q(db.from('tuition_students').update({ full_name:name, tutor_id: tutor, ...(phone?{phone}:{}) }).eq('id', id));
     } else {
-      const row = await q(db.from('tuition_students').insert({ full_name:name, email, tutor_id: tutor, source:'manual' }).select('id').single());
+      const row = await q(db.from('tuition_students').insert({ full_name:name, email, phone, tutor_id: tutor, source:'manual' }).select('id').single());
       id = row.id;
     }
     closeModal(); location.hash = '#/student/' + id;
@@ -330,7 +334,7 @@ async function viewStudent(id){
         <div class="fg full"><label>İç notlar (öğrenci görmez)</label><textarea class="form-inp" id="sp_internal_notes" rows="2">${esc(s.internal_notes||'')}</textarea></div>
       </div>
       <div class="row" style="margin-top:14px"><button class="btn" onclick="saveStudent('${s.id}')">Profili kaydet</button>
-        ${!s.user_id && s.email ? `<button class="btn ghost" onclick="linkStudentApp('${s.id}')">Uygulama hesabına bağla</button>`:''}</div>
+        ${!s.user_id && s.email ? `<button class="btn ghost" onclick="linkStudentApp('${s.id}')">Uygulama hesabına bağla</button>`:''}${waBtn(s.phone)}</div>
     </div>
     <div class="card">
       <div class="row between" style="margin-bottom:14px"><h3 style="margin:0">Kurlar</h3><button class="btn" onclick="newCourseModal('${s.id}','${s.tutor_id||''}','${s.level||''}')">+ Yeni kur</button></div>
@@ -393,7 +397,7 @@ async function createCourse(studentId){
 let CUR = null;
 async function viewCourse(id){
   const [c, lessons, obs, hw, pays, quizzes, reports] = await Promise.all([
-    q(db.from('tuition_courses').select('*, tuition_students(id,full_name,email,timezone)').eq('id', id).single()),
+    q(db.from('tuition_courses').select('*, tuition_students(id,full_name,email,phone,timezone)').eq('id', id).single()),
     q(db.from('tuition_lessons').select('*').eq('course_id', id).order('lesson_no')),
     q(db.from('tuition_observations').select('*, tuition_lessons!inner(course_id)').eq('tuition_lessons.course_id', id)),
     q(db.from('tuition_homework').select('*').eq('course_id', id).order('created_at')),
@@ -415,7 +419,7 @@ async function viewCourse(id){
     <div class="card">
       <div class="row between"><h3 style="margin:0">${esc(c.title)} ${badge(COURSE_STATUS,c.status)}</h3>
         <div class="row"><select class="form-inp" style="width:auto" onchange="setCourseStatus(this.value)">${opt(COURSE_STATUS,c.status)}</select></div></div>
-      <p class="muted small" style="margin-top:6px">${esc(c.tuition_students.full_name)} - Öğretmen: ${esc(tutorName(c.tutor_id))} - ${c.total_lessons} ders / ${c.duration_weeks} hafta / ${c.lesson_minutes} dk - ${c.level||''}</p>
+      <p class="muted small" style="margin-top:6px">${esc(c.tuition_students.full_name)} ${waBtn(c.tuition_students.phone,true)} - Öğretmen: ${esc(tutorName(c.tutor_id))} - ${c.total_lessons} ders / ${c.duration_weeks} hafta / ${c.lesson_minutes} dk - ${c.level||''}</p>
     </div>
     <div class="stats">
       <div class="stat"><div class="num" style="color:var(--green)">${cnt('attended')+cnt('late')}</div><div class="lbl">Katıldı (${cnt('late')} geç)</div></div>
@@ -437,7 +441,7 @@ async function viewCourse(id){
         <td><select class="form-inp" style="min-width:130px" onchange="setAttendance('${l.id}',this.value)">${opt(ATT,l.attendance)}</select></td>
         <td>${obsBy[l.id] ? `<button class="btn sm" style="background:rgba(0,200,83,0.2);color:var(--green)" onclick="obsModal('${l.id}')">Girildi</button>` : `<button class="btn ghost sm" onclick="obsModal('${l.id}')">+ Gözlem</button>`}</td>
         <td>${quizCell(quizBy[l.id], l)}</td>
-        <td>${l.meet_link?`<a href="${esc(l.meet_link)}" target="_blank" rel="noopener">Aç</a>${l.calendar_event_id?' <span class="small muted" title="Takvim daveti gönderildi">📅</span>':''}`:'<span class="muted">-</span>'}</td>
+        <td>${l.meet_link?`<a href="${esc(l.meet_link)}" target="_blank" rel="noopener">Aç</a>${l.calendar_event_id?' <span class="small muted" title="Takvim daveti gönderildi">📅</span>':''}${waLink(c.tuition_students.phone)&&l.scheduled_at?` <a class="small" style="color:#25D366" title="Ders saati ve Meet linkini öğrenciye WhatsApp'tan gönder" target="_blank" rel="noopener" href="${waLink(c.tuition_students.phone)}?text=${encodeURIComponent(`Merhaba ${c.tuition_students.full_name}, Ders ${l.lesson_no}: ${new Date(l.scheduled_at).toLocaleString('tr-TR',{dateStyle:'medium',timeStyle:'short',timeZone:c.tuition_students.timezone||undefined})}${c.tuition_students.timezone?' ('+c.tuition_students.timezone+')':''}\nGoogle Meet: ${l.meet_link}`)}">WhatsApp ile gönder</a>`:''}`:'<span class="muted">-</span>'}</td>
         <td><button class="btn ghost sm" onclick="lessonModal('${l.id}')">Detay</button></td></tr>`).join('')}
       </tbody></table></div>
       <p class="muted small" style="margin-top:8px">Saatler tarayıcınızın saat diliminde${c.tuition_students.timezone?' (öğrenci: '+esc(c.tuition_students.timezone)+')':''}. Katılım seçildiği anda kaydedilir.</p>
@@ -1394,6 +1398,7 @@ async function assignModal(tutorId){
     <div class="grid" id="as_new" style="margin-top:8px">
       <div class="fg"><label>Ad soyad *</label><input class="form-inp" id="as_name"></div>
       <div class="fg"><label>E-posta (Meet daveti buraya gider)</label><input class="form-inp" id="as_email" type="email"></div>
+      <div class="fg"><label>Telefon / WhatsApp (ülke koduyla)</label><input class="form-inp" id="as_phone" type="tel" placeholder="+90 5xx xxx xx xx"></div>
     </div>
     <div class="grid" style="margin-top:8px">
       <div class="fg"><label>Seviye</label><select class="form-inp" id="as_level"><option value="">-</option>${LEVELS.map(l=>`<option>${l}</option>`).join('')}</select></div>
@@ -1417,7 +1422,7 @@ async function assignCreate(){
   $('as_btn').disabled = true;
   await run(async()=>{
     if (studentId === '__new') {
-      const st = await q(db.from('tuition_students').insert({ full_name: val('as_name'), email: val('as_email'), level: val('as_level'), tutor_id: tutor, status:'active', source:'manual' }).select('id').single());
+      const st = await q(db.from('tuition_students').insert({ full_name: val('as_name'), email: val('as_email'), phone: val('as_phone'), level: val('as_level'), tutor_id: tutor, status:'active', source:'manual' }).select('id').single());
       studentId = st.id;
     } else {
       await q(db.from('tuition_students').update({ tutor_id: tutor, status:'active' }).eq('id', studentId).is('tutor_id', null));
