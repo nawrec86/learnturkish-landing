@@ -934,9 +934,9 @@ async function viewOverview(silent){
           <tr><td>Platform (ödeyen)</td><td class="small">${Object.entries(S.paid_by_platform||{}).map(([k,v])=>`${esc(k)}: ${v}`).join(' · ')||'-'}</td></tr>
           <tr><td>Ödeyen / aktif kullanıcı (30g)</td><td><b>${pct(S.paid, A.active_30d) ?? '-'}%</b></td></tr>
         </tbody></table>
-        <table style="margin-top:12px"><thead><tr><th>Paket</th><th>Abone</th><th>Fiyat</th><th>Aylık</th></tr></thead><tbody>
-          ${(R.breakdown||[]).map(b=>`<tr><td>${esc(b.key)}</td><td>${b.count}</td><td>${money(b.price)}${b.key==='tomer_pro:yearly'?' <span class="muted small">(varsayım)</span>':''}</td><td><b>${money(b.monthly)}</b></td></tr>`).join('') || '<tr><td colspan="4" class="muted">Ödeyen abone yok</td></tr>'}
-          <tr><td colspan="3"><b>Tahmini aylık (MRR) / yıllık</b></td><td><b style="color:var(--green)">${money(R.mrr_estimate||0)}</b> / ${money(R.arr_estimate||0)}</td></tr>
+        <table style="margin-top:12px"><thead><tr><th>Paket</th><th>Abone</th><th>Ödeme başına</th><th>Toplam</th></tr></thead><tbody>
+          ${(R.breakdown||[]).map(b=>`<tr><td>${esc(b.key)}</td><td>${b.count}</td><td>${money(b.price)} <span class="muted small">/ ${b.key.endsWith(':yearly')?'yıl':'ay'}</span></td><td><b>${money(b.price*b.count)}</b></td></tr>`).join('') || '<tr><td colspan="4" class="muted">Ödeyen abone yok</td></tr>'}
+          <tr><td colspan="3"><b>Aktif aboneler x liste fiyatı</b> <span class="muted small">(her biri kendi yenileme gününde, tam tutar)</span></td><td><b style="color:var(--green)">${money((R.breakdown||[]).reduce((a,b)=>a+b.price*b.count,0))}</b></td></tr>
         </tbody></table>
         <p class="small muted" style="margin-top:8px">${esc(R.note||'')}</p>
       </div>
