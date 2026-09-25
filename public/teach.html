@@ -815,7 +815,8 @@ async function countOf(table, filter = x => x){
   if (error) { console.error(table, error); return '!'; }
   return count ?? 0;
 }
-const FLAGS = { TR:'🇹🇷',US:'🇺🇸',GB:'🇬🇧',DE:'🇩🇪',FR:'🇫🇷',RU:'🇷🇺',UZ:'🇺🇿',KG:'🇰🇬',KZ:'🇰🇿',AZ:'🇦🇿',SA:'🇸🇦',AE:'🇦🇪',EG:'🇪🇬',IR:'🇮🇷',PK:'🇵🇰',IN:'🇮🇳',NG:'🇳🇬',TZ:'🇹🇿',BA:'🇧🇦',RS:'🇷🇸',MK:'🇲🇰',UA:'🇺🇦',NL:'🇳🇱',IT:'🇮🇹',ES:'🇪🇸',CA:'🇨🇦',AU:'🇦🇺',AF:'🇦🇫',TM:'🇹🇲',TJ:'🇹🇯',ID:'🇮🇩',MY:'🇲🇾',BD:'🇧🇩',DZ:'🇩🇿',MA:'🇲🇦',IQ:'🇮🇶',SY:'🇸🇾',JO:'🇯🇴' };
+// Bayrak ulke kodundan uretilir (A-Z -> regional indicator); her ISO kodu calisir, gecersizse undefined -> cagiran '🌐' koyar
+const FLAGS = new Proxy({}, { get: (_, k) => typeof k === 'string' && /^[A-Za-z]{2}$/.test(k) ? String.fromCodePoint(...[...k.toUpperCase()].map(ch => 0x1F1E6 + ch.charCodeAt(0) - 65)) : undefined });
 const EXP_CATS = { ads:'Reklam / boost', ai:'AI (Anthropic, ElevenLabs...)', infra:'Sunucu / Supabase / Vercel', tutor:'Öğretmen ödemesi', store:'Mağaza / geliştirici hesabı', marketing:'Pazarlama / içerik', tools:'Yazılım / abonelik', other:'Diğer' };
 const PLATFORM_NAMES = { instagram:'Instagram', facebook:'Facebook', youtube:'YouTube', tiktok:'TikTok' };
 const nf = n => n==null ? '-' : Number(n).toLocaleString('tr-TR');
