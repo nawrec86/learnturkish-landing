@@ -1096,14 +1096,15 @@ async function viewOverview(silent){
     <div class="card" id="ai-card"><div class="row between" style="margin-bottom:12px"><h3 style="margin:0">🤖 AI yorumu: daha fazla satış için ne yapmalı?</h3><button class="btn sm" id="ai_btn" onclick="aiAdvice()">${window.__AI?'↻ Yeniden yorumla':'✨ Yorumla'}</button></div>
       <div id="ai_out">${window.__AI?renderAdvice(window.__AI):'<p class="small muted">Paneldeki tüm rakamlar (kullanıcı, tutunma, abone, mağaza, ülkeler, reklam kampanyaları) AI\'a verilir; somut öneri ve bütçe tavsiyesi döner.</p>'}</div>
     </div>
-    <p class="muted small"><span style="color:var(--green)">●</span> Canlı: her dakika kendini yeniler · son güncelleme ${new Date(B.generated_at).toLocaleTimeString('tr-TR')} · Meta harcaması saatlik, mağaza kazancı günlük otomatik çekilir.</p>`;
+    <p class="muted small"><span style="color:var(--green)">●</span> Canlı: 5 dakikada bir kendini yeniler (sekme açıkken) · son güncelleme ${new Date(B.generated_at).toLocaleTimeString('tr-TR')} · Meta harcaması saatlik, mağaza kazancı günlük otomatik çekilir.</p>`;
   if (silent) window.scrollTo(0, keepY);
   // Canli: sadece Genel Bakis acikken ve bir detay penceresi acik degilken yenile
-  OV_TIMER = setTimeout(() => {
+  // Veritabani yukunu dusuk tut: 5 dakikada bir, sadece sekme gorunurken yenile
+  OV_TIMER = setTimeout(function tick() {
     if (!location.hash.startsWith('#/overview')) return;
-    if ($('modalBg').style.display === 'flex') { OV_TIMER = setTimeout(() => viewOverview(true), 30000); return; }
+    if (document.visibilityState !== 'visible' || $('modalBg').style.display === 'flex') { OV_TIMER = setTimeout(tick, 60000); return; }
     viewOverview(true);
-  }, 60000);
+  }, 300000);
 }
 // ---- Detay pencereleri (kartlara tiklayinca) ----
 let UM = null;
