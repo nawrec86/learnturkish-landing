@@ -957,7 +957,7 @@ async function viewOverview(silent){
         ${(()=>{
           const U = B.usage || {};
           const dl = sumObj(IN.total);
-          const SCR = {'tab:home':'Ana sayfa','tab:sc':'Senaryolar','tab:dict':'Sözlük','tab:tomer':'TYS / TÖMER','tab:pc':'Partner sohbet','tab:pr':'Profil','tab:tm':'Gramer (TÖMER)','tab:exam':'Sınav','tab:gr':'Gramer','tab:st':'Sezon teması','tab:lb':'Liderlik tablosu','tab:tr':'Türkiye rehberi','tab:ch':'1v1 Challenge','tab:pod':'Podcast','tab:gm':'Oyunlar','tab:progress':'İlerleme','tab:pron':'Telaffuz','scr:chat':'AI sohbet','scr:login':'Giriş ekranı','scr:onb':'Kurulum (onboarding)','scr:levelTest':'Seviye testi','scr:weeklyTest':'Haftalık test','scr:dailyChallenge':'Günlük görev','paywall:premium':'Paywall (Premium)','paywall:tomer_pro':'Paywall (TÖMER Pro)'};
+          const SCR = {'tab:home':'Ana sayfa','tab:sc':'Senaryolar','tab:dict':'Sözlük','tab:tomer':'TYS / TÖMER','tab:pc':'Partner sohbet','tab:pr':'Profil','tab:tm':'Gramer (TÖMER)','tab:exam':'Sınav','tab:gr':'Gramer','tab:st':'Sezon teması','tab:lb':'Liderlik tablosu','tab:tr':'Türkiye rehberi','tab:ch':'1v1 Challenge','tab:pod':'Podcast','tab:gm':'Oyunlar','tab:progress':'İlerleme','tab:pron':'Telaffuz','scr:chat':'AI sohbet','scr:login':'Giriş ekranı','scr:onb':'Kurulum (onboarding)','scr:levelTest':'Seviye testi','scr:weeklyTest':'Haftalık test','scr:dailyChallenge':'Günlük görev','paywall:premium':'Paywall (Premium)','paywall:tomer_pro':'Paywall (TÖMER Pro)','banner:tuition':'Özel ders banner tıklaması'};
           const scr = U.screens_30d || [];
           const mxS = Math.max(1, ...scr.map(x=>+x.views));
           const feats = (U.features_30d||[]).filter(f=>+f.events_30d>0).sort((a,b)=>b.events_30d-a.events_30d);
@@ -1235,6 +1235,8 @@ async function delExpense(id){ if(!confirm('Gider silinsin mi?')) return; await 
 async function viewSettings(){
   const { data } = await db.from('app_settings').select('value,updated_at').eq('key','private_tuition').maybeSingle();
   const v = (data && data.value) || {};
+  const { data: tq } = await db.from('app_settings').select('value,updated_at').eq('key','tomer_free_questions').maybeSingle();
+  const tv = (tq && tq.value) || { enabled:true, limit:10, period:'total' };
   $('view').innerHTML = `<div class="card"><h3>📱 Uygulamadaki "Öğretmenle canlı ders" kartı</h3>
     <p class="muted small" style="margin-bottom:14px">Kart açıkken uygulamanın ana ekranında ve profil sayfasında görünür, öğrenciyi rezervasyon formuna ve WhatsApp'a yönlendirir. Kursu olan öğrenciler karttan her zaman "Derslerim"e ulaşır (bu ayardan bağımsız). Değişiklik uygulama güncellemesi gerektirmez.</p>
     <div class="grid">
@@ -1245,7 +1247,24 @@ async function viewSettings(){
     </div>
     <div class="row" style="margin-top:16px"><button class="btn" id="st_save" onclick="saveSettings()">Kaydet</button>
       ${data&&data.updated_at?`<span class="muted small">Son güncelleme: ${fmtDT(data.updated_at)}</span>`:''}</div>
+  </div>
+  <div class="card"><h3>🏆 TÖMER ücretsiz soru hakkı</h3>
+    <p class="muted small" style="margin-bottom:14px">Aboneliği olmayan kullanıcı TÖMER ders quizlerinde bu kadar soru çözebilir, sonra TÖMER Pro teklifi görür. Premium ve TÖMER Pro aboneleri sınırsız. Değişiklik anında geçerli, uygulama güncellemesi gerekmez.</p>
+    <div class="grid">
+      <div class="fg"><label>Durum</label><select class="form-inp" id="tq_enabled"><option value="1" ${tv.enabled!==false?'selected':''}>Açık (sınır uygulanır)</option><option value="0" ${tv.enabled===false?'selected':''}>Kapalı (herkes sınırsız)</option></select></div>
+      <div class="fg"><label>Soru sayısı</label><input class="form-inp" type="number" min="0" id="tq_limit" value="${Number(tv.limit??10)}"></div>
+      <div class="fg"><label>Süre</label><select class="form-inp" id="tq_period"><option value="total" ${tv.period!=='day'?'selected':''}>Toplam (bir kez)</option><option value="day" ${tv.period==='day'?'selected':''}>Her gün yenilenir</option></select></div>
+    </div>
+    <div class="row" style="margin-top:16px"><button class="btn" id="tq_save" onclick="saveTomerLimit()">Kaydet</button>
+      ${tq&&tq.updated_at?`<span class="muted small">Son güncelleme: ${fmtDT(tq.updated_at)}</span>`:'<span class="muted small">Varsayılan: açık, 10 soru, toplam</span>'}</div>
   </div>`;
+}
+async function saveTomerLimit(){
+  $('tq_save').disabled = true;
+  try {
+    await run(()=>invokeFn('tuition-admin', { action:'save_tomer_limit', value:{ enabled: val('tq_enabled')==='1', limit: parseInt(val('tq_limit'),10)||0, period: val('tq_period') } }), 'TÖMER ayarı kaydedildi');
+    viewSettings();
+  } catch(_) { $('tq_save').disabled = false; }
 }
 async function saveSettings(){
   const wa = (val('st_wa')||'').replace(/\D/g,'');
