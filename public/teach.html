@@ -1018,10 +1018,10 @@ async function viewOverview(silent){
 
     <div class="card" id="store-rev"><div class="row between" style="margin-bottom:12px"><h3 style="margin:0">🏪 Mağaza kazançları (App Store + Google Play)</h3>
       ${(SR.configured||{}).app_store||(SR.configured||{}).google_play?`<button class="btn ghost sm" id="sr_sync" onclick="storeSync()">↻ Şimdi çek (30 gün)</button> <button class="btn ghost sm" id="sr_sync_all" onclick="storeSyncAll()">⏮ Başlangıçtan beri çek</button>`:''}</div>
-      ${realRev ? (()=>{ const daily = Object.entries(SR.daily||{}).sort(); const mx = Math.max(1,...daily.map(d=>d[1])); const byC = Object.entries(SR.by_country||{}).sort((a,b)=>b[1]-a[1]).slice(0,10); const mxC = Math.max(1,...byC.map(c=>c[1]));
+      ${realRev ? (()=>{ const daily = Object.entries(SR.daily||{}).sort(); const bySt = (o,f) => ` App Store ${f((o||{}).app_store||0)} · Google Play ${f((o||{}).google_play||0)}`; const mx = Math.max(1,...daily.map(d=>d[1])); const byC = Object.entries(SR.by_country||{}).sort((a,b)=>b[1]-a[1]).slice(0,10); const mxC = Math.max(1,...byC.map(c=>c[1]));
         return `<div class="stats" style="margin:0 0 12px">
-          ${stat(money(storeMonth),'Bu ay net','var(--green)')}${stat(money(sumObj(SR.d30)),'Son 30 gün net')}${stat(money(sumObj(SR.total)),'Toplam net (başlangıçtan beri)')}
-          ${stat(nf(sumObj(SR.units_month)),'Bu ay satış / yenileme')}</div>
+          ${stat(money(storeMonth),'Bu ay net','var(--green)',bySt(SR.month,money))}${stat(money(sumObj(SR.d30)),'Son 30 gün net','',bySt(SR.d30,money))}${stat(money(sumObj(SR.total)),'Toplam net (başlangıçtan beri)','',bySt(SR.total,money))}
+          ${stat(nf(sumObj(SR.units_month)),'Bu ay satış / yenileme','',bySt(SR.units_month,nf))}</div>
           <div class="grid"><div><p class="small muted">Son 30 gün günlük net</p><div style="display:flex;align-items:flex-end;gap:2px;height:80px;margin-top:18px">${daily.map(([d,v])=>`<div title="${d}: ${money(v)}" style="flex:1;position:relative;background:var(--green);opacity:.8;height:${Math.max(3,v/mx*100)}%;border-radius:2px">${v>0?`<span style="position:absolute;bottom:100%;left:50%;transform:translateX(-50%);font-size:9px;white-space:nowrap;color:#bbb">${v<10?v.toFixed(1):Math.round(v)}</span>`:''}</div>`).join('')}</div>
           <div style="display:flex;gap:2px;margin-top:3px">${daily.map(([d])=>`<div class="small muted" style="flex:1;text-align:center;font-size:9px">${Number(d.slice(8,10))}</div>`).join('')}</div>
           ${(()=>{ const DBC = SR.daily_by_country; const rows = daily.filter(([,v])=>v>0).reverse();
