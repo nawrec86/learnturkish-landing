@@ -203,10 +203,10 @@ function route(){
   if ($('app').style.display!=='block') return;
   if (typeof OV_TIMER !== 'undefined') clearTimeout(OV_TIMER);
   const [, page, id] = (location.hash || '#/home').split('/');
-  document.querySelectorAll('.tab').forEach(t=>t.classList.toggle('active', t.dataset.tab===page || (page==='student'&&t.dataset.tab==='students') || (page==='course'&&t.dataset.tab==='students')));
+  document.querySelectorAll('.tab').forEach(t=>t.classList.toggle('active', t.dataset.tab===page || (page==='student'&&t.dataset.tab==='students') || (page==='course'&&t.dataset.tab==='students') || (page==='tutor'&&t.dataset.tab==='tutors')));
   $('view').innerHTML = '<div class="empty">Yükleniyor...</div>';
-  const pages = { home:viewHome, students:viewStudents, student:viewStudent, course:viewCourse, tutors:viewTutors, requests:viewRequests, overview:viewOverview, settings:viewSettings };
-  if (!ME.is_admin && ['tutors','requests','overview','settings'].includes(page)) { location.hash = '#/home'; return; }
+  const pages = { home:viewHome, students:viewStudents, student:viewStudent, course:viewCourse, tutors:viewTutors, tutor:viewTutor, requests:viewRequests, overview:viewOverview, settings:viewSettings };
+  if (!ME.is_admin && ['tutors','tutor','requests','overview','settings'].includes(page)) { location.hash = '#/home'; return; }
   (pages[page] || viewHome)(id).catch(e => { $('view').innerHTML = `<div class="card"><b>Hata:</b> ${esc(e.message)}</div>`; });
 }
 
@@ -1312,7 +1312,7 @@ async function viewTutors(){
     <div class="row between" style="margin-bottom:12px"><h3 style="margin:0">Öğretmenler (${TUTORS.length})</h3><button class="btn" onclick="tutorModal()">+ Yeni öğretmen</button></div>
     <p class="muted small" style="margin-bottom:12px">Öğretmeni e-postasıyla ekleyin: hesabı varsa otomatik bağlanır, yoksa hesap açılır ve size bir "şifreni belirle" linki gösterilir (e-posta servisi kuruluysa öğretmene e-postayla da gider). Öğretmen linke tıklayıp doğrudan bu panele girer. Panele girebilmesi için öğretmen <b>aktif</b> olmalı. Google Meet davetleri de bu e-postaya gider.</p>
     <div class="tbl-wrap"><table><thead><tr><th>Ad</th><th>Öğrenci / kur</th><th>Yaklaşan ders</th><th>Geçmiş dersler</th><th>Giriş hesabı</th><th>Kalıcı Meet linki</th><th>Durum</th><th></th></tr></thead><tbody>
-    ${TUTORS.map(t=>`<tr><td><b>${esc(t.full_name)}</b>${t.languages&&t.languages.length?`<div class="small muted">${esc(t.languages.join(', '))}</div>`:''}</td>
+    ${TUTORS.map(t=>`<tr><td class="click" onclick="location.hash='#/tutor/${t.id}'"><b>${esc(t.full_name)} ›</b>${t.languages&&t.languages.length?`<div class="small muted">${esc(t.languages.join(', '))}</div>`:''}</td>
       <td class="click" onclick="location.hash='#/students/${t.id}'"><b>${(TS[t.id]?.students.size)||0}</b> / ${(TS[t.id]?.courses)||0} ›</td>
       <td class="small">${TS[t.id]?.upcoming ? `${TS[t.id].upcoming} ders<div class="muted">sıradaki ${fmtDT(TS[t.id].next)}</div>` : '<span class="muted">-</span>'}</td>
       <td class="small">${TP[t.id] ? `<span style="color:var(--green)">✓ ${TP[t.id].done} yapıldı</span>${TP[t.id].missed?` · ${TP[t.id].missed} gelmedi/mazeret`:''}${TP[t.id].unmarked?`<div style="color:#FF6B6B;font-weight:700">⚠ ${TP[t.id].unmarked} ders katılım girilmemiş</div>`:''}${TP[t.id].noObs?`<div style="color:var(--gold)">${TP[t.id].noObs} derste gözlem yok</div>`:''}` : '<span class="muted">-</span>'}</td>
@@ -1323,6 +1323,61 @@ async function viewTutors(){
         ${t.user_id?`<button class="btn ghost sm" onclick="sendTutorLink('${t.id}')">Giriş linki gönder</button>`:''}
         <button class="btn ghost sm" onclick="updTutor('${t.id}',{is_active:${!t.is_active}},true)">${t.is_active?'Pasif yap':'Aktif yap'}</button></td></tr>`).join('') || '<tr><td colspan="5" class="empty">Henüz öğretmen yok. "+ Yeni öğretmen" ile ekleyin.</td></tr>'}
     </tbody></table></div></div>`;
+}
+
+// ---------------------------------------------------------------------------
+// OGRETMEN DETAY (admin): ne yapti - dersler, katilim, gozlem, odev, quiz, rapor + aktivite akisi
+// ---------------------------------------------------------------------------
+async function viewTutor(id){
+  await loadTutors();
+  const t = TUTORS.find(x=>x.id===id); if (!t) { $('view').innerHTML = '<div class="card">Öğretmen bulunamadı</div>'; return; }
+  const courses = await q(db.from('tuition_courses').select('id,title,status,student_id,tuition_students(full_name)').eq('tutor_id', id));
+  const cids = courses.map(c=>c.id);
+  const cname = Object.fromEntries(courses.map(c=>[c.id, c.tuition_students?.full_name || c.title]));
+  const none = cids.length ? cids : ['00000000-0000-0000-0000-000000000000'];
+  const [lessons, obs, hw, qz, rp] = await Promise.all([
+    q(db.from('tuition_lessons').select('id,course_id,lesson_no,topic,scheduled_at,attendance,attendance_marked_at,meet_link').in('course_id', none).order('scheduled_at',{ascending:false})),
+    q(db.from('tuition_observations').select('lesson_id,created_at,covered,tuition_lessons!inner(course_id,lesson_no)').in('tuition_lessons.course_id', none)),
+    q(db.from('tuition_homework').select('id,course_id,title,status,created_at,reviewed_at,submitted_at').in('course_id', none)),
+    q(db.from('tuition_quizzes').select('id,course_id,title,status,created_at,published_at').in('course_id', none)),
+    q(db.from('tuition_reports').select('id,course_id,status,created_at,published_at').in('course_id', none)),
+  ]);
+  const now = new Date().toISOString();
+  const obsSet = new Set(obs.map(o=>o.lesson_id));
+  const past = lessons.filter(l=>l.scheduled_at && l.scheduled_at < now && l.attendance!=='cancelled');
+  const done = past.filter(l=>['attended','late'].includes(l.attendance));
+  const unmarked = past.filter(l=>l.attendance==='scheduled');
+  const noObs = done.filter(l=>!obsSet.has(l.id));
+  const upcoming = lessons.filter(l=>l.scheduled_at && l.scheduled_at >= now && l.attendance==='scheduled').reverse();
+  const hwToReview = hw.filter(h=>h.status==='submitted');
+  // Aktivite akisi: ogretmenin yaptigi islemler, en yeni ustte
+  const act = [];
+  for (const l of lessons) if (l.attendance_marked_at) act.push({ at:l.attendance_marked_at, c:l.course_id, t:`Ders ${l.lesson_no} katılım girildi: ${(ATT[l.attendance]||[l.attendance])[0]}` });
+  for (const o of obs) act.push({ at:o.created_at, c:o.tuition_lessons.course_id, t:`Ders ${o.tuition_lessons.lesson_no} gözlem yazıldı${o.covered?' - '+o.covered.slice(0,60):''}` });
+  for (const h of hw) { act.push({ at:h.created_at, c:h.course_id, t:`Ödev verildi: ${h.title}` }); if (h.reviewed_at) act.push({ at:h.reviewed_at, c:h.course_id, t:`Ödev değerlendirildi: ${h.title}` }); }
+  for (const x of qz) act.push({ at:x.published_at||x.created_at, c:x.course_id, t:`AI quiz ${x.published_at?'yayınlandı':'hazırlandı'}: ${x.title||''}` });
+  for (const r of rp) act.push({ at:r.published_at||r.created_at, c:r.course_id, t:`Gelişim raporu ${r.published_at?'yayınlandı':'hazırlandı'}` });
+  act.sort((a,b)=>String(b.at).localeCompare(String(a.at)));
+  const stat = (n,l,color,on) => `<div class="stat${on?' click':''}"${on?` onclick="document.getElementById('${on}').scrollIntoView({behavior:'smooth'})"`:''}><div class="num"${color?` style="color:${color}"`:''}>${n}</div><div class="lbl">${l}</div></div>`;
+  const lrow = l => `<tr class="click" onclick="location.hash='#/course/${l.course_id}'"><td>${fmtDT(l.scheduled_at)}</td><td><b>${esc(cname[l.course_id]||'')}</b></td><td>Ders ${l.lesson_no}${l.topic?' - '+esc(l.topic):''}</td><td>${badge(ATT, l.attendance)}</td><td>${obsSet.has(l.id)?'<span style="color:var(--green)">✓</span>':(['attended','late'].includes(l.attendance)?'<span style="color:var(--gold)">yok</span>':'-')}</td></tr>`;
+  $('view').innerHTML = `
+    <span class="back" onclick="location.hash='#/tutors'">&larr; Öğretmenler</span>
+    <div class="card"><div class="row between"><h3 style="margin:0">👩‍🏫 ${esc(t.full_name)} ${t.is_active?'<span class="badge b-green">Aktif</span>':'<span class="badge b-grey">Pasif</span>'}</h3>
+      <div class="row"><button class="btn sm" onclick="assignModal('${t.id}')">+ Ders ekle</button><button class="btn ghost sm" onclick="location.hash='#/students/${t.id}'">Öğrencileri</button></div></div></div>
+    <div class="stats">
+      ${stat(new Set(courses.map(c=>c.student_id)).size+' / '+courses.filter(c=>['planned','active'].includes(c.status)).length,'Öğrenci / aktif kur')}
+      ${stat(done.length,'Yapılan ders','var(--green)','tv-past')}
+      ${stat(unmarked.length,'Katılımı girilmemiş', unmarked.length?'#FF6B6B':null,'tv-past')}
+      ${stat(noObs.length,'Gözlemi yazılmamış', noObs.length?'var(--gold)':null,'tv-past')}
+      ${stat(upcoming.length,'Yaklaşan ders',null,'tv-up')}
+      ${stat(hwToReview.length,'Değerlendirilecek ödev', hwToReview.length?'var(--gold)':null)}
+      ${stat(qz.length+' / '+rp.length,'AI quiz / rapor')}
+    </div>
+    <div class="grid">
+      <div class="card"><h3>🕘 Son yaptıkları</h3>${act.length?`<div class="tbl-wrap"><table><tbody>${act.slice(0,40).map(a=>`<tr class="click" onclick="location.hash='#/course/${a.c}'"><td class="small" style="white-space:nowrap">${fmtDT(a.at)}</td><td><b>${esc(cname[a.c]||'')}</b><div class="small">${esc(a.t)}</div></td></tr>`).join('')}</tbody></table></div>`:'<div class="empty">Henüz bir işlem yok</div>'}</div>
+      <div class="card" id="tv-up"><h3>📅 Yaklaşan dersler</h3>${upcoming.length?`<div class="tbl-wrap"><table><tbody>${upcoming.slice(0,20).map(l=>`<tr class="click" onclick="location.hash='#/course/${l.course_id}'"><td>${fmtDT(l.scheduled_at)}</td><td><b>${esc(cname[l.course_id]||'')}</b></td><td>Ders ${l.lesson_no}</td><td>${l.meet_link?`<a href="${esc(l.meet_link)}" target="_blank" rel="noopener" onclick="event.stopPropagation()">Meet</a>`:'<span class="muted">link yok</span>'}</td></tr>`).join('')}</tbody></table></div>`:'<div class="empty">Planlı ders yok</div>'}</div>
+    </div>
+    <div class="card" id="tv-past"><h3>✅ Geçmiş dersler (yapıldı mı?)</h3>${past.length?`<div class="tbl-wrap"><table><thead><tr><th>Tarih</th><th>Öğrenci</th><th>Ders</th><th>Katılım</th><th>Gözlem</th></tr></thead><tbody>${past.map(lrow).join('')}</tbody></table></div>`:'<div class="empty">Geçmiş ders yok</div>'}</div>`;
 }
 // Yonetici: ogretmene ders ekle = (mevcut ya da yeni) ogrenci + kur + istege bagli ilk ders tarihi
 async function assignModal(tutorId){
