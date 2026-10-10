@@ -826,6 +826,46 @@ function otherCur(obj){ return Object.entries(obj||{}).filter(([c])=>c!=='USD').
 function hbar(v, max, color){ return `<div class="bar" style="width:100%;min-width:80px"><div style="width:${max?Math.max(2,v/max*100):0}%;background:${color||'var(--green)'}"></div></div>`; }
 function delta(now, before){ if (now==null||before==null) return ''; const d=now-before; return d===0?'<span class="muted small">=</span>':`<span class="small" style="color:${d>0?'var(--green)':'#FF6B6B'}">${d>0?'+':''}${nf(d)}</span>`; }
 
+// Buyume hunisi: indirme -> kayit -> kurulum -> ilk pratik -> ertesi gun geri donus -> 7. gun -> paywall -> odeme
+function growthCard(G){
+  if (!G) return '';
+  if (G.error) return `<div class="card"><h3>🚀 Büyüme hunisi</h3><p class="small" style="color:#FF6B6B">${esc(G.error)}</p></div>`;
+  const F = G.funnel_30d || {}, Q = G.quality || {};
+  const p = (a,b) => b ? Math.round(a/b*100) : null;
+  const pc = (a,b) => { const v=p(a,b); return v==null?'-':v+'%'; };
+  const col = v => v==null ? '#888' : v>=40 ? 'var(--green)' : v>=20 ? 'var(--gold)' : '#FF6B6B';
+  const steps = [
+    ['📲 Mağazadan indirme', F.downloads, null, 'App Store + Play ilk indirme'],
+    ['👤 Hesap açtı', F.signups, F.downloads, 'indirenlerin hesap açanı'],
+    ['✅ Kurulumu bitirdi', F.onboarded, F.signups, 'onboarding tamam'],
+    ['✏️ İlk pratiği yaptı (XP > 0)', F.practiced, F.signups, 'en az bir alıştırma'],
+    ['🔁 Ertesi gün geri döndü', F.back_d1, F.signups, 'kayıttan 20+ saat sonra tekrar açtı'],
+    ['📅 7. gün hâlâ geliyor', F.back_d7, F.eligible_d7, `en az 7 günlük ${nf(F.eligible_d7)} kişiden`],
+    ['🔔 Bildirim izni var', F.push_on, F.signups, 'geri çağırabildiğimiz kişi'],
+    ['💎 Paywall gördü', F.paywall_seen, F.signups, 'ekran ölçümü olan sürümlerde'],
+    ['💳 Ödedi', F.paid, F.signups, 'mağaza işlemi olan abonelik'],
+  ];
+  const mx = Math.max(1, ...steps.map(s=>+s[1]||0));
+  const cohorts = (G.cohorts||[]).slice(0,8);
+  const warn = [];
+  if (Q.total && Q.native_en/Q.total > .45) warn.push(`Ana dil "en" görünen ${nf(Q.native_en)} / ${nf(Q.total)} hesap: büyük kısmı seçilmemiş varsayılan olabilir.`);
+  if (Q.total && Q.level_set/Q.total < .05) warn.push(`Seviye neredeyse hiç kaydedilmiyor (${nf(Q.level_set)} hesapta başlangıç dışı seviye).`);
+  if (Q.total && Q.reason_set/Q.total < .05) warn.push(`Öğrenme amacı kaydedilmiyor (${nf(Q.reason_set)} hesap). Kişiselleştirme ve reklam hedefleme için gerekli.`);
+  if (Q.active30 && Q.active30_no_country/Q.active30 > .3) warn.push(`Son 30 gün aktiflerin ${pc(Q.active30_no_country,Q.active30)} kadarında ülke boş.`);
+  if (Q.active30 && Q.screen_tracked_30d/Q.active30 < .7) warn.push(`Ekran ölçümü aktiflerin sadece ${pc(Q.screen_tracked_30d,Q.active30)} kadarından geliyor (${nf(Q.screen_tracked_30d)} / ${nf(Q.active30)}): eski sürümdekiler ölçülmüyor.`);
+  return `<div class="card" id="growth-card"><h3>🚀 Büyüme hunisi (son 30 gün)</h3>
+    <table><tbody>${steps.map(([lbl,n,base,sub])=>{ const v=base==null?null:p(n,base); return `<tr><td>${lbl}<div class="small muted">${sub}</div></td><td style="white-space:nowrap"><b>${nf(n)}</b>${base==null?'':` <span class="small" style="color:${col(v)}">${pc(n,base)}</span>`}</td><td style="width:40%">${hbar(+n||0,mx,'var(--blue)')}</td></tr>`; }).join('')}</tbody></table>
+    <p class="small muted" style="margin-top:8px">30 günden eski ${nf(G.old_users)} hesaptan son 30 günde gelen: <b>${nf(G.old_active_30d)}</b> (${pc(G.old_active_30d,G.old_users)}). Bu oran büyümenin asıl göstergesi: kova delikse indirme artışı kalıcı olmaz.</p>
+    <h4 style="margin:14px 0 6px">Haftalık kayıt grupları (kohort)</h4>
+    ${cohorts.length?`<div class="tbl-wrap"><table><thead><tr><th>Hafta</th><th>Kayıt</th><th>Kurulum</th><th>Pratik</th><th>Ertesi gün</th><th>7. gün</th><th>Bildirim</th><th>Ödedi</th></tr></thead><tbody>
+      ${cohorts.map(c=>{ const cell=(a,b)=>{ const v=p(a,b); return `<td><span style="color:${col(v)}">${pc(a,b)}</span> <span class="small muted">${nf(a)}</span></td>`; };
+        return `<tr><td>${fmtD(c.week)}</td><td><b>${nf(c.signups)}</b></td>${cell(c.onboarded,c.signups)}${cell(c.practiced,c.signups)}${cell(c.back_d1,c.signups)}${c.eligible_d7?cell(c.back_d7,c.eligible_d7):'<td class="muted small">henüz değil</td>'}${cell(c.push_on,c.signups)}${cell(c.paid,c.signups)}</tr>`; }).join('')}
+    </tbody></table></div>`:'<p class="small muted">Kohort verisi yok.</p>'}
+    <p class="small muted" style="margin-top:6px">Ölçüm ${fmtD(G.measured_since)} tarihinde başladı. Hedef: ertesi gün %40+, 7. gün %20+ (dil uygulamaları için iyi seviye).</p>
+    ${warn.length?`<h4 style="margin:14px 0 6px">⚠️ Veri eksikleri</h4><ul class="small" style="padding-inline-start:18px">${warn.map(w=>`<li>${esc(w)}</li>`).join('')}</ul>`:''}
+  </div>`;
+}
+
 let OV_TIMER = null;
 async function viewOverview(silent){
   clearTimeout(OV_TIMER);
@@ -884,6 +924,8 @@ async function viewOverview(silent){
       ${LT.error ? '' : stat(money(LT.profit_usd||0),'Toplam kâr / zarar (başladığımızdan beri)',(LT.profit_usd||0)>=0?'var(--green)':'#FF6B6B',`gelir ${money(LT.revenue_usd||0)} - gider ${money(LT.expenses_usd||0)}`,"document.getElementById('monthly-card').scrollIntoView({behavior:'smooth'})")}
       ${stat(money(netMonth),'Bu ay kâr / zarar', netMonth>=0?'var(--green)':'#FF6B6B', `gelir ${money(incomeMonth)} - gider ${money(costMonth)}`,"document.getElementById('pl-card').scrollIntoView({behavior:'smooth'})")}
     </div>
+
+    ${growthCard(B.growth)}
 
     <div class="grid">
       <div class="card"><h3>👥 Kullanıcılar ve devam edenler</h3>
