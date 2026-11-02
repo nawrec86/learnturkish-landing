@@ -4,7 +4,7 @@
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
 <title>LearnTurkish AI — Learn Turkish by Talking with AI</title>
-<meta name="description" content="Master Turkish through real AI conversations. 3 AI coaches, 25+ scenarios, 150 podcasts, games and more. Start free today."/>
+<meta name="description" content="Master Turkish through real AI conversations. 4 AI coaches, 1v1 Challenge, 25+ scenarios, 150 podcasts, games and more. Start free today."/>
 <link rel="preconnect" href="https://fonts.googleapis.com"/>
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
 <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,500;0,9..40,600;1,9..40,400&display=swap" rel="stylesheet"/>
@@ -146,13 +146,15 @@ nav{position:fixed;top:0;left:0;right:0;z-index:200;height:64px;display:flex;ali
 .feat-deco{position:absolute;right:-10px;bottom:-10px;font-size:80px;opacity:.06;filter:blur(2px);pointer-events:none}
 
 /* COACHES */
-.coaches-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:20px}
+.coaches-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:20px}
 .coach-card{border-radius:28px;padding:36px 28px;border:1px solid transparent;position:relative;overflow:hidden;transition:transform .2s,box-shadow .2s;text-align:center}
 .coach-card:hover{transform:translateY(-6px)}
 .coach-card.ayse{background:rgba(245,197,24,.07);border-color:rgba(245,197,24,.18)}
 .coach-card.ayse:hover{box-shadow:0 20px 60px rgba(245,197,24,.2);border-color:rgba(245,197,24,.35)}
 .coach-card.emre{background:rgba(59,130,246,.08);border-color:rgba(59,130,246,.2)}
 .coach-card.emre:hover{box-shadow:0 20px 60px rgba(59,130,246,.22);border-color:rgba(59,130,246,.4)}
+.coach-card.zeynep{background:rgba(240,101,60,.08);border-color:rgba(240,101,60,.2)}
+.coach-card.zeynep:hover{box-shadow:0 20px 60px rgba(240,101,60,.2);border-color:rgba(240,101,60,.4)}
 .coach-card.demir{background:rgba(139,92,246,.08);border-color:rgba(139,92,246,.2)}
 .coach-card.demir:hover{box-shadow:0 20px 60px rgba(139,92,246,.2);border-color:rgba(139,92,246,.4)}
 .coach-aura{position:absolute;width:160px;height:160px;border-radius:50%;top:-40px;right:-30px;opacity:.12;filter:blur(35px);pointer-events:none}
@@ -162,6 +164,7 @@ nav{position:fixed;top:0;left:0;right:0;z-index:200;height:64px;display:flex;ali
 .coach-avatar-img{width:100px;height:100px;border-radius:50%;margin:0 auto 20px;object-fit:cover;border:3px solid rgba(255,255,255,.1)}
 .ayse .coach-avatar-img{box-shadow:0 0 30px rgba(245,197,24,.3)}
 .emre .coach-avatar-img{box-shadow:0 0 30px rgba(59,130,246,.3)}
+.zeynep .coach-avatar-img{box-shadow:0 0 30px rgba(240,101,60,.3)}
 .demir .coach-avatar-img{box-shadow:0 0 30px rgba(139,92,246,.3)}
 .coach-avatar-fallback{width:100px;height:100px;border-radius:50%;margin:0 auto 20px;display:flex;align-items:center;justify-content:center;font-size:36px;font-weight:800;font-family:var(--hh)}
 .coach-name{font-family:var(--hh);font-size:24px;font-weight:800;margin-bottom:4px}
@@ -300,7 +303,7 @@ footer{border-top:1px solid rgba(255,255,255,.07);padding:36px clamp(16px,5vw,80
   .hero{grid-template-columns:1fr;text-align:center;gap:40px}
   .feat-grid{grid-template-columns:1fr 1fr}
   .feat-card.wide{grid-column:span 1}
-  .coaches-grid{grid-template-columns:1fr}
+  .coaches-grid{grid-template-columns:1fr 1fr}
   .scenarios-grid{grid-template-columns:repeat(2,1fr)}
   .podcast-preview{grid-template-columns:1fr}
   .pricing-grid{grid-template-columns:1fr}
@@ -369,7 +372,7 @@ footer{border-top:1px solid rgba(255,255,255,.07);padding:36px clamp(16px,5vw,80
       <span data-i18n="hero_title1">From "Merhaba"</span><br>
       <em data-i18n="hero_title2">to Fluency</em>
     </h1>
-    <p class="hero-sub" data-i18n="hero_sub">Practice real conversations with 3 AI coaches. 25+ real-life scenarios, 150 podcasts, games, and more. Responses in 1&#x2013;2 seconds.</p>
+    <p class="hero-sub" data-i18n="hero_sub">Practice real conversations with 4 AI coaches who talk back. Challenge learners 1v1, 25+ real-life scenarios, 150 podcasts, games, and more. Responses in 1&#x2013;2 seconds.</p>
     <div class="hero-actions">
       <a href="https://apps.apple.com/app/learnturkish-ai/id6744827342" class="btn-primary">&#x1F680; <span data-i18n="hero_cta">Start Free</span></a>
       <button class="btn-ghost" onclick="openModal()">
@@ -532,7 +535,7 @@ footer{border-top:1px solid rgba(255,255,255,.07);padding:36px clamp(16px,5vw,80
     <div class="stat-item"><div class="stat-num" style="color:var(--gold)">150</div><div class="stat-lbl" data-i18n="stat_podcasts">AI Podcasts</div></div>
     <div class="stat-item"><div class="stat-num" style="color:var(--green)">25+</div><div class="stat-lbl" data-i18n="stat_scenarios">Real Scenarios</div></div>
     <div class="stat-item"><div class="stat-num" style="color:var(--purple)">4.8 &#x2B50;</div><div class="stat-lbl" data-i18n="stat_rating">App Rating</div></div>
-    <div class="stat-item"><div class="stat-num" style="color:var(--teal)">16</div><div class="stat-lbl" data-i18n="stat_languages">UI Languages</div></div>
+    <div class="stat-item"><div class="stat-num" style="color:var(--teal)">17</div><div class="stat-lbl" data-i18n="stat_languages">UI Languages</div></div>
   </div>
 </div>
 
@@ -555,7 +558,7 @@ footer{border-top:1px solid rgba(255,255,255,.07);padding:36px clamp(16px,5vw,80
     </div>
     <div class="feat-card" style="background:rgba(245,197,24,.07);border-color:rgba(245,197,24,.18)">
       <div class="feat-icon" style="background:rgba(245,197,24,.15)">&#x1F916;</div>
-      <div class="feat-title" data-i18n="feat2_title">3 AI Coaches</div>
+      <div class="feat-title" data-i18n="feat2_title">4 AI Coaches</div>
       <div class="feat-body" data-i18n="feat2_body">Ay&#x15F;e (warm teacher), Emre (casual friend), Prof. Demir (grammar expert). Each with a unique voice and personality.</div>
       <span class="feat-tag" style="background:rgba(245,197,24,.12);border-color:rgba(245,197,24,.25);color:var(--gold)" data-i18n="feat2_tag">Instant corrections</span>
     </div>
@@ -590,15 +593,33 @@ footer{border-top:1px solid rgba(255,255,255,.07);padding:36px clamp(16px,5vw,80
     <div class="feat-card" style="background:rgba(139,92,246,.07);border-color:rgba(139,92,246,.18)">
       <div class="feat-deco">&#x1F30D;</div>
       <div class="feat-icon" style="background:rgba(139,92,246,.15)">&#x1F30D;</div>
-      <div class="feat-num" style="color:var(--purple)">16</div>
+      <div class="feat-num" style="color:var(--purple)">17</div>
       <div class="feat-title" data-i18n="feat8_title">Language Support</div>
-      <div class="feat-body" data-i18n="feat8_body">English, Arabic, Russian, Uzbek, French, Persian and more. The app speaks your language.</div>
+      <div class="feat-body" data-i18n="feat8_body">English, Arabic, Russian, Uzbek, Kyrgyz, Kazakh, French, Persian and more. The app speaks your language.</div>
     </div>
     <div class="feat-card" style="background:rgba(0,200,83,.06);border-color:rgba(0,200,83,.16)">
       <div class="feat-icon" style="background:rgba(0,200,83,.15)">&#x1F465;</div>
       <div class="feat-title" data-i18n="feat9_title">Find a Partner</div>
       <div class="feat-body" data-i18n="feat9_body">Match with real Turkish learners worldwide. Practice 1v1 conversations on random topics for 10 minutes.</div>
       <span class="feat-tag" style="background:rgba(0,200,83,.12);border-color:rgba(0,200,83,.25);color:var(--green)" data-i18n="feat9_tag">Real people, real practice</span>
+    </div>
+    <div class="feat-card" style="background:rgba(240,101,60,.07);border-color:rgba(240,101,60,.18)">
+      <div class="feat-icon" style="background:rgba(240,101,60,.15)">&#x2694;&#xFE0F;</div>
+      <div class="feat-title" data-i18n="feat10_title">1v1 Challenge</div>
+      <div class="feat-body" data-i18n="feat10_body">Race another learner in Quiz, Speed or Fill-in-the-Blank. No opponent online? An AI rival steps in. Chat with your opponent after the match.</div>
+      <span class="feat-tag" style="background:rgba(240,101,60,.12);border-color:rgba(240,101,60,.25);color:#F0653C" data-i18n="feat10_tag">Live opponents</span>
+    </div>
+    <div class="feat-card" style="background:rgba(59,130,246,.07);border-color:rgba(59,130,246,.18)">
+      <div class="feat-icon" style="background:rgba(59,130,246,.15)">&#x1F9ED;</div>
+      <div class="feat-title" data-i18n="feat11_title">Level Test</div>
+      <div class="feat-body" data-i18n="feat11_body">A short placement test finds your level. Review quizzes and a progress screen keep you on track.</div>
+      <span class="feat-tag" style="background:rgba(59,130,246,.12);border-color:rgba(59,130,246,.25);color:#3B82F6" data-i18n="feat11_tag">Know your level</span>
+    </div>
+    <div class="feat-card" style="background:rgba(139,92,246,.07);border-color:rgba(139,92,246,.18)">
+      <div class="feat-icon" style="background:rgba(139,92,246,.15)">&#x1F3A4;</div>
+      <div class="feat-title" data-i18n="feat12_title">Pronunciation</div>
+      <div class="feat-body" data-i18n="feat12_body">Say it out loud and get instant feedback on your Turkish pronunciation.</div>
+      <span class="feat-tag" style="background:rgba(139,92,246,.12);border-color:rgba(139,92,246,.25);color:#8B5CF6" data-i18n="feat12_tag">Speak with confidence</span>
     </div>
   </div>
 </div>
@@ -610,21 +631,29 @@ footer{border-top:1px solid rgba(255,255,255,.07);padding:36px clamp(16px,5vw,80
   <div class="section-header">
     <div class="sec-label" data-i18n="coaches_label">AI COACHES</div>
     <h2 class="sec-title" data-i18n="coaches_title">Who do you want to practice with?</h2>
-    <p class="sec-sub" data-i18n="coaches_sub">Three unique characters for every learning style. Switch anytime.</p>
+    <p class="sec-sub" data-i18n="coaches_sub">Four unique characters, each with a 3D face that talks back to you. Switch anytime.</p>
   </div>
   <div class="coaches-grid">
     <div class="coach-card ayse">
       <div class="coach-aura"></div>
-      <img src="/coach_ayse.png" alt="Ayse" class="coach-avatar-img" onerror="this.style.display='none';document.getElementById('ayse-fb').style.display='flex'">
+      <img src="/coach_ayse.jpg" alt="Ayse" class="coach-avatar-img" onerror="this.style.display='none';document.getElementById('ayse-fb').style.display='flex'">
       <div id="ayse-fb" class="coach-avatar-fallback" style="display:none;background:rgba(245,197,24,.2);color:var(--gold);box-shadow:0 0 30px rgba(245,197,24,.25)">A</div>
       <div class="coach-name">Ay&#x15F;e</div>
       <div class="coach-role" data-i18n="ayse_role">Warm Teacher</div>
       <div class="coach-bio" data-i18n="ayse_bio">Patient and understanding. Perfect for beginners. Encourages you with "Harika! &#xC7;ok g&#xFC;zel!" and explains every mistake in your language.</div>
       <span class="coach-tag" data-i18n="ayse_tag">Ideal for beginners</span>
     </div>
+    <div class="coach-card zeynep">
+      <div class="coach-aura"></div>
+      <img src="/coach_zeynep.jpg" alt="Zeynep" class="coach-avatar-img">
+      <div class="coach-name">Zeynep</div>
+      <div class="coach-role" data-i18n="zeynep_role">Witty Challenger</div>
+      <div class="coach-bio" data-i18n="zeynep_bio">24-year-old from &#x130;zmir. Teases you into trying harder: "Bu kadar m&#x131;? Hadi ama!" Playful, sharp, always on your side.</div>
+      <span class="coach-tag" data-i18n="zeynep_tag" style="background:rgba(240,101,60,.12);border-color:rgba(240,101,60,.25);color:#F0653C">For extra motivation</span>
+    </div>
     <div class="coach-card emre">
       <div class="coach-aura"></div>
-      <img src="/coach_emre.png" alt="Emre" class="coach-avatar-img" onerror="this.style.display='none';document.getElementById('emre-fb').style.display='flex'">
+      <img src="/coach_emre.jpg" alt="Emre" class="coach-avatar-img" onerror="this.style.display='none';document.getElementById('emre-fb').style.display='flex'">
       <div id="emre-fb" class="coach-avatar-fallback" style="display:none;background:rgba(59,130,246,.2);color:var(--blue);box-shadow:0 0 30px rgba(59,130,246,.25)">E</div>
       <div class="coach-name">Emre</div>
       <div class="coach-role" data-i18n="emre_role">Conversation Partner</div>
@@ -633,7 +662,7 @@ footer{border-top:1px solid rgba(255,255,255,.07);padding:36px clamp(16px,5vw,80
     </div>
     <div class="coach-card demir">
       <div class="coach-aura"></div>
-      <img src="/coach_demir.png" alt="Prof. Demir" class="coach-avatar-img" onerror="this.style.display='none';document.getElementById('demir-fb').style.display='flex'">
+      <img src="/coach_demir.jpg" alt="Prof. Demir" class="coach-avatar-img" onerror="this.style.display='none';document.getElementById('demir-fb').style.display='flex'">
       <div id="demir-fb" class="coach-avatar-fallback" style="display:none;background:rgba(139,92,246,.2);color:var(--purple);box-shadow:0 0 30px rgba(139,92,246,.25)">P</div>
       <div class="coach-name">Prof. Demir</div>
       <div class="coach-role" data-i18n="demir_role">Grammar Coach</div>
@@ -743,7 +772,7 @@ footer{border-top:1px solid rgba(255,255,255,.07);padding:36px clamp(16px,5vw,80
       <div><span class="price-amount">$0</span></div>
       <div class="price-desc" data-i18n="plan_free_desc">Perfect to get started and explore the app.</div>
       <div class="price-divider"></div>
-      <div class="price-feature"><span class="pf-check">&#x2713;</span><span data-i18n="pf_free1">10 AI messages per day</span></div>
+      <div class="price-feature"><span class="pf-check">&#x2713;</span><span data-i18n="pf_free1">20 AI messages per day</span></div>
       <div class="price-feature"><span class="pf-check">&#x2713;</span><span data-i18n="pf_free2">8 free scenarios</span></div>
       <div class="price-feature"><span class="pf-check">&#x2713;</span><span data-i18n="pf_free3">All 5 games</span></div>
       <div class="price-feature"><span class="pf-check">&#x2713;</span><span data-i18n="pf_free4">A1 podcasts (30 episodes)</span></div>
@@ -754,14 +783,14 @@ footer{border-top:1px solid rgba(255,255,255,.07);padding:36px clamp(16px,5vw,80
       <div class="price-badge" data-i18n="plan_popular">Most Popular</div>
       <div class="price-plan" data-i18n="plan_monthly">MONTHLY</div>
       <div><span class="price-amount">$4.99</span><span class="price-per" data-i18n="per_month">/month</span></div>
-      <div class="price-desc" data-i18n="plan_monthly_desc">Unlimited access to everything.</div>
+      <div class="price-desc" data-i18n="plan_monthly_desc">Full access to everything.</div>
       <div class="price-divider"></div>
-      <div class="price-feature"><span class="pf-check">&#x2713;</span><span data-i18n="pf_pro1">Unlimited AI messages</span></div>
+      <div class="price-feature"><span class="pf-check">&#x2713;</span><span data-i18n="pf_pro1">100 AI messages per day</span></div>
       <div class="price-feature"><span class="pf-check">&#x2713;</span><span data-i18n="pf_pro2">All 25+ scenarios</span></div>
       <div class="price-feature"><span class="pf-check">&#x2713;</span><span data-i18n="pf_pro3">All 150 podcasts (A1&#x2013;C1)</span></div>
       <div class="price-feature"><span class="pf-check">&#x2713;</span><span data-i18n="pf_pro4">Weekly premium tests</span></div>
       <div class="price-feature"><span class="pf-check">&#x2713;</span><span data-i18n="pf_pro5">LinkedIn certificates</span></div>
-      <div class="price-feature"><span class="pf-check">&#x2713;</span><span data-i18n="pf_pro6">3 AI coaches (Ay&#x15F;e, Emre, Prof. Demir)</span></div>
+      <div class="price-feature"><span class="pf-check">&#x2713;</span><span data-i18n="pf_pro6">4 AI coaches (Ay&#x15F;e, Zeynep, Emre, Prof. Demir)</span></div>
       <a href="https://apps.apple.com/app/learnturkish-ai/id6744827342" class="price-btn main" data-i18n="plan_monthly_btn">Go Premium &#x2192;</a>
     </div>
     <div class="price-card">
@@ -827,11 +856,11 @@ document.getElementById('videoModal').addEventListener('click',function(e){if(e.
 
 const TRANSLATIONS = {
   en:{},
-  tr:{nav_features:'Özellikler',nav_coaches:'Koçlar',nav_scenarios:'Senaryolar',nav_pricing:'Fiyatlar',nav_cta:'Ücretsiz Başla',hero_badge:'Yapay Zeka ile Türkçe Öğren',hero_title1:'"Merhaba"dan',hero_title2:'Akıcılığa',hero_sub:'3 AI koçuyla gerçek konuşmalar yap. 25+ senaryo, 150 podcast, oyunlar ve daha fazlası.',hero_cta:'Ücretsiz Başla',hero_demo:'Demo İzle',stat_learners:'Aktif Öğrenci',stat_podcasts:'AI Podcast',stat_scenarios:'Gerçek Senaryo',stat_rating:'Uygulama Puanı',stat_languages:'Arayüz Dili',feat_label:'ÖZELLİKLER',feat_title:'Neden LearnTurkish AI?',feat_sub:'Türkçeyi güvenle konuşmak için ihtiyacın olan her şey — tek uygulamada.',feat1_title:'25+ Gerçek Hayat Senaryosu',feat2_title:'3 AI Koç',feat3_title:'AI Podcastleri',feat4_title:'5 Öğrenme Oyunu',feat5_title:'TÖMER Hazırlık',feat6_title:'Türkiye Rehberi',feat7_title:'LinkedIn Sertifikaları',feat8_title:'16 Dil Desteği',feat9_title:'Partner Bul',feat1_tag:'En Popüler →',feat2_tag:'Anında düzeltme',feat4_tag:'+XP her oyun için',feat5_tag:'Resmi sınav formatı',feat9_tag:'Gerçek insanlar',coaches_label:'AI KOÇLAR',coaches_title:'Kiminle pratik yapmak istersin?',coaches_sub:'Her öğrenme stiline uygun üç benzersiz karakter. İstediğin zaman değiştir.',ayse_role:'Sıcakkanlı Öğretmen',emre_role:'Sohbet Ortağı',demir_role:'Dilbilgisi Koçu',ayse_bio:'Sabırlı ve anlayışlı. Yeni başlayanlar için mükemmel. Her hatayı kendi dilinde açıklar.',emre_bio:'25 yaşında İstanbullu. Günlük argo kullanır. Gerçek bir Türk arkadaşıyla sohbet gibi hissettirir.',demir_bio:'Ayrıntıcı profesör. Her dilbilgisi kuralını örneklerle açıklar. TÖMER hazırlığına en uygun.',ayse_tag:'Yeni başlayanlar için ideal',emre_tag:'Günlük konuşma için',demir_tag:'TÖMER hazırlığı için',sc_label:'SENARYOLAR',sc_title:'Gerçek durumlarda pratik yap',sc_sub:'25+ senaryo. Gerçek İstanbul lokasyonları, gerçek Türk fiyatları.',pod_label:'AI PODCASTLER',pod_title:'150 bölüm. A1'den C1'e.',pod_sub:'Koçunun sesiyle dinle, yazıyı oku, quiz çöz ve XP kazan.',price_label:'FİYATLAR',price_title:'Basit ve dürüst fiyatlar',price_sub:'Ücretsiz başla. Hazır olunca yükselt. Kredi kartı gerekmez.',plan_free:'ÜCRETSİZ',plan_monthly:'AYLIK',plan_yearly:'YILLIK',plan_popular:'En Popüler',per_month:'/ay',per_year:'/yıl',save_58:'%58 tasarruf',plan_free_desc:'Başlamak ve uygulamayı keşfetmek için mükemmel.',plan_monthly_desc:'Her şeye sınırsız erişim.',plan_yearly_desc:'Ciddi öğrenciler için en iyi değer.',pf_free1:'Günlük 10 AI mesajı',pf_free2:'8 ücretsiz senaryo',pf_free3:'Tüm 5 oyun',pf_free4:'A1 podcastleri (30 bölüm)',pf_free5:'Türkiye Rehberi',pf_pro1:'Sınırsız AI mesajları',pf_pro2:'Tüm 25+ senaryo',pf_pro3:'Tüm 150 podcast',pf_pro4:'Haftalık premium testler',pf_pro5:'LinkedIn sertifikaları',pf_pro6:'3 AI koç',pf_year1:'Aylık plandaki her şey',pf_year2:'Öncelikli destek',pf_year3:'Yeni özelliklere erken erişim',plan_free_btn:'Ücretsiz Başla',plan_monthly_btn:'Premium'a Geç →',plan_yearly_btn:'Yıllık Planı Al →',refund_note:'7 günlük para iade garantisi · Soru sorulmaz.',cta_title:'Bugün Türkçe konuşmaya başla.',cta_sub:'Dünya genelinde 1.000+ öğrenciye katıl. Başlamak ücretsiz.',footer_privacy:'Gizlilik',footer_terms:'Kullanım Koşulları',footer_refund:'İade Politikası',footer_contact:'İletişim'},
-  ru:{nav_features:'Funkcii',nav_coaches:'Trener i',nav_scenarios:'Scenarii',nav_pricing:'Ceny',nav_cta:'Nachat besplatno',hero_badge:'Izuchenie tureckogo s II',hero_title1:'Ot Merhaba',hero_title2:'k svobodnomu vladeniyu',hero_sub:'Praktikujte realnye razgovory s 3 II-trenerami. 25+ scenariev, 150 podkastov i bolshe.',stat_learners:'Aktivnyh uchenikov',stat_podcasts:'II podkastov',stat_scenarios:'Scenariev',stat_rating:'Rejting',stat_languages:'Yazykov interfejsa',coaches_label:'II TRENERY',coaches_title:'S kem hotite praktikovat?',price_label:'CENY',price_title:'Prostye chestnye ceny',plan_free:'BESPLATNO',plan_monthly:'EZHEMESYACHNO',plan_yearly:'EZHEGODNO',plan_popular:'Samyj populyarnyj',per_month:'/mes',per_year:'/god',save_58:'Ekonomiya 58%',cta_title:'Nachni govorit po-turecky segodnya.',footer_privacy:'Konfidencialnost',footer_terms:'Usloviya',footer_refund:'Vozvrat',footer_contact:'Kontakt'},
-  uz:{nav_features:'Xususiyatlar',nav_coaches:'Murabbiylar',nav_scenarios:'Stsenariylar',nav_pricing:'Narxlar',nav_cta:'Bepul boshlash',hero_badge:'AI bilan Turkcha o`rgan',hero_title1:'Merhabadan',hero_title2:'ravon gapirguncha',hero_sub:'3 AI murabbiy bilan haqiqiy suhbatlar mashq qiling. 25+ stsenariy, 150 podkast va ko`proq.',stat_learners:"Faol o`quvchilar",stat_podcasts:'AI Podkastlar',stat_scenarios:'Stsenariylar',stat_rating:'Reyting',stat_languages:'Interfeys tillari',coaches_label:'AI MURABBIYLAR',coaches_title:'Kim bilan mashq qilmoqchisiz?',price_label:'NARXLAR',price_title:'Oddiy va halol narxlar',plan_free:'BEPUL',plan_monthly:'OYLIK',plan_yearly:'YILLIK',plan_popular:'Eng mashhur',per_month:'/oy',per_year:'/yil',save_58:'58% tejash',cta_title:'Bugun Turkcha gapira boshlang.',footer_privacy:'Maxfiylik',footer_terms:'Shartlar',footer_refund:'Qaytarish',footer_contact:'Aloqa'},
-  ar:{nav_features:'الميزات',nav_coaches:'المدربون',nav_scenarios:'السيناريوهات',nav_pricing:'الاسعار',nav_cta:'ابدا مجانا',hero_badge:'تعلم التركية بالذكاء الاصطناعي',hero_title1:'من Merhaba',hero_title2:'الى الطلاقة',hero_sub:'تدرب على محادثات حقيقية مع 3 مدربين AI. اكثر من 25 سيناريو و 150 بودكاست.',stat_learners:'متعلم نشط',stat_podcasts:'بودكاست AI',stat_scenarios:'سيناريو',stat_rating:'تقييم',stat_languages:'لغة واجهة',coaches_label:'المدربون الذكيون',coaches_title:'مع من تريد التدرب?',price_label:'الاسعار',price_title:'اسعار بسيطة وصادقة',plan_free:'مجاني',plan_monthly:'شهري',plan_yearly:'سنوي',plan_popular:'الاكثر شعبية',per_month:'/شهر',per_year:'/سنة',save_58:'وفر 58%',cta_title:'ابدا التحدث بالتركية اليوم.',footer_privacy:'الخصوصية',footer_terms:'الشروط',footer_refund:'سياسة الاسترداد',footer_contact:'اتصل بنا'},
-  fr:{nav_features:'Fonctionnalites',nav_coaches:'Coachs',nav_scenarios:'Scenarios',nav_pricing:'Tarifs',nav_cta:'Commencer gratuitement',hero_badge:"Apprendre le turc avec l'IA",hero_title1:'De Merhaba',hero_title2:'a la maitrise',hero_sub:'Pratiquez de vraies conversations avec 3 coachs IA. Plus de 25 scenarios et 150 podcasts.',stat_learners:'Apprenants actifs',stat_podcasts:'Podcasts IA',stat_scenarios:'Scenarios',stat_rating:'Note',stat_languages:"Langues d'interface",coaches_label:'COACHS IA',coaches_title:'Avec qui voulez-vous pratiquer?',price_label:'TARIFS',price_title:'Des prix simples et honnetes',plan_free:'GRATUIT',plan_monthly:'MENSUEL',plan_yearly:'ANNUEL',plan_popular:'Le plus populaire',per_month:'/mois',per_year:'/an',save_58:'Economisez 58%',cta_title:"Commencez a parler turc aujourd'hui.",footer_privacy:'Confidentialite',footer_terms:'Conditions',footer_refund:'Remboursement',footer_contact:'Contact'}
+  tr:{nav_features:'Özellikler',nav_coaches:'Koçlar',nav_scenarios:'Senaryolar',nav_pricing:'Fiyatlar',nav_cta:'Ücretsiz Başla',hero_badge:'Yapay Zeka ile Türkçe Öğren',hero_title1:'"Merhaba"dan',hero_title2:'Akıcılığa',hero_sub:'Konuşan 4 AI koçla gerçek konuşmalar yap. 1v1 Challenge, 25+ senaryo, 150 podcast, oyunlar ve daha fazlası.',hero_cta:'Ücretsiz Başla',hero_demo:'Demo İzle',stat_learners:'Aktif Öğrenci',stat_podcasts:'AI Podcast',stat_scenarios:'Gerçek Senaryo',stat_rating:'Uygulama Puanı',stat_languages:'Arayüz Dili',feat_label:'ÖZELLİKLER',feat_title:'Neden LearnTurkish AI?',feat_sub:'Türkçeyi güvenle konuşmak için ihtiyacın olan her şey — tek uygulamada.',feat1_title:'25+ Gerçek Hayat Senaryosu',feat2_title:'4 AI Koç',feat3_title:'AI Podcastleri',feat4_title:'5 Öğrenme Oyunu',feat5_title:'TÖMER Hazırlık',feat6_title:'Türkiye Rehberi',feat7_title:'LinkedIn Sertifikaları',feat8_title:'17 Dil Desteği',feat9_title:'Partner Bul',feat1_tag:'En Popüler →',feat2_tag:'Anında düzeltme',feat4_tag:'+XP her oyun için',feat5_tag:'Resmi sınav formatı',feat9_tag:'Gerçek insanlar',coaches_label:'AI KOÇLAR',coaches_title:'Kiminle pratik yapmak istersin?',coaches_sub:'Her öğrenme stiline uygun dört benzersiz karakter, her biri seninle konuşan 3D yüzlü. İstediğin zaman değiştir.',ayse_role:'Sıcakkanlı Öğretmen',emre_role:'Sohbet Ortağı',demir_role:'Dilbilgisi Koçu',ayse_bio:'Sabırlı ve anlayışlı. Yeni başlayanlar için mükemmel. Her hatayı kendi dilinde açıklar.',emre_bio:'25 yaşında İstanbullu. Günlük argo kullanır. Gerçek bir Türk arkadaşıyla sohbet gibi hissettirir.',demir_bio:'Ayrıntıcı profesör. Her dilbilgisi kuralını örneklerle açıklar. TÖMER hazırlığına en uygun.',ayse_tag:'Yeni başlayanlar için ideal',emre_tag:'Günlük konuşma için',demir_tag:'TÖMER hazırlığı için',zeynep_role:'Cesur Meydan Okuyucu',zeynep_bio:'İzmirli 24 yaşında. Seni dürterek daha çok çabalatır: "Bu kadar mı? Hadi ama!" Şakacı, keskin, hep senin yanında.',zeynep_tag:'Ekstra motivasyon için',feat10_title:'1v1 Challenge',feat10_body:'Quiz, Hız veya Boşluk Doldurma modunda başka bir öğrenciyle yarış. Rakip yoksa yapay rakip devreye girer. Maç sonu rakibinle sohbet et.',feat10_tag:'Canlı rakipler',feat11_title:'Seviye Testi',feat11_body:'Kısa bir seviye testi seviyeni bulur. Tekrar quizleri ve ilerleme ekranı seni yolda tutar.',feat11_tag:'Seviyeni bil',feat12_title:'Telaffuz',feat12_body:'Yüksek sesle söyle, Türkçe telaffuzun için anında geri bildirim al.',feat12_tag:'Özgüvenle konuş',sc_label:'SENARYOLAR',sc_title:'Gerçek durumlarda pratik yap',sc_sub:'25+ senaryo. Gerçek İstanbul lokasyonları, gerçek Türk fiyatları.',pod_label:'AI PODCASTLER',pod_title:'150 bölüm. A1'den C1'e.',pod_sub:'Koçunun sesiyle dinle, yazıyı oku, quiz çöz ve XP kazan.',price_label:'FİYATLAR',price_title:'Basit ve dürüst fiyatlar',price_sub:'Ücretsiz başla. Hazır olunca yükselt. Kredi kartı gerekmez.',plan_free:'ÜCRETSİZ',plan_monthly:'AYLIK',plan_yearly:'YILLIK',plan_popular:'En Popüler',per_month:'/ay',per_year:'/yıl',save_58:'%58 tasarruf',plan_free_desc:'Başlamak ve uygulamayı keşfetmek için mükemmel.',plan_monthly_desc:'Her şeye tam erişim.',plan_yearly_desc:'Ciddi öğrenciler için en iyi değer.',pf_free1:'Günlük 20 AI mesajı',pf_free2:'8 ücretsiz senaryo',pf_free3:'Tüm 5 oyun',pf_free4:'A1 podcastleri (30 bölüm)',pf_free5:'Türkiye Rehberi',pf_pro1:'Günlük 100 AI mesajı',pf_pro2:'Tüm 25+ senaryo',pf_pro3:'Tüm 150 podcast',pf_pro4:'Haftalık premium testler',pf_pro5:'LinkedIn sertifikaları',pf_pro6:'4 AI koç (Ayşe, Zeynep, Emre, Prof. Demir)',pf_year1:'Aylık plandaki her şey',pf_year2:'Öncelikli destek',pf_year3:'Yeni özelliklere erken erişim',plan_free_btn:'Ücretsiz Başla',plan_monthly_btn:'Premium'a Geç →',plan_yearly_btn:'Yıllık Planı Al →',refund_note:'7 günlük para iade garantisi · Soru sorulmaz.',cta_title:'Bugün Türkçe konuşmaya başla.',cta_sub:'Dünya genelinde 1.000+ öğrenciye katıl. Başlamak ücretsiz.',footer_privacy:'Gizlilik',footer_terms:'Kullanım Koşulları',footer_refund:'İade Politikası',footer_contact:'İletişim'},
+  ru:{nav_features:'Funkcii',nav_coaches:'Trener i',nav_scenarios:'Scenarii',nav_pricing:'Ceny',nav_cta:'Nachat besplatno',hero_badge:'Izuchenie tureckogo s II',hero_title1:'Ot Merhaba',hero_title2:'k svobodnomu vladeniyu',hero_sub:'Praktikujte realnye razgovory s 4 II-trenerami. 25+ scenariev, 150 podkastov i bolshe.',stat_learners:'Aktivnyh uchenikov',stat_podcasts:'II podkastov',stat_scenarios:'Scenariev',stat_rating:'Rejting',stat_languages:'Yazykov interfejsa',coaches_label:'II TRENERY',coaches_title:'S kem hotite praktikovat?',price_label:'CENY',price_title:'Prostye chestnye ceny',plan_free:'BESPLATNO',plan_monthly:'EZHEMESYACHNO',plan_yearly:'EZHEGODNO',plan_popular:'Samyj populyarnyj',per_month:'/mes',per_year:'/god',save_58:'Ekonomiya 58%',cta_title:'Nachni govorit po-turecky segodnya.',footer_privacy:'Konfidencialnost',footer_terms:'Usloviya',footer_refund:'Vozvrat',footer_contact:'Kontakt'},
+  uz:{nav_features:'Xususiyatlar',nav_coaches:'Murabbiylar',nav_scenarios:'Stsenariylar',nav_pricing:'Narxlar',nav_cta:'Bepul boshlash',hero_badge:'AI bilan Turkcha o`rgan',hero_title1:'Merhabadan',hero_title2:'ravon gapirguncha',hero_sub:'4 AI murabbiy bilan haqiqiy suhbatlar mashq qiling. 25+ stsenariy, 150 podkast va ko`proq.',stat_learners:"Faol o`quvchilar",stat_podcasts:'AI Podkastlar',stat_scenarios:'Stsenariylar',stat_rating:'Reyting',stat_languages:'Interfeys tillari',coaches_label:'AI MURABBIYLAR',coaches_title:'Kim bilan mashq qilmoqchisiz?',price_label:'NARXLAR',price_title:'Oddiy va halol narxlar',plan_free:'BEPUL',plan_monthly:'OYLIK',plan_yearly:'YILLIK',plan_popular:'Eng mashhur',per_month:'/oy',per_year:'/yil',save_58:'58% tejash',cta_title:'Bugun Turkcha gapira boshlang.',footer_privacy:'Maxfiylik',footer_terms:'Shartlar',footer_refund:'Qaytarish',footer_contact:'Aloqa'},
+  ar:{nav_features:'الميزات',nav_coaches:'المدربون',nav_scenarios:'السيناريوهات',nav_pricing:'الاسعار',nav_cta:'ابدا مجانا',hero_badge:'تعلم التركية بالذكاء الاصطناعي',hero_title1:'من Merhaba',hero_title2:'الى الطلاقة',hero_sub:'تدرب على محادثات حقيقية مع 4 مدربين AI. اكثر من 25 سيناريو و 150 بودكاست.',stat_learners:'متعلم نشط',stat_podcasts:'بودكاست AI',stat_scenarios:'سيناريو',stat_rating:'تقييم',stat_languages:'لغة واجهة',coaches_label:'المدربون الذكيون',coaches_title:'مع من تريد التدرب?',price_label:'الاسعار',price_title:'اسعار بسيطة وصادقة',plan_free:'مجاني',plan_monthly:'شهري',plan_yearly:'سنوي',plan_popular:'الاكثر شعبية',per_month:'/شهر',per_year:'/سنة',save_58:'وفر 58%',cta_title:'ابدا التحدث بالتركية اليوم.',footer_privacy:'الخصوصية',footer_terms:'الشروط',footer_refund:'سياسة الاسترداد',footer_contact:'اتصل بنا'},
+  fr:{nav_features:'Fonctionnalites',nav_coaches:'Coachs',nav_scenarios:'Scenarios',nav_pricing:'Tarifs',nav_cta:'Commencer gratuitement',hero_badge:"Apprendre le turc avec l'IA",hero_title1:'De Merhaba',hero_title2:'a la maitrise',hero_sub:'Pratiquez de vraies conversations avec 4 coachs IA. Plus de 25 scenarios et 150 podcasts.',stat_learners:'Apprenants actifs',stat_podcasts:'Podcasts IA',stat_scenarios:'Scenarios',stat_rating:'Note',stat_languages:"Langues d'interface",coaches_label:'COACHS IA',coaches_title:'Avec qui voulez-vous pratiquer?',price_label:'TARIFS',price_title:'Des prix simples et honnetes',plan_free:'GRATUIT',plan_monthly:'MENSUEL',plan_yearly:'ANNUEL',plan_popular:'Le plus populaire',per_month:'/mois',per_year:'/an',save_58:'Economisez 58%',cta_title:"Commencez a parler turc aujourd'hui.",footer_privacy:'Confidentialite',footer_terms:'Conditions',footer_refund:'Remboursement',footer_contact:'Contact'}
 };
 
 function setLang(lang){
