@@ -73,13 +73,104 @@
   .empty{text-align:center;color:var(--t3);padding:20px}
   textarea.form-inp{resize:vertical}
   @media (max-width:640px){.main{padding:16px}nav{padding:12px 16px}}
+  /* ===== Premium theme (16 Kas 2026) — sade, sakin, kırmızı sadece vurgu ===== */
+  :root{
+    --r:#E30A17;--r-soft:rgba(227,10,23,0.12);
+    --bg:#09090B;--surface:#111114;--surface-2:#16161A;--hover:rgba(255,255,255,0.035);
+    --t1:#EDEDF0;--t2:rgba(237,237,240,0.70);--t3:rgba(237,237,240,0.45);
+    --card:var(--surface);--border:rgba(255,255,255,0.07);--border-2:rgba(255,255,255,0.12);
+    --green:#34D399;--gold:#FBBF24;--blue:#7AA7F7;--orange:#FB923C;
+    --font:'Inter',-apple-system,'Segoe UI',Roboto,Arial,sans-serif;
+    --side:232px;--radius:14px;
+  }
+  body{background:var(--bg);font-size:13.5px;line-height:1.5;-webkit-font-smoothing:antialiased;font-feature-settings:'cv11','ss01'}
+  a{color:var(--t1);text-decoration-color:var(--border-2);text-underline-offset:3px}
+  ::selection{background:var(--r-soft)}
+
+  /* Login */
+  .login-box{background:var(--surface);border:1px solid var(--border);border-radius:20px;padding:44px 36px;box-shadow:0 30px 80px rgba(0,0,0,.45)}
+  .login-logo{width:56px;height:56px;border-radius:14px;margin:0 auto 18px;display:block}
+  .login-box h1{font-size:20px;font-weight:700;letter-spacing:-.2px}
+  .login-box p{font-size:13px}
+  .inp,.form-inp{background:var(--bg);border:1px solid var(--border-2);border-radius:10px;transition:border-color .15s,box-shadow .15s}
+  .inp:focus,.form-inp:focus{border-color:rgba(255,255,255,.28);box-shadow:0 0 0 3px rgba(255,255,255,.05)}
+  select.form-inp option{background:var(--surface)}
+
+  /* Buttons */
+  .btn{font-weight:600;border-radius:9px;letter-spacing:.1px;transition:filter .15s,background .15s}
+  .btn:hover{filter:brightness(1.08)}
+  .btn.ghost{background:transparent;border:1px solid var(--border-2);color:var(--t1);font-weight:500}
+  .btn.ghost:hover{background:var(--hover);filter:none}
+
+  /* Shell: sol menü */
+  nav{position:fixed;inset:0 auto 0 0;width:var(--side);flex-direction:column;align-items:stretch;justify-content:flex-start;gap:0;padding:22px 14px;border-bottom:0;border-inline-end:1px solid var(--border);background:var(--bg);flex-wrap:nowrap}
+  .brand{font-size:15px;font-weight:700;letter-spacing:-.2px;padding:0 10px 22px;display:flex;align-items:center;gap:10px}
+  .brand::before{content:'';width:26px;height:26px;border-radius:7px;background:url('/logo.png') center/cover;flex:none}
+  .brand span{color:var(--t3);font-weight:500}
+  .tabs{flex-direction:column;gap:2px;flex:1}
+  .tab{text-align:start;padding:9px 12px;border:0;border-radius:8px;font-size:13.5px;font-weight:500;color:var(--t2);position:relative;transition:background .12s,color .12s}
+  .tab:hover{background:var(--hover);color:var(--t1)}
+  .tab.active{background:var(--surface-2);color:var(--t1);border:0}
+  .tab.active::before{content:'';position:absolute;inset-inline-start:-14px;top:9px;bottom:9px;width:2px;border-radius:2px;background:var(--r)}
+  .who{flex-direction:column;align-items:stretch;gap:8px;padding:14px 10px 0;border-top:1px solid var(--border);font-size:12px}
+  .who .btn{width:100%}
+  .main{max-width:1180px;padding:36px 40px 60px;margin:0 0 0 var(--side)}
+  @media (min-width:1500px){.main{margin-inline:calc(var(--side) + (100vw - var(--side) - 1180px)/2) auto}}
+
+  /* Cards */
+  .card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:22px 24px;margin-bottom:18px}
+  .card h3{font-size:13px;font-weight:600;color:var(--t2);text-transform:none;letter-spacing:.1px;margin-bottom:16px}
+  .main > h2,.main h2{font-size:22px;font-weight:600;letter-spacing:-.4px}
+
+  /* KPI tiles */
+  .stats{gap:1px;background:var(--border);border:1px solid var(--border);border-radius:var(--radius);overflow:hidden;margin-bottom:18px}
+  .stat{background:var(--surface);border:0;border-radius:0;padding:18px 20px;text-align:start}
+  .stat .num{font-size:24px;font-weight:600;letter-spacing:-.5px;font-variant-numeric:tabular-nums}
+  .stat .lbl{font-size:12px;margin-top:4px}
+  .stat.click:hover{background:var(--surface-2);border-color:transparent}
+  .stat.click .lbl::after{content:' →';opacity:.5}
+
+  /* Tables */
+  th{font-size:11px;font-weight:500;letter-spacing:.6px;color:var(--t3);padding:10px 12px;border-bottom:1px solid var(--border)}
+  td{padding:11px 12px;border-bottom:1px solid rgba(255,255,255,0.045);color:var(--t2);font-variant-numeric:tabular-nums}
+  tr:last-child td{border-bottom:0}
+  td b,td strong{color:var(--t1);font-weight:600}
+  tr.click:hover td,tr.clickrow:hover td{background:var(--hover)}
+
+  /* Badges & bars */
+  .badge{font-weight:500;padding:2px 9px;font-size:11px}
+  .b-grey{background:rgba(255,255,255,0.06)}
+  .bar{height:6px;border-radius:3px;background:rgba(255,255,255,0.06)}
+  .bar>div{background:var(--t2)}
+
+  /* Modal & toast */
+  .modal-bg{background:rgba(0,0,0,0.6);backdrop-filter:blur(6px)}
+  .modal{background:var(--surface);border-color:var(--border-2);border-radius:16px;box-shadow:0 30px 80px rgba(0,0,0,.5)}
+  .modal h3{font-size:16px;font-weight:600}
+  #toast{border-radius:10px;font-weight:500;box-shadow:0 10px 30px rgba(0,0,0,.4)}
+  .fg label{font-weight:500}
+  .back{font-size:13px}.back:hover{color:var(--t1)}
+  h1,h2,h3,h4,b,strong{font-weight:600}
+  [style*="font-weight:900"],[style*="font-weight:800"]{font-weight:600!important}
+
+  /* Mobil: üst bar, yatay kayan menü */
+  @media (max-width:900px){
+    nav{position:sticky;top:0;width:auto;inset:auto;flex-direction:row;align-items:center;padding:12px 16px;border-inline-end:0;border-bottom:1px solid var(--border);gap:12px;background:rgba(9,9,11,.92);backdrop-filter:blur(10px)}
+    .brand{padding:0}.brand span{display:none}
+    .tabs{flex-direction:row;overflow-x:auto;flex-wrap:nowrap;scrollbar-width:none}
+    .tabs::-webkit-scrollbar{display:none}
+    .tab{white-space:nowrap;padding:7px 11px}
+    .tab.active::before{display:none}
+    .who{flex-direction:row;border:0;padding:0}.who #whoLbl{display:none}.who .btn{width:auto}
+    .main{margin:0;padding:20px 16px 48px}
+  }
 </style>
 </head>
 <body>
 
 <div id="login">
   <div class="login-box">
-    <div style="font-size:44px;margin-bottom:14px">🎓</div>
+    <img src="/logo.png" alt="" class="login-logo">
     <h1>LearnTurkish AI</h1>
     <p>Yönetim ve Özel Ders Paneli</p>
     <input type="email" class="inp" id="email" placeholder="E-posta" autocomplete="email" onkeydown="if(event.key==='Enter')document.getElementById('pwd').focus()">
@@ -1625,6 +1716,13 @@ window.addEventListener('load', async () => {
   const { data: { session } } = await db.auth.getSession();
   if (session) await enter(); else $('email').focus();
 });
+</script>
+<script>
+// Premium tema: başlıklardaki dekoratif emojileri kaldır (sade görünüm)
+(function(){const re=/^[\p{Extended_Pictographic}\u{1F1E6}-\u{1F1FF}️‍\s]+/u;
+function clean(root){root.querySelectorAll('h2,h3,h4').forEach(h=>{const n=h.firstChild;if(n&&n.nodeType===3&&re.test(n.nodeValue)){n.nodeValue=n.nodeValue.replace(re,'');}});}
+const v=document.getElementById('view');if(v){new MutationObserver(()=>clean(v)).observe(v,{childList:true,subtree:true});}
+const m=document.getElementById('modal');if(m){new MutationObserver(()=>clean(m)).observe(m,{childList:true,subtree:true});}})();
 </script>
 </body>
 </html>
