@@ -123,8 +123,8 @@
   .main > h2,.main h2{font-size:22px;font-weight:600;letter-spacing:-.4px}
 
   /* KPI tiles */
-  .stats{gap:1px;background:var(--border);border:1px solid var(--border);border-radius:var(--radius);overflow:hidden;margin-bottom:18px}
-  .stat{background:var(--surface);border:0;border-radius:0;padding:18px 20px;text-align:start}
+  .stats{display:flex;flex-wrap:wrap;gap:0;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);overflow:hidden;margin-bottom:18px}
+  .stat{flex:1 1 160px;background:transparent;border:0;border-radius:0;padding:18px 20px;text-align:start;box-shadow:1px 0 0 var(--border),0 1px 0 var(--border)}
   .stat .num{font-size:24px;font-weight:600;letter-spacing:-.5px;font-variant-numeric:tabular-nums}
   .stat .lbl{font-size:12px;margin-top:4px}
   .stat.click:hover{background:var(--surface-2);border-color:transparent}
