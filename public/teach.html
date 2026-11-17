@@ -1018,6 +1018,8 @@ async function viewOverview(silent){
 
     ${growthCard(B.growth)}
 
+    <div id="ig-card"></div>
+
     <div class="grid">
       <div class="card"><h3>👥 Kullanıcılar ve devam edenler</h3>
         <table><tbody>
@@ -1242,6 +1244,7 @@ async function viewOverview(silent){
       <div id="ai_out">${window.__AI?renderAdvice(window.__AI):'<p class="small muted">Paneldeki tüm rakamlar (kullanıcı, tutunma, abone, mağaza, ülkeler, reklam kampanyaları) AI\'a verilir; somut öneri ve bütçe tavsiyesi döner.</p>'}</div>
     </div>
     <p class="muted small"><span style="color:var(--green)">●</span> Canlı: 5 dakikada bir kendini yeniler (sekme açıkken) · son güncelleme ${new Date(B.generated_at).toLocaleTimeString('tr-TR')} · Meta harcaması saatlik, mağaza kazancı günlük otomatik çekilir.</p>`;
+  loadIgCard();
   if (silent) window.scrollTo(0, keepY);
   // Canli: sadece Genel Bakis acikken ve bir detay penceresi acik degilken yenile
   // Veritabani yukunu dusuk tut: 5 dakikada bir, sadece sekme gorunurken yenile
@@ -1250,6 +1253,38 @@ async function viewOverview(silent){
     if (document.visibilityState !== 'visible' || $('modalBg').style.display === 'flex') { OV_TIMER = setTimeout(tick, 60000); return; }
     viewOverview(true);
   }, 300000);
+}
+// ---- Instagram büyüme kartı (social_stats_daily: saatlik Graph API senkronu) ----
+const IG_TARGET = 5000;
+async function loadIgCard(){
+  const el = $('ig-card'); if (!el) return;
+  try {
+    const [rows, ads] = await Promise.all([
+      q(db.from('social_stats_daily').select('day,followers,posts').eq('platform','instagram').order('day',{ascending:true}).limit(120)),
+      q(db.from('meta_ad_spend_daily').select('day,spend_usd,campaign_name').ilike('campaign_name','%Takipçi%')),
+    ]);
+    if (!rows.length) { el.innerHTML=''; return; }
+    const first = rows[0], last = rows[rows.length-1];
+    const gained = (last.followers||0) - (first.followers||0);
+    const spend = ads.reduce((a,r)=>a+Number(r.spend_usd||0),0);
+    const cpf = gained>0 && spend>0 ? spend/gained : null;
+    const left = Math.max(0, IG_TARGET-(last.followers||0));
+    const pctv = Math.min(100, Math.round((last.followers||0)/IG_TARGET*100));
+    const days = rows.slice(-30);
+    const diffs = days.map((r,i)=> i===0 ? null : (r.followers||0)-(days[i-1].followers||0));
+    const maxD = Math.max(1, ...diffs.filter(x=>x!=null));
+    el.innerHTML = `<div class="card"><div class="row between" style="margin-bottom:14px"><h3 style="margin:0">Instagram · @learnturkish.ai</h3><a class="small muted" href="https://www.instagram.com/learnturkish.ai/" target="_blank" rel="noopener">Profili aç →</a></div>
+      <div class="stats" style="margin-bottom:16px">
+        <div class="stat"><div class="num">${nf(last.followers)}</div><div class="lbl">Takipçi</div></div>
+        <div class="stat"><div class="num" style="color:var(--green)">+${nf(gained)}</div><div class="lbl">${fmtD(first.day)}'den beri</div></div>
+        <div class="stat"><div class="num">${money(spend)}</div><div class="lbl">Takipçi reklamı harcaması</div></div>
+        <div class="stat"><div class="num">${cpf!=null?money(cpf):'-'}</div><div class="lbl">Takipçi başı maliyet</div><div class="small muted">organik dahil, üst sınır</div></div>
+      </div>
+      <div class="row between small" style="margin-bottom:6px"><b>Hedef: ${nf(IG_TARGET)} takipçi</b><span class="muted">${pctv}% · kalan ${nf(left)}${cpf?` · tahmini bütçe ${money(left*cpf)}`:''}</span></div>
+      <div class="bar" style="height:8px;margin-bottom:16px"><div style="width:${pctv}%;background:var(--r)"></div></div>
+      ${days.length>1?`<div class="small muted" style="margin-bottom:6px">Günlük yeni takipçi</div><div style="display:flex;align-items:flex-end;gap:4px;height:56px">${days.slice(1).map((r,i)=>{const d=diffs[i+1]||0;return `<div title="${fmtD(r.day)}: ${d>=0?'+':''}${d}" style="flex:1;height:${Math.max(3,Math.round(Math.max(0,d)/maxD*56))}px;background:var(--t2);opacity:.75;border-radius:2px"></div>`;}).join('')}</div>`:''}
+      <p class="small muted" style="margin-top:10px">Saatte bir otomatik güncellenir (Meta Graph API).</p></div>`;
+  } catch(e) { el.innerHTML = `<div class="card small muted">Instagram verisi alınamadı: ${esc(e.message)}</div>`; }
 }
 // ---- Detay pencereleri (kartlara tiklayinca) ----
 let UM = null;
