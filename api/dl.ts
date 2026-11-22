@@ -7,6 +7,7 @@
 //   /dl?src=poster_tr      → +UTM tracking (poster TR'den geldi)
 //   /dl?src=poster_en      → +UTM tracking (poster EN'den geldi)
 //   /dl?src=website        → +UTM tracking (website'den geldi)
+//   /dl?src=ad_meta_tomer  → utm_medium=paid (Meta reklami; Play Console referrer + App Store ct kampanya raporu)
 //
 // Masaüstü → fallback olarak '/' (henüz /download sayfası yok)
 
@@ -23,7 +24,7 @@ export default function handler(req: any, res: any) {
 
   const utmParams = new URLSearchParams({
     utm_source: src,
-    utm_medium: src.startsWith('poster_') ? 'poster' : 'web',
+    utm_medium: src.startsWith('poster_') ? 'poster' : src.startsWith('ad_') ? 'paid' : 'web',
     utm_campaign: 'app_download',
   });
 
