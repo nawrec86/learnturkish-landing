@@ -15,7 +15,27 @@ const APP_STORE_URL = 'https://apps.apple.com/tr/app/learnturkish-ai/id676127784
 const PLAY_STORE_URL = 'https://play.google.com/store/apps/details?id=com.nawrec86.learnturkishai';
 const DESKTOP_FALLBACK = '/';
 
-export default function handler(req: any, res: any) {
+// Tiklama sayaci: ilgili migration (dl_hits + log_dl_hit RPC) uygulanmamissa sessizce basarisiz olur,
+// yonlendirmeyi ASLA bozmaz. Anon anahtar public (teach.html ile ayni).
+const SUPABASE_URL = 'https://ilxahosomxpgokyilpco.supabase.co';
+const SUPABASE_ANON_KEY = process.env.SUPABASE_ANON_KEY || 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImlseGFob3NvbXhwZ29reWlscGNvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzM2NjA2MTcsImV4cCI6MjA4OTIzNjYxN30.p7LB1qmOZ7_Nq1udQVU-BHMF8VRHjP9QmJtu6ZLTVU8'; // anon (public) anahtar; teach.html ile ayni
+
+async function logHit(src: string, platform: string): Promise<void> {
+  if (!SUPABASE_ANON_KEY) return;
+  try {
+    const ctrl = new AbortController();
+    const t = setTimeout(() => ctrl.abort(), 800);
+    await fetch(`${SUPABASE_URL}/rest/v1/rpc/log_dl_hit`, {
+      method: 'POST',
+      headers: { apikey: SUPABASE_ANON_KEY, Authorization: `Bearer ${SUPABASE_ANON_KEY}`, 'Content-Type': 'application/json' },
+      body: JSON.stringify({ p_src: src, p_platform: platform }),
+      signal: ctrl.signal,
+    });
+    clearTimeout(t);
+  } catch { /* sayac yonlendirmeyi bozmasin */ }
+}
+
+export default async function handler(req: any, res: any) {
   const ua: string = (req.headers && req.headers['user-agent']) || '';
   const src: string = (req.query && typeof req.query.src === 'string' && req.query.src) || 'direct';
 
@@ -29,6 +49,7 @@ export default function handler(req: any, res: any) {
   });
 
   let redirectUrl: string;
+  await logHit(src, isIOS ? 'ios' : isAndroid ? 'android' : 'desktop');
 
   if (isIOS) {
     redirectUrl = `${APP_STORE_URL}?ct=${encodeURIComponent(src)}`;
